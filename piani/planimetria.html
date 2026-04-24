@@ -8,6 +8,7 @@
 </head>
 <body>
   <div class="toolbar">
+    <a href="../index.html" class="home-cta-link-toolbar">Torna alla home</a>
     <button id="zoomOut" type="button">Zoom -</button>
     <button id="zoomIn" type="button">Zoom +</button>
     <button id="zoomReset" type="button">Reset 100%</button>
@@ -65,27 +66,45 @@
         <div class="table-editor" id="apparecchiaturaEditor">
           <div class="table-editor-grid">
             <label class="table-editor-field">
-              <span>Tipologia</span>
+              <span>Apparecchiatura</span>
               <input id="appTipologiaInput" type="text">
             </label>
             <label class="table-editor-field">
-              <span>QTA</span>
+              <span>Ancoraggio</span>
+              <select id="appInstallazioneTipologiaInput" class="table-editor-tipologia-select">
+                <option value="" selected></option>
+                <option value="Carrellato">Carrellato</option>
+                <option value="Parete">Parete</option>
+                <option value="Pensile">Pensile</option>
+                <option value="Soffitto">Soffitto</option>
+              </select>
+            </label>
+            <label class="table-editor-field">
+              <span>Qta</span>
               <input id="appQtaInput" type="number" min="0">
             </label>
             <label class="table-editor-field">
               <span>Nuovo</span>
-              <input id="appNuovoInput" type="text">
+              <select id="appNuovoInput">
+                <option value="" selected></option>
+                <option value="Si">Si</option>
+                <option value="No">No</option>
+              </select>
             </label>
             <label class="table-editor-field">
-              <span>trasferimento</span>
-              <input id="appTrasferimentoInput" type="text">
+              <span>Trasferimento</span>
+              <select id="appTrasferimentoInput">
+                <option value="" selected></option>
+                <option value="Si">Si</option>
+                <option value="No">No</option>
+              </select>
             </label>
             <label class="table-editor-field">
               <span>inv</span>
               <input id="appInvInput" type="text">
             </label>
             <label class="table-editor-field">
-              <span>note</span>
+              <span>Note</span>
               <input id="appNoteInput" type="text">
             </label>
           </div>
@@ -98,12 +117,13 @@
         <table class="modal-table">
           <thead>
             <tr>
+              <th>Apparecchiatura</th>
               <th>Tipologia</th>
-              <th>QTA</th>
+              <th>Qta</th>
               <th>Nuovo</th>
-              <th>trasferimento</th>
+              <th>Trasferimento</th>
               <th>inv</th>
-              <th>note</th>
+              <th>Note</th>
               <th>Azioni</th>
             </tr>
           </thead>

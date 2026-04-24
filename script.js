@@ -25,6 +25,7 @@ const contentImpiantistica = document.getElementById('contentImpiantistica');
 const apparecchiaturaTableBody = document.getElementById('apparecchiaturaTableBody');
 const impiantisticaTableBody = document.getElementById('impiantisticaTableBody');
 const appTipologiaInput = document.getElementById('appTipologiaInput');
+const appInstallazioneTipologiaInput = document.getElementById('appInstallazioneTipologiaInput');
 const appQtaInput = document.getElementById('appQtaInput');
 const appNuovoInput = document.getElementById('appNuovoInput');
 const appTrasferimentoInput = document.getElementById('appTrasferimentoInput');
@@ -55,6 +56,7 @@ const mapLoadMinMs = 2000;
 let mapLoadMinMet = false;
 let mapLoadResourceMet = false;
 let mapLoadMinTimeoutId = null;
+const apparecchiaturaTipologiaOptions = ['', 'Carrellato', 'Parete', 'Pensile', 'Soffitto'];
 
 function resetMapLoadSequence() {
   console.log('[MapLoader] resetMapLoadSequence');
@@ -154,37 +156,9 @@ function validateFloorFromQueryString() {
   return true;
 }
 
-const apparecchiaturaRows = [
-  {
-    tipologia: 'Monitor paziente',
-    qta: '2',
-    nuovo: 'Si',
-    trasferimento: 'No',
-    inv: 'INV-001245',
-    note: 'Verifica annuale pianificata'
-  },
-  {
-    tipologia: 'Defibrillatore',
-    qta: '1',
-    nuovo: 'No',
-    trasferimento: 'Si',
-    inv: 'INV-004872',
-    note: 'Trasferito da terapia intensiva'
-  }
-];
+const apparecchiaturaRows = [];
 
-const impiantisticaRows = [
-  {
-    tipologia: 'Punti rete dati',
-    qtaPresenti: '6',
-    qtaDaImplementare: '2'
-  },
-  {
-    tipologia: 'Prese elettriche dedicate',
-    qtaPresenti: '8',
-    qtaDaImplementare: '4'
-  }
-];
+const impiantisticaRows = [];
 
 function updateZoomDisplay() {
   mapObject.style.width = 'auto';
@@ -333,6 +307,45 @@ function escapeHtml(value) {
     .replaceAll("'", '&#39;');
 }
 
+function normalizeApparecchiaturaTipologiaValue(value) {
+  const trimmedValue = String(value || '').trim();
+  if (trimmedValue === '') {
+    return '';
+  }
+
+  if (apparecchiaturaTipologiaOptions.includes(trimmedValue)) {
+    return trimmedValue;
+  }
+
+  const normalizedValue = trimmedValue.toLowerCase();
+  const legacyToCurrentTipologiaMap = {
+    carrellato: 'Carrellato',
+    'a parete': 'Parete',
+    parete: 'Parete',
+    'su pensile': 'Pensile',
+    pensile: 'Pensile',
+    'a soffitto': 'Soffitto',
+    soffitto: 'Soffitto'
+  };
+
+  return legacyToCurrentTipologiaMap[normalizedValue] || '';
+}
+
+function normalizeApparecchiaturaRow(row) {
+  const safeRow = row && typeof row === 'object' ? row : {};
+  const apparecchiaturaValue = String(safeRow.apparecchiatura || safeRow.tipologia || '-').trim() || '-';
+
+  return {
+    apparecchiatura: apparecchiaturaValue,
+    tipologia: normalizeApparecchiaturaTipologiaValue(safeRow.tipologia),
+    qta: String(safeRow.qta || '0').trim() || '0',
+    nuovo: String(safeRow.nuovo || '-').trim() || '-',
+    trasferimento: String(safeRow.trasferimento || '-').trim() || '-',
+    inv: String(safeRow.inv || '-').trim() || '-',
+    note: String(safeRow.note || '-').trim() || '-'
+  };
+}
+
 function setApparecchiaturaEditMode(isEditing) {
   appAddButton.hidden = isEditing;
   appSaveButton.hidden = !isEditing;
@@ -347,7 +360,8 @@ function setImpiantisticaEditMode(isEditing) {
 
 function getApparecchiaturaFormData() {
   return {
-    tipologia: appTipologiaInput.value.trim(),
+    apparecchiatura: appTipologiaInput.value.trim(),
+    tipologia: normalizeApparecchiaturaTipologiaValue(appInstallazioneTipologiaInput.value),
     qta: appQtaInput.value.trim(),
     nuovo: appNuovoInput.value.trim(),
     trasferimento: appTrasferimentoInput.value.trim(),
@@ -366,6 +380,7 @@ function getImpiantisticaFormData() {
 
 function resetApparecchiaturaForm() {
   appTipologiaInput.value = '';
+  appInstallazioneTipologiaInput.value = '';
   appQtaInput.value = '';
   appNuovoInput.value = '';
   appTrasferimentoInput.value = '';
@@ -384,20 +399,25 @@ function resetImpiantisticaForm() {
 }
 
 function renderApparecchiaturaTable() {
-  const rowsHtml = apparecchiaturaRows.map((row, index) => `
+  const rowsHtml = apparecchiaturaRows.map((row, index) => {
+    const normalizedRow = normalizeApparecchiaturaRow(row);
+    apparecchiaturaRows[index] = normalizedRow;
+    return `
     <tr>
-      <td>${escapeHtml(row.tipologia)}</td>
-      <td>${escapeHtml(row.qta)}</td>
-      <td>${escapeHtml(row.nuovo)}</td>
-      <td>${escapeHtml(row.trasferimento)}</td>
-      <td>${escapeHtml(row.inv)}</td>
-      <td>${escapeHtml(row.note)}</td>
+      <td>${escapeHtml(normalizedRow.apparecchiatura)}</td>
+      <td>${escapeHtml(normalizedRow.tipologia || '-')}</td>
+      <td>${escapeHtml(normalizedRow.qta)}</td>
+      <td>${escapeHtml(normalizedRow.nuovo)}</td>
+      <td>${escapeHtml(normalizedRow.trasferimento)}</td>
+      <td>${escapeHtml(normalizedRow.inv)}</td>
+      <td>${escapeHtml(normalizedRow.note)}</td>
       <td><button type="button" class="row-edit-button" data-app-edit="${index}">Modifica</button></td>
     </tr>
-  `).join('');
+  `;
+  }).join('');
 
   apparecchiaturaTableBody.innerHTML = rowsHtml || `
-    <tr><td colspan="7">Nessun dato inserito.</td></tr>
+    <tr><td colspan="8">Nessun dato inserito.</td></tr>
   `;
 
   apparecchiaturaTableBody.querySelectorAll('[data-app-edit]').forEach((button) => {
@@ -408,12 +428,16 @@ function renderApparecchiaturaTable() {
         return;
       }
 
-      appTipologiaInput.value = selectedRow.tipologia;
-      appQtaInput.value = selectedRow.qta;
-      appNuovoInput.value = selectedRow.nuovo;
-      appTrasferimentoInput.value = selectedRow.trasferimento;
-      appInvInput.value = selectedRow.inv;
-      appNoteInput.value = selectedRow.note;
+      const normalizedSelectedRow = normalizeApparecchiaturaRow(selectedRow);
+      apparecchiaturaRows[rowIndex] = normalizedSelectedRow;
+
+      appTipologiaInput.value = normalizedSelectedRow.apparecchiatura;
+      appInstallazioneTipologiaInput.value = normalizedSelectedRow.tipologia;
+      appQtaInput.value = normalizedSelectedRow.qta;
+      appNuovoInput.value = normalizedSelectedRow.nuovo;
+      appTrasferimentoInput.value = normalizedSelectedRow.trasferimento;
+      appInvInput.value = normalizedSelectedRow.inv;
+      appNoteInput.value = normalizedSelectedRow.note;
       editingApparecchiaturaIndex = rowIndex;
       setApparecchiaturaEditMode(true);
     });
@@ -580,14 +604,15 @@ function initializeMapDimensions() {
 
 function handleAddApparecchiatura() {
   const rawRow = getApparecchiaturaFormData();
-  const newRow = {
-    tipologia: rawRow.tipologia || '-',
+  const newRow = normalizeApparecchiaturaRow({
+    apparecchiatura: rawRow.apparecchiatura || '-',
+    tipologia: rawRow.tipologia,
     qta: rawRow.qta || '0',
     nuovo: rawRow.nuovo || '-',
     trasferimento: rawRow.trasferimento || '-',
     inv: rawRow.inv || '-',
     note: rawRow.note || '-'
-  };
+  });
 
   const hasAtLeastOneTypedValue = Object.values(rawRow).some((value) => value !== '');
   if (!hasAtLeastOneTypedValue) {
@@ -605,9 +630,9 @@ function handleSaveApparecchiatura() {
     return;
   }
 
-  const updatedRow = getApparecchiaturaFormData();
-  if (!updatedRow.tipologia || !updatedRow.qta) {
-    window.alert('Compila almeno Tipologia e QTA per Apparecchiatura.');
+  const updatedRow = normalizeApparecchiaturaRow(getApparecchiaturaFormData());
+  if (!updatedRow.apparecchiatura || !updatedRow.qta) {
+    window.alert('Compila almeno Apparecchiatura e QTA per Apparecchiatura.');
     return;
   }
 
