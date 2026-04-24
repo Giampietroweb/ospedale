@@ -98,6 +98,31 @@ Interpretazione visiva:
 
 - `*P6-191-060*`
 
+### 3.4 Aggregazione in stringa unica (automazione)
+
+Dopo la delimitazione `*...*`, ogni etichetta spezzata su piu nodi `<text>` deve essere ricomposta in un solo nodo con stringa completa.
+
+Pattern tipico in input (nodi separati):
+
+- `*P6`
+- `-`
+- `191`
+- `191` (duplicato grafico possibile)
+- `-`
+- `060*`
+
+Output atteso:
+
+- `*P6-191-060*` in un unico `<text>...</text>`
+
+Regole operative:
+
+- aggregare solo sequenze che iniziano con `*` e terminano con `*`
+- preservare gli attributi grafici del primo nodo (`fill`, `font-size`, `stroke`, ecc.)
+- se il token centrale e duplicato per resa grafica, mantenerne una sola copia nella stringa finale
+- eliminare i nodi intermedi usati solo per comporre il codice
+- processo idempotente: rieseguire la pipeline non deve creare duplicati o alterazioni progressive
+
 ## 4) Regole del viewer HTML (`insex.html`)
 
 ### 4.1 Struttura e strumenti
@@ -132,6 +157,7 @@ Incremento/decremento a click:
 - Evitare sostituzioni manuali massive nel file SVG: preferire script idempotenti che:
   - rimuovono prima delimitatori/stili obsoleti
   - riapplicano regole in modo deterministico
+  - aggregano i frammenti delimitati in una sola stringa per etichetta
 - Dopo modifiche ai pattern, verificare almeno un caso per ciascun formato:
   - `P6-AAA-001`
   - `P6-191-060`
@@ -169,18 +195,25 @@ Obiettivi:
 - se il codice è spezzato su più <text>, metti * all’inizio del primo frammento e alla fine dell’ultimo
 - assicurati che i pattern numerici (tipo P6-191-060) siano inclusi
 
-5) Z-index equivalente in SVG:
+5) Aggregazione automatica in stringa unica:
+- dopo la delimitazione, ricomponi ogni codice spezzato in un solo nodo <text>
+- se esistono duplicazioni del token centrale (es. 191 ripetuto), mantieni un solo token nella stringa finale
+- esempio finale richiesto: *P6-191-060* in un unico <text>
+- preserva stile e attributi del primo nodo ed elimina i nodi intermedi di composizione
+
+6) Z-index equivalente in SVG:
 - porta tutti i <text> evidenziati in fondo al file SVG per renderli sopra le linee
 
-6) Viewer HTML:
+7) Viewer HTML:
 - aggiorna/crea insex.html per mostrare la nuova SVG
 - zoom di default 200%
 - zoom +/- del 20%
 - reset 100%
 - centraggio iniziale e mantenimento del centro durante zoom in/out
 
-7) Verifiche finali:
+8) Verifiche finali:
 - controlla che non esistano casi senza delimitazione completa (*inizio e fine*)
 - controlla che non esistano casi *P6* (senza blocchi successivi)
+- controlla che non restino etichette P6 spezzate su più nodi consecutivi
 - riporta un breve riepilogo numerico delle occorrenze trovate/modificate
 ```
