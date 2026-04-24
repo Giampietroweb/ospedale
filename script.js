@@ -9,14 +9,18 @@ const mapLoaderOverlay = document.getElementById('mapLoaderOverlay');
 const mapErrorCenterMessage = document.getElementById('mapErrorCenterMessage');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalCloseButton = document.getElementById('modalClose');
+const roomValidationStatus = document.getElementById('roomValidationStatus');
 const roomCodeValue = document.getElementById('roomCodeValue');
-const roomDescriptionValue = document.getElementById('roomDescriptionValue');
+const roomCodeNameValue = document.getElementById('roomCodeNameValue');
+const roomOccupazioneValue = document.getElementById('roomOccupazioneValue');
 const roomDepartmentValue = document.getElementById('roomDepartmentValue');
 const roomCodeInput = document.getElementById('roomCodeInput');
-const roomDescriptionInput = document.getElementById('roomDescriptionInput');
+const roomCodeNameInput = document.getElementById('roomCodeNameInput');
+const roomOccupazioneInput = document.getElementById('roomOccupazioneInput');
 const roomDepartmentInput = document.getElementById('roomDepartmentInput');
 const editRoomCodeButton = document.getElementById('editRoomCodeButton');
-const editRoomDescriptionButton = document.getElementById('editRoomDescriptionButton');
+const editRoomCodeNameButton = document.getElementById('editRoomCodeNameButton');
+const editRoomOccupazioneButton = document.getElementById('editRoomOccupazioneButton');
 const editRoomDepartmentButton = document.getElementById('editRoomDepartmentButton');
 const sectionApparecchiaturaButton = document.getElementById('sectionApparecchiatura');
 const sectionImpiantisticaButton = document.getElementById('sectionImpiantistica');
@@ -51,6 +55,7 @@ let mapLoadMinMet = false;
 let mapLoadResourceMet = false;
 let mapLoadMinTimeoutId = null;
 const apparecchiaturaTipologiaOptions = ['', 'Carrellato', 'Parete', 'Pensile', 'Soffitto'];
+let occurrencesMap = null;
 
 function resetMapLoadSequence() {
   console.log('[MapLoader] resetMapLoadSequence');
@@ -148,6 +153,38 @@ function validateFloorFromQueryString() {
   setCenteredMapErrorMessage('');
   setMapControlsEnabled(true);
   return true;
+}
+
+async function loadOccurrencesData(floorName) {
+  try {
+    const response = await fetch(`../planimetrie/occorenze-${floorName}.json`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const records = await response.json();
+    if (!Array.isArray(records)) {
+      throw new Error('Formato JSON non valido: array atteso');
+    }
+
+    occurrencesMap = new Map();
+    records.forEach((record) => {
+      if (!record || typeof record !== 'object') {
+        return;
+      }
+
+      const roomCode = String(record['Codice semplificato'] || '').trim();
+      if (roomCode === '') {
+        return;
+      }
+
+      occurrencesMap.set(roomCode, record);
+    });
+    console.log('[Occorrenze] Caricate occorrenze', { count: occurrencesMap.size, floorName });
+  } catch (error) {
+    console.error('[Occorrenze] Errore caricamento JSON:', error);
+    occurrencesMap = null;
+  }
 }
 
 const apparecchiaturaRows = [];
@@ -267,10 +304,15 @@ const editableFieldConfigs = {
     inputElement: roomCodeInput,
     buttonElement: editRoomCodeButton
   },
-  roomDescription: {
-    valueElement: roomDescriptionValue,
-    inputElement: roomDescriptionInput,
-    buttonElement: editRoomDescriptionButton
+  roomCodeName: {
+    valueElement: roomCodeNameValue,
+    inputElement: roomCodeNameInput,
+    buttonElement: editRoomCodeNameButton
+  },
+  roomOccupazione: {
+    valueElement: roomOccupazioneValue,
+    inputElement: roomOccupazioneInput,
+    buttonElement: editRoomOccupazioneButton
   },
   roomDepartment: {
     valueElement: roomDepartmentValue,
@@ -577,11 +619,51 @@ function setActiveModalSection(sectionName) {
   contentImpiantistica.hidden = isApparecchiatura;
 }
 
+function clearRoomValidationStatus() {
+  roomValidationStatus.textContent = '';
+  roomValidationStatus.hidden = true;
+  roomValidationStatus.classList.remove('is-ok', 'is-error');
+}
+
+function showRoomValidationOk() {
+  roomValidationStatus.textContent = 'Ok, locale riconosciuto.';
+  roomValidationStatus.hidden = false;
+  roomValidationStatus.classList.add('is-ok');
+  roomValidationStatus.classList.remove('is-error');
+}
+
+function showRoomValidationError(message) {
+  roomValidationStatus.textContent = message;
+  roomValidationStatus.hidden = false;
+  roomValidationStatus.classList.add('is-error');
+  roomValidationStatus.classList.remove('is-ok');
+}
+
+function validateRoomOccurrence(roomCode) {
+  if (!occurrencesMap) {
+    showRoomValidationError('Dati occorrenze non disponibili');
+    return;
+  }
+
+  const record = occurrencesMap.get(roomCode);
+  if (!record) {
+    showRoomValidationError('locale non trovato');
+    return;
+  }
+
+  roomCodeNameValue.textContent = String(record.Nome || '-').trim() || '-';
+  roomOccupazioneValue.textContent = String(record.Occupazione || '-').trim() || '-';
+  showRoomValidationOk();
+}
+
 function openModal(textValue) {
   const roomCode = getRoomCodeWithoutAsterisks(textValue);
   roomCodeValue.textContent = roomCode;
-  roomDescriptionValue.textContent = 'Placeholder descrizione stanza';
+  roomCodeNameValue.textContent = '-';
+  roomOccupazioneValue.textContent = '-';
   roomDepartmentValue.textContent = 'cardiologia';
+  clearRoomValidationStatus();
+  validateRoomOccurrence(roomCode);
   resetEditableFieldsState();
   resetApparecchiaturaForm();
   editingImpiantisticaIndex = null;
@@ -734,7 +816,8 @@ zoomOutButton.addEventListener('click', handleZoomOut);
 zoomResetButton.addEventListener('click', handleZoomReset);
 modalCloseButton.addEventListener('click', closeModal);
 setupEditableFieldEvents('roomCode');
-setupEditableFieldEvents('roomDescription');
+setupEditableFieldEvents('roomCodeName');
+setupEditableFieldEvents('roomOccupazione');
 setupEditableFieldEvents('roomDepartment');
 appAddButton.addEventListener('click', handleAddApparecchiatura);
 appSaveButton.addEventListener('click', handleSaveApparecchiatura);
@@ -751,6 +834,7 @@ const isFloorMapReady = validateFloorFromQueryString();
 console.log('[MapLoader] isFloorMapReady', { isFloorMapReady, requestedFloorName });
 
 if (isFloorMapReady) {
+  loadOccurrencesData(requestedFloorName);
   startMapLoadSequence();
 
   let mapInitDone = false;

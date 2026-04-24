@@ -234,6 +234,31 @@ body::-webkit-scrollbar-corner,
   color: #0f172a;
 }
 
+.modal-validation-status {
+  display: inline-flex;
+  align-items: center;
+  margin: 0 0 10px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.modal-validation-status.is-ok {
+  color: #166534;
+  background: #dcfce7;
+  border-color: #86efac;
+}
+
+.modal-validation-status.is-error {
+  color: #991b1b;
+  background: #fee2e2;
+  border-color: #fca5a5;
+}
+
 .modal-header-fields {
   display: flex;
   flex-direction: row;

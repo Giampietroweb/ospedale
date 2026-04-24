@@ -32,6 +32,7 @@
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <button id="modalClose" class="modal-close" type="button" aria-label="Chiudi modale">&times;</button>
       <h2 id="modalTitle" class="modal-title">Dettagli stanza</h2>
+      <div id="roomValidationStatus" class="modal-validation-status" hidden></div>
       <div class="modal-header-fields">
         <div class="modal-field">
           <span class="modal-field-label">Id-stanza (Codice semplificato)</span>
@@ -42,19 +43,19 @@
           </div>
         </div>
         <div class="modal-field">
-          <span class="modal-field-label">Codice</span>
+          <span class="modal-field-label">Codice (Nome)</span>
           <div class="modal-field-main">
-            <span id="roomDescriptionValue" class="modal-field-value">DG2 (Nome)</span>
-            <input id="roomDescriptionInput" class="modal-field-input" type="text" hidden>
-            <button id="editRoomDescriptionButton" class="modal-edit-button" type="button">Modifica</button>
+            <span id="roomCodeNameValue" class="modal-field-value">DG2</span>
+            <input id="roomCodeNameInput" class="modal-field-input" type="text" hidden>
+            <button id="editRoomCodeNameButton" class="modal-edit-button" type="button">Modifica</button>
           </div>
         </div>
         <div class="modal-field">
           <span class="modal-field-label">Descrizione (Occupazione)</span>
           <div class="modal-field-main">
-            <span id="roomDescriptionValue" class="modal-field-value">Placeholder descrizione stanza</span>
-            <input id="roomDescriptionInput" class="modal-field-input" type="text" hidden>
-            <button id="editRoomDescriptionButton" class="modal-edit-button" type="button">Modifica</button>
+            <span id="roomOccupazioneValue" class="modal-field-value">Placeholder descrizione stanza</span>
+            <input id="roomOccupazioneInput" class="modal-field-input" type="text" hidden>
+            <button id="editRoomOccupazioneButton" class="modal-edit-button" type="button">Modifica</button>
           </div>
         </div>
         <div class="modal-field">
