@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mappa SVG con Zoom</title>
+  <style>
+    :root {
+      color-scheme: light;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #f5f5f5;
+    }
+
+    .toolbar {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      background: #ffffff;
+      border-bottom: 1px solid #d9d9d9;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    button {
+      padding: 8px 12px;
+      border: 1px solid #bcbcbc;
+      background: #ffffff;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #f0f0f0;
+    }
+
+    .zoom-label {
+      min-width: 70px;
+      font-weight: 700;
+    }
+
+    .viewer {
+      flex: 1;
+      overflow: auto;
+      padding: 12px;
+    }
+
+    .map-wrapper {
+      width: max-content;
+    }
+
+    .map-image {
+      display: block;
+      max-width: none;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="toolbar">
+    <button id="zoomOut" type="button">Zoom -</button>
+    <button id="zoomIn" type="button">Zoom +</button>
+    <button id="zoomReset" type="button">Reset 100%</button>
+    <span id="zoomValue" class="zoom-label">100%</span>
+  </div>
+
+  <div id="viewer" class="viewer">
+    <div id="mapWrapper" class="map-wrapper">
+      <img src="mappa.svg" alt="Mappa SVG" class="map-image">
+    </div>
+  </div>
+
+  <script>
+    const zoomOutButton = document.getElementById('zoomOut');
+    const zoomInButton = document.getElementById('zoomIn');
+    const zoomResetButton = document.getElementById('zoomReset');
+    const zoomValueLabel = document.getElementById('zoomValue');
+    const viewer = document.getElementById('viewer');
+    const mapImage = document.querySelector('.map-image');
+
+    const minZoom = 0.1;
+    const maxZoom = 50;
+    const zoomStep = 0.2;
+    let currentZoom = 2;
+    let baseImageWidth = 0;
+    let baseImageHeight = 0;
+
+    function updateZoomDisplay() {
+      mapImage.style.width = `${baseImageWidth * currentZoom}px`;
+      mapImage.style.height = `${baseImageHeight * currentZoom}px`;
+      zoomValueLabel.textContent = `${Math.round(currentZoom * 100)}%`;
+    }
+
+    function centerMapInViewport() {
+      const targetScrollLeft = Math.max(0, (viewer.scrollWidth - viewer.clientWidth) / 2);
+      const targetScrollTop = Math.max(0, (viewer.scrollHeight - viewer.clientHeight) / 2);
+
+      viewer.scrollLeft = targetScrollLeft;
+      viewer.scrollTop = targetScrollTop;
+    }
+
+    function updateZoomKeepingViewportCenter() {
+      const centerRatioX = viewer.scrollWidth > 0
+        ? (viewer.scrollLeft + (viewer.clientWidth / 2)) / viewer.scrollWidth
+        : 0.5;
+      const centerRatioY = viewer.scrollHeight > 0
+        ? (viewer.scrollTop + (viewer.clientHeight / 2)) / viewer.scrollHeight
+        : 0.5;
+
+      updateZoomDisplay();
+
+      viewer.scrollLeft = Math.max(0, (viewer.scrollWidth * centerRatioX) - (viewer.clientWidth / 2));
+      viewer.scrollTop = Math.max(0, (viewer.scrollHeight * centerRatioY) - (viewer.clientHeight / 2));
+    }
+
+    function handleZoomIn() {
+      currentZoom = Math.min(maxZoom, Number((currentZoom + zoomStep).toFixed(2)));
+      updateZoomKeepingViewportCenter();
+    }
+
+    function handleZoomOut() {
+      currentZoom = Math.max(minZoom, Number((currentZoom - zoomStep).toFixed(2)));
+      updateZoomKeepingViewportCenter();
+    }
+
+    function handleZoomReset() {
+      currentZoom = 1;
+      updateZoomDisplay();
+      centerMapInViewport();
+    }
+
+    zoomInButton.addEventListener('click', handleZoomIn);
+    zoomOutButton.addEventListener('click', handleZoomOut);
+    zoomResetButton.addEventListener('click', handleZoomReset);
+
+    mapImage.addEventListener('load', () => {
+      baseImageWidth = mapImage.naturalWidth;
+      baseImageHeight = mapImage.naturalHeight;
+      updateZoomDisplay();
+      centerMapInViewport();
+    });
+
+    if (mapImage.complete) {
+      baseImageWidth = mapImage.naturalWidth;
+      baseImageHeight = mapImage.naturalHeight;
+      updateZoomDisplay();
+      centerMapInViewport();
+    }
+  </script>
+</body>
+</html>
