@@ -16,8 +16,15 @@
 
   <div id="viewer" class="viewer">
     <div id="mapWrapper" class="map-wrapper">
-      <object id="mapObject" data="../planimetrie/mappa.svg" type="image/svg+xml" class="map-image" aria-label="Mappa SVG"></object>
+      <object id="mapObject" data="" type="image/svg+xml" class="map-image" aria-label="Mappa SVG"></object>
     </div>
+    <div id="mapLoaderOverlay" class="map-loader-overlay" hidden>
+      <div class="map-loader-content" role="status" aria-live="polite" aria-label="Caricamento mappa in corso">
+        <div class="map-loader-spinner" aria-hidden="true"></div>
+        <p class="map-loader-text">Caricamento mappa…</p>
+      </div>
+    </div>
+    <div id="mapErrorCenterMessage" class="map-error-center-message" hidden></div>
   </div>
 
   <div id="modalOverlay" class="modal-overlay" aria-hidden="true">

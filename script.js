@@ -3,7 +3,10 @@ const zoomInButton = document.getElementById('zoomIn');
 const zoomResetButton = document.getElementById('zoomReset');
 const zoomValueLabel = document.getElementById('zoomValue');
 const viewer = document.getElementById('viewer');
+const mapWrapper = document.getElementById('mapWrapper');
 const mapObject = document.getElementById('mapObject');
+const mapLoaderOverlay = document.getElementById('mapLoaderOverlay');
+const mapErrorCenterMessage = document.getElementById('mapErrorCenterMessage');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalCloseButton = document.getElementById('modalClose');
 const roomCodeValue = document.getElementById('roomCodeValue');
@@ -46,6 +49,110 @@ let baseImageHeight = 0;
 let activeFieldBeingEdited = null;
 let editingApparecchiaturaIndex = null;
 let editingImpiantisticaIndex = null;
+let requestedFloorName = '';
+const floorNamePattern = /^[a-z0-9-]+$/i;
+const mapLoadMinMs = 2000;
+let mapLoadMinMet = false;
+let mapLoadResourceMet = false;
+let mapLoadMinTimeoutId = null;
+
+function resetMapLoadSequence() {
+  console.log('[MapLoader] resetMapLoadSequence');
+  mapLoadMinMet = false;
+  mapLoadResourceMet = false;
+  if (mapLoadMinTimeoutId !== null) {
+    window.clearTimeout(mapLoadMinTimeoutId);
+    mapLoadMinTimeoutId = null;
+  }
+}
+
+function showMapLoader() {
+  console.log('[MapLoader] showMapLoader');
+  if (mapLoaderOverlay) {
+    mapLoaderOverlay.hidden = false;
+  }
+  if (viewer) {
+    viewer.setAttribute('aria-busy', 'true');
+  }
+}
+
+function hideMapLoader() {
+  console.log('[MapLoader] hideMapLoader');
+  if (mapLoaderOverlay) {
+    mapLoaderOverlay.hidden = true;
+  }
+  if (viewer) {
+    viewer.removeAttribute('aria-busy');
+  }
+}
+
+function tryReleaseMapLoader() {
+  console.log('[MapLoader] tryReleaseMapLoader', {
+    mapLoadMinMet,
+    mapLoadResourceMet
+  });
+  if (mapLoadMinMet && mapLoadResourceMet) {
+    hideMapLoader();
+  }
+}
+
+function startMapLoadSequence() {
+  console.log('[MapLoader] startMapLoadSequence', { mapLoadMinMs });
+  resetMapLoadSequence();
+  showMapLoader();
+  mapLoadMinTimeoutId = window.setTimeout(() => {
+    console.log('[MapLoader] minimum timeout met');
+    mapLoadMinMet = true;
+    tryReleaseMapLoader();
+  }, mapLoadMinMs);
+}
+
+function markMapResourceReady() {
+  console.log('[MapLoader] markMapResourceReady');
+  mapLoadResourceMet = true;
+  tryReleaseMapLoader();
+}
+
+function setCenteredMapErrorMessage(text) {
+  if (!mapErrorCenterMessage) {
+    return;
+  }
+
+  mapErrorCenterMessage.textContent = text;
+  mapErrorCenterMessage.hidden = text === '';
+}
+
+function setMapControlsEnabled(isEnabled) {
+  zoomOutButton.disabled = !isEnabled;
+  zoomInButton.disabled = !isEnabled;
+  zoomResetButton.disabled = !isEnabled;
+}
+
+function getFloorNameFromQuery() {
+  const searchParams = new URLSearchParams(window.location.search);
+  return (searchParams.get('piano') || '').trim();
+}
+
+function validateFloorFromQueryString() {
+  const floorName = getFloorNameFromQuery();
+  requestedFloorName = floorName;
+  console.log('[MapLoader] validateFloorFromQueryString', { floorName });
+  if (!floorName) {
+    setCenteredMapErrorMessage('Parametro "piano" mancante nella URL.');
+    setMapControlsEnabled(false);
+    return false;
+  }
+
+  if (!floorNamePattern.test(floorName)) {
+    setCenteredMapErrorMessage('Parametro "piano" non valido.');
+    setMapControlsEnabled(false);
+    return false;
+  }
+
+  setCenteredMapErrorMessage('');
+  setMapControlsEnabled(true);
+  return true;
+}
 
 const apparecchiaturaRows = [
   {
@@ -80,8 +187,12 @@ const impiantisticaRows = [
 ];
 
 function updateZoomDisplay() {
-  mapObject.style.width = `${baseImageWidth * currentZoom}px`;
-  mapObject.style.height = `${baseImageHeight * currentZoom}px`;
+  mapObject.style.width = 'auto';
+  mapObject.style.height = 'auto';
+  mapObject.style.transformOrigin = 'top left';
+  mapObject.style.transform = `scale(${currentZoom})`;
+  mapWrapper.style.width = `${baseImageWidth * currentZoom}px`;
+  mapWrapper.style.height = `${baseImageHeight * currentZoom}px`;
   zoomValueLabel.textContent = `${Math.round(currentZoom * 100)}%`;
 }
 
@@ -438,10 +549,13 @@ function applyFallbackMapSize() {
 }
 
 function initializeMapDimensions() {
+  console.log('[MapLoader] initializeMapDimensions start');
   const svgDocument = mapObject.contentDocument;
   if (!svgDocument || !svgDocument.documentElement) {
-    console.warn('Impossibile accedere al DOM interno di planimetrie/mappa.svg. Se apri il file con file:// avvia un server locale (es. python -m http.server).');
-    applyFallbackMapSize();
+    console.log('[MapLoader] initializeMapDimensions failed: missing svgDocument');
+    setCenteredMapErrorMessage(`Errore nel caricamento della planimetria SVG. Planimetria non trovata: ${requestedFloorName || '-'}.`);
+    setMapControlsEnabled(false);
+    markMapResourceReady();
     return;
   }
 
@@ -457,8 +571,11 @@ function initializeMapDimensions() {
   }
 
   bindOccurrencesClick(svgDocument);
+  setCenteredMapErrorMessage('');
   updateZoomDisplay();
   centerMapInViewport();
+  console.log('[MapLoader] initializeMapDimensions success');
+  markMapResourceReady();
 }
 
 function handleAddApparecchiatura() {
@@ -555,10 +672,56 @@ modalOverlay.addEventListener('click', (event) => {
   }
 });
 
-mapObject.addEventListener('load', initializeMapDimensions);
+const isFloorMapReady = validateFloorFromQueryString();
+console.log('[MapLoader] isFloorMapReady', { isFloorMapReady, requestedFloorName });
 
-if (mapObject.contentDocument) {
-  initializeMapDimensions();
+if (isFloorMapReady) {
+  startMapLoadSequence();
+
+  let mapInitDone = false;
+  function runMapInitOnce() {
+    console.log('[MapLoader] runMapInitOnce called', { mapInitDone });
+    if (mapInitDone) {
+      return;
+    }
+    mapInitDone = true;
+    try {
+      initializeMapDimensions();
+    } catch (error) {
+      console.error('Errore inizializzazione mappa:', error);
+      setCenteredMapErrorMessage('Errore durante l\'inizializzazione della planimetria.');
+      setMapControlsEnabled(false);
+      markMapResourceReady();
+    }
+  }
+
+  // Registrare `load` prima di assegnare `data`, altrimenti l'evento può essere emesso
+  // e perso in corsa (il loader resterebbe all'infinito).
+  mapObject.addEventListener('load', runMapInitOnce, { once: true });
+  console.log('[MapLoader] load listener registered');
+  mapObject.addEventListener('error', () => {
+    console.log('[MapLoader] object error event');
+    const errorMessage = `Errore nel caricamento della planimetria SVG. Planimetria non trovata: ${requestedFloorName || '-'}.`;
+    setCenteredMapErrorMessage(errorMessage);
+    setMapControlsEnabled(false);
+    markMapResourceReady();
+  });
+  console.log('[MapLoader] error listener registered');
+
+  mapObject.data = `../planimetrie/${requestedFloorName}.svg`;
+  console.log('[MapLoader] mapObject.data assigned', { data: mapObject.data });
+
+  // Fallback di sicurezza: se per qualsiasi motivo `load` non arriva,
+  // proviamo una sola inizializzazione ritardata.
+  window.setTimeout(() => {
+    console.log('[MapLoader] fallback timeout tick', {
+      mapInitDone,
+      hasContentDocument: Boolean(mapObject.contentDocument)
+    });
+    if (!mapInitDone && mapObject.contentDocument) {
+      runMapInitOnce();
+    }
+  }, 3000);
 }
 
 renderApparecchiaturaTable();

@@ -13,6 +13,8 @@ body {
   display: flex;
   flex-direction: column;
   background: #f5f5f5;
+  scrollbar-width: auto;
+  scrollbar-color: #334155 #cbd5e1;
 }
 
 .toolbar {
@@ -47,8 +49,106 @@ button:hover {
 
 .viewer {
   flex: 1;
+  position: relative;
   overflow: auto;
   padding: 12px;
+  scrollbar-width: auto;
+  scrollbar-color: #334155 #cbd5e1;
+}
+
+.map-loader-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(245, 245, 245, 0.88);
+  backdrop-filter: blur(2px);
+}
+
+.map-loader-overlay[hidden] {
+  display: none !important;
+}
+
+.map-loader-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 28px;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+  border: 1px solid #e2e8f0;
+}
+
+.map-loader-text {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.map-loader-spinner {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 3px solid #e2e8f0;
+  border-top-color: #2563eb;
+  animation: map-loader-spin 0.8s linear infinite;
+}
+
+@keyframes map-loader-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.map-error-center-message {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 2000;
+  max-width: min(90%, 540px);
+  padding: 14px 18px;
+  border: 2px solid #7f1d1d;
+  border-radius: 10px;
+  background: #dc2626;
+  color: #ffffff;
+  font-weight: 700;
+  text-align: center;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+body::-webkit-scrollbar,
+.viewer::-webkit-scrollbar {
+  width: 37px;
+  height: 37px;
+}
+
+body::-webkit-scrollbar-track,
+.viewer::-webkit-scrollbar-track {
+  background: #cbd5e1;
+  border-radius: 10px;
+}
+
+body::-webkit-scrollbar-thumb,
+.viewer::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 10px;
+  border: 3px solid #cbd5e1;
+}
+
+body::-webkit-scrollbar-thumb:hover,
+.viewer::-webkit-scrollbar-thumb:hover {
+  background: #1e293b;
+}
+
+body::-webkit-scrollbar-corner,
+.viewer::-webkit-scrollbar-corner {
+  background: #cbd5e1;
 }
 
 .map-wrapper {
