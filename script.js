@@ -6,7 +6,19 @@ const viewer = document.getElementById('viewer');
 const mapObject = document.getElementById('mapObject');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalCloseButton = document.getElementById('modalClose');
-const modalContent = document.getElementById('modalContent');
+const roomCodeValue = document.getElementById('roomCodeValue');
+const roomDescriptionValue = document.getElementById('roomDescriptionValue');
+const roomDepartmentValue = document.getElementById('roomDepartmentValue');
+const roomCodeInput = document.getElementById('roomCodeInput');
+const roomDescriptionInput = document.getElementById('roomDescriptionInput');
+const roomDepartmentInput = document.getElementById('roomDepartmentInput');
+const editRoomCodeButton = document.getElementById('editRoomCodeButton');
+const editRoomDescriptionButton = document.getElementById('editRoomDescriptionButton');
+const editRoomDepartmentButton = document.getElementById('editRoomDepartmentButton');
+const sectionApparecchiaturaButton = document.getElementById('sectionApparecchiatura');
+const sectionImpiantisticaButton = document.getElementById('sectionImpiantistica');
+const contentApparecchiatura = document.getElementById('contentApparecchiatura');
+const contentImpiantistica = document.getElementById('contentImpiantistica');
 
 const minZoom = 0.1;
 const maxZoom = 50;
@@ -14,6 +26,7 @@ const zoomStep = 0.2;
 let currentZoom = 2;
 let baseImageWidth = 0;
 let baseImageHeight = 0;
+let activeFieldBeingEdited = null;
 
 function updateZoomDisplay() {
   mapObject.style.width = `${baseImageWidth * currentZoom}px`;
@@ -59,8 +72,117 @@ function handleZoomReset() {
   centerMapInViewport();
 }
 
+function getRoomCodeWithoutAsterisks(textValue) {
+  return textValue.replace(/^\*/, '').replace(/\*$/, '');
+}
+
+const editableFieldConfigs = {
+  roomCode: {
+    valueElement: roomCodeValue,
+    inputElement: roomCodeInput,
+    buttonElement: editRoomCodeButton
+  },
+  roomDescription: {
+    valueElement: roomDescriptionValue,
+    inputElement: roomDescriptionInput,
+    buttonElement: editRoomDescriptionButton
+  },
+  roomDepartment: {
+    valueElement: roomDepartmentValue,
+    inputElement: roomDepartmentInput,
+    buttonElement: editRoomDepartmentButton
+  }
+};
+
+function stopEditingField(fieldName, saveChanges) {
+  const fieldConfig = editableFieldConfigs[fieldName];
+  if (!fieldConfig) {
+    return;
+  }
+
+  if (saveChanges) {
+    fieldConfig.valueElement.textContent = fieldConfig.inputElement.value.trim() || fieldConfig.valueElement.textContent;
+  }
+
+  fieldConfig.valueElement.hidden = false;
+  fieldConfig.inputElement.hidden = true;
+  fieldConfig.buttonElement.textContent = 'Modifica';
+  activeFieldBeingEdited = null;
+}
+
+function startEditingField(fieldName) {
+  const fieldConfig = editableFieldConfigs[fieldName];
+  if (!fieldConfig) {
+    return;
+  }
+
+  if (activeFieldBeingEdited && activeFieldBeingEdited !== fieldName) {
+    stopEditingField(activeFieldBeingEdited, true);
+  }
+
+  fieldConfig.inputElement.value = fieldConfig.valueElement.textContent.trim();
+  fieldConfig.valueElement.hidden = true;
+  fieldConfig.inputElement.hidden = false;
+  fieldConfig.buttonElement.textContent = 'Salva';
+  fieldConfig.inputElement.focus();
+  fieldConfig.inputElement.select();
+  activeFieldBeingEdited = fieldName;
+}
+
+function handleEditFieldClick(fieldName) {
+  if (activeFieldBeingEdited === fieldName) {
+    stopEditingField(fieldName, true);
+    return;
+  }
+
+  startEditingField(fieldName);
+}
+
+function setupEditableFieldEvents(fieldName) {
+  const fieldConfig = editableFieldConfigs[fieldName];
+  fieldConfig.buttonElement.addEventListener('click', () => handleEditFieldClick(fieldName));
+  fieldConfig.inputElement.addEventListener('keydown', (event) => {
+    if (event.key === 'Enter') {
+      stopEditingField(fieldName, true);
+    }
+
+    if (event.key === 'Escape') {
+      stopEditingField(fieldName, false);
+    }
+  });
+}
+
+function resetEditableFieldsState() {
+  Object.keys(editableFieldConfigs).forEach((fieldName) => {
+    const fieldConfig = editableFieldConfigs[fieldName];
+    fieldConfig.valueElement.hidden = false;
+    fieldConfig.inputElement.hidden = true;
+    fieldConfig.buttonElement.textContent = 'Modifica';
+  });
+  activeFieldBeingEdited = null;
+}
+
+function setActiveModalSection(sectionName) {
+  const isApparecchiatura = sectionName === 'apparecchiatura';
+
+  sectionApparecchiaturaButton.classList.toggle('is-active', isApparecchiatura);
+  sectionApparecchiaturaButton.setAttribute('aria-selected', String(isApparecchiatura));
+  contentApparecchiatura.classList.toggle('is-active', isApparecchiatura);
+  contentApparecchiatura.hidden = !isApparecchiatura;
+
+  sectionImpiantisticaButton.classList.toggle('is-active', !isApparecchiatura);
+  sectionImpiantisticaButton.setAttribute('aria-selected', String(!isApparecchiatura));
+  contentImpiantistica.classList.toggle('is-active', !isApparecchiatura);
+  contentImpiantistica.hidden = isApparecchiatura;
+}
+
 function openModal(textValue) {
-  modalContent.textContent = `Hai cliccato: ${textValue}`;
+  const roomCode = getRoomCodeWithoutAsterisks(textValue);
+  roomCodeValue.textContent = roomCode;
+  roomDescriptionValue.textContent = 'Placeholder descrizione stanza';
+  roomDepartmentValue.textContent = 'cardiologia';
+  resetEditableFieldsState();
+  setActiveModalSection('apparecchiatura');
   modalOverlay.classList.add('is-open');
   modalOverlay.setAttribute('aria-hidden', 'false');
 }
@@ -163,6 +285,11 @@ zoomInButton.addEventListener('click', handleZoomIn);
 zoomOutButton.addEventListener('click', handleZoomOut);
 zoomResetButton.addEventListener('click', handleZoomReset);
 modalCloseButton.addEventListener('click', closeModal);
+setupEditableFieldEvents('roomCode');
+setupEditableFieldEvents('roomDescription');
+setupEditableFieldEvents('roomDepartment');
+sectionApparecchiaturaButton.addEventListener('click', () => setActiveModalSection('apparecchiatura'));
+sectionImpiantisticaButton.addEventListener('click', () => setActiveModalSection('impiantistica'));
 modalOverlay.addEventListener('click', (event) => {
   if (event.target === modalOverlay) {
     closeModal();

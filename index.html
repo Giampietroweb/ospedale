@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Struttura Ospedaliera Statica</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="page-structure p-6">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl font-extrabold text-slate-800 tracking-tight">Mappa Struttura Ospedale</h1>
+            <p class="text-slate-500 mt-2">Navigazione dei reparti e dei livelli</p>
+        </header>
+
+        <!-- Sezione Elevata: Torri e Piastra -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
+            
+            <!-- Torre Sud -->
+            <section>
+                <div class="flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x-2 border-t-2 border-sky-300">
+                    <a href="piano-0.html" class="piano-link piastra-piano">Piano 0</a>
+                    <a href="piano-1.html" class="piano-link piastra-piano">Piano 1</a>
+                    <a href="piano-2.html" class="piano-link piastra-piano">Piano 2</a>
+                    <a href="piano-3.html" class="piano-link piastra-piano">Piano 3</a>
+                    <a href="piano-4.html" class="piano-link piastra-piano">Piano 4</a>
+                    <a href="piano-5.html" class="piano-link piastra-piano">Piano 5</a>
+                    <a href="piano-6.html" class="piano-link piastra-piano bg-slate-100 font-bold">Piano 6</a>
+                    <div class="h-12 bg-sky-500 text-white flex items-center justify-center font-bold text-xs uppercase tracking-widest">
+                        Torre Sud
+                    </div>
+                </div>
+            </section>
+
+            <!-- Piastra Centrale -->
+            <section>
+                <div class="flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x-2 border-t-2 border-sky-300">
+                    <a href="piastra-0.html" class="piano-link piastra-piano">Piano 0</a>
+                    <a href="piastra-1.html" class="piano-link piastra-piano">Piano 1</a>
+                    <a href="piastra-2.html" class="piano-link piastra-piano">Piano 2</a>
+                    <div class="h-12 bg-sky-500 text-white flex items-center justify-center font-bold text-xs uppercase tracking-widest">
+                        Piastra Centrale
+                    </div>
+                </div>
+            </section>
+
+            <!-- Torre Nord -->
+            <section>
+                <div class="flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x-2 border-t-2 border-sky-300">
+                    <a href="nord-0.html" class="piano-link piastra-piano">Piano 0</a>
+                    <a href="nord-1.html" class="piano-link piastra-piano">Piano 1</a>
+                    <a href="nord-2.html" class="piano-link piastra-piano">Piano 2</a>
+                    <a href="nord-3.html" class="piano-link piastra-piano">Piano 3</a>
+                    <a href="nord-4.html" class="piano-link piastra-piano">Piano 4</a>
+                    <a href="nord-5.html" class="piano-link piastra-piano">Piano 5</a>
+                    <a href="nord-6.html" class="piano-link piastra-piano bg-slate-100 font-bold">Piano 6</a>
+                    <div class="h-12 bg-sky-500 text-white flex items-center justify-center font-bold text-xs uppercase tracking-widest">
+                        Torre Nord
+                    </div>
+                </div>
+            </section>
+
+        </div>
+
+        <!-- Fondamenta / Interrati -->
+        <div class="mt-8">
+            <h2 class="label-edificio text-slate-400">Livelli Interrati</h2>
+            <div class="flex flex-col rounded-b-xl overflow-hidden shadow-xl border-x-2 border-b-2 border-slate-700">
+                <a href="sotterraneo-1.html" class="piano-link interrato-piano">
+                    <span class="mr-3 text-lg font-bold">Piano -1</span>
+                </a>
+                <a href="sotterraneo-2.html" class="piano-link interrato-piano border-t border-slate-600">
+                    <span class="mr-3 text-lg font-bold">Piano -2</span>
+                </a>
+            </div>
+        </div>
+
+        <footer class="mt-16 text-center text-slate-400 text-sm">
+            &copy; 2026 - Mappa Informativa Ospedaliera
+        </footer>
+    </div>
+
+</body>
+</html>
