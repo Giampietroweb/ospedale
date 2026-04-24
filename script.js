@@ -34,12 +34,6 @@ const appNoteInput = document.getElementById('appNoteInput');
 const appAddButton = document.getElementById('appAddButton');
 const appSaveButton = document.getElementById('appSaveButton');
 const appCancelButton = document.getElementById('appCancelButton');
-const impTipologiaInput = document.getElementById('impTipologiaInput');
-const impQtaPresentiInput = document.getElementById('impQtaPresentiInput');
-const impQtaImplementareInput = document.getElementById('impQtaImplementareInput');
-const impAddButton = document.getElementById('impAddButton');
-const impSaveButton = document.getElementById('impSaveButton');
-const impCancelButton = document.getElementById('impCancelButton');
 
 const minZoom = 0.1;
 const maxZoom = 50;
@@ -158,7 +152,62 @@ function validateFloorFromQueryString() {
 
 const apparecchiaturaRows = [];
 
-const impiantisticaRows = [];
+const impiantisticaRows = [
+  {
+    tipologia: 'Presa O2',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa Aria med',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa vuoto',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa Evac',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },{
+    tipologia: 'Presa Protossido',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },{
+    tipologia: 'Presa Elettrica',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },{
+    tipologia: 'Presa Dati',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },{
+    tipologia: 'Punto Acqua',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },{
+    tipologia: 'Scarico Acqua',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },{
+    tipologia: 'Presa Interbloccata',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  }
+];
 
 function updateZoomDisplay() {
   mapObject.style.width = 'auto';
@@ -352,12 +401,6 @@ function setApparecchiaturaEditMode(isEditing) {
   appCancelButton.hidden = !isEditing;
 }
 
-function setImpiantisticaEditMode(isEditing) {
-  impAddButton.hidden = isEditing;
-  impSaveButton.hidden = !isEditing;
-  impCancelButton.hidden = !isEditing;
-}
-
 function getApparecchiaturaFormData() {
   return {
     apparecchiatura: appTipologiaInput.value.trim(),
@@ -367,14 +410,6 @@ function getApparecchiaturaFormData() {
     trasferimento: appTrasferimentoInput.value.trim(),
     inv: appInvInput.value.trim(),
     note: appNoteInput.value.trim()
-  };
-}
-
-function getImpiantisticaFormData() {
-  return {
-    tipologia: impTipologiaInput.value.trim(),
-    qtaPresenti: impQtaPresentiInput.value.trim(),
-    qtaDaImplementare: impQtaImplementareInput.value.trim()
   };
 }
 
@@ -388,14 +423,6 @@ function resetApparecchiaturaForm() {
   appNoteInput.value = '';
   editingApparecchiaturaIndex = null;
   setApparecchiaturaEditMode(false);
-}
-
-function resetImpiantisticaForm() {
-  impTipologiaInput.value = '';
-  impQtaPresentiInput.value = '';
-  impQtaImplementareInput.value = '';
-  editingImpiantisticaIndex = null;
-  setImpiantisticaEditMode(false);
 }
 
 function renderApparecchiaturaTable() {
@@ -445,32 +472,93 @@ function renderApparecchiaturaTable() {
 }
 
 function renderImpiantisticaTable() {
-  const rowsHtml = impiantisticaRows.map((row, index) => `
+  const rowsHtml = impiantisticaRows.map((row, index) => {
+    const isRowEditing = editingImpiantisticaIndex === index;
+    return `
     <tr>
       <td>${escapeHtml(row.tipologia)}</td>
-      <td>${escapeHtml(row.qtaPresenti)}</td>
-      <td>${escapeHtml(row.qtaDaImplementare)}</td>
-      <td><button type="button" class="row-edit-button" data-imp-edit="${index}">Modifica</button></td>
+      <td>
+        <input
+          type="number"
+          min="0"
+          class="table-inline-input"
+          data-imp-qta-presenti="${index}"
+          value="${escapeHtml(row.qtaPresenti || '')}"
+          ${isRowEditing ? '' : 'disabled'}
+        >
+      </td>
+      <td>
+        <input
+          type="number"
+          min="0"
+          class="table-inline-input"
+          data-imp-qta-implementare="${index}"
+          value="${escapeHtml(row.qtaDaImplementare || '')}"
+          ${isRowEditing ? '' : 'disabled'}
+        >
+      </td>
+      <td>
+        <input
+          type="text"
+          class="table-inline-input"
+          data-imp-note="${index}"
+          value="${escapeHtml(row.note || '')}"
+          ${isRowEditing ? '' : 'disabled'}
+        >
+      </td>
+      <td>
+        <button type="button" class="row-edit-button" data-imp-edit="${index}">
+          ${isRowEditing ? 'Salva' : 'Modifica'}
+        </button>
+      </td>
     </tr>
-  `).join('');
-
-  impiantisticaTableBody.innerHTML = rowsHtml || `
-    <tr><td colspan="4">Nessun dato inserito.</td></tr>
   `;
+  }).join('');
 
-  impiantisticaTableBody.querySelectorAll('[data-imp-edit]').forEach((button) => {
-    button.addEventListener('click', () => {
-      const rowIndex = Number(button.dataset.impEdit);
+  impiantisticaTableBody.innerHTML = rowsHtml || '<tr><td colspan="5">Nessun dato inserito.</td></tr>';
+
+  impiantisticaTableBody.querySelectorAll('[data-imp-qta-presenti]').forEach((inputElement) => {
+    inputElement.addEventListener('input', () => {
+      const rowIndex = Number(inputElement.dataset.impQtaPresenti);
       const selectedRow = impiantisticaRows[rowIndex];
       if (!selectedRow) {
         return;
       }
+      selectedRow.qtaPresenti = inputElement.value.trim();
+    });
+  });
 
-      impTipologiaInput.value = selectedRow.tipologia;
-      impQtaPresentiInput.value = selectedRow.qtaPresenti;
-      impQtaImplementareInput.value = selectedRow.qtaDaImplementare;
-      editingImpiantisticaIndex = rowIndex;
-      setImpiantisticaEditMode(true);
+  impiantisticaTableBody.querySelectorAll('[data-imp-qta-implementare]').forEach((inputElement) => {
+    inputElement.addEventListener('input', () => {
+      const rowIndex = Number(inputElement.dataset.impQtaImplementare);
+      const selectedRow = impiantisticaRows[rowIndex];
+      if (!selectedRow) {
+        return;
+      }
+      selectedRow.qtaDaImplementare = inputElement.value.trim();
+    });
+  });
+
+  impiantisticaTableBody.querySelectorAll('[data-imp-note]').forEach((inputElement) => {
+    inputElement.addEventListener('input', () => {
+      const rowIndex = Number(inputElement.dataset.impNote);
+      const selectedRow = impiantisticaRows[rowIndex];
+      if (!selectedRow) {
+        return;
+      }
+      selectedRow.note = inputElement.value.trim();
+    });
+  });
+
+  impiantisticaTableBody.querySelectorAll('[data-imp-edit]').forEach((buttonElement) => {
+    buttonElement.addEventListener('click', () => {
+      const rowIndex = Number(buttonElement.dataset.impEdit);
+      if (editingImpiantisticaIndex === rowIndex) {
+        editingImpiantisticaIndex = null;
+      } else {
+        editingImpiantisticaIndex = rowIndex;
+      }
+      renderImpiantisticaTable();
     });
   });
 }
@@ -496,7 +584,7 @@ function openModal(textValue) {
   roomDepartmentValue.textContent = 'cardiologia';
   resetEditableFieldsState();
   resetApparecchiaturaForm();
-  resetImpiantisticaForm();
+  editingImpiantisticaIndex = null;
   setActiveModalSection('apparecchiatura');
   modalOverlay.classList.add('is-open');
   modalOverlay.setAttribute('aria-hidden', 'false');
@@ -641,41 +729,6 @@ function handleSaveApparecchiatura() {
   resetApparecchiaturaForm();
 }
 
-function handleAddImpiantistica() {
-  const rawRow = getImpiantisticaFormData();
-  const newRow = {
-    tipologia: rawRow.tipologia || '-',
-    qtaPresenti: rawRow.qtaPresenti || '0',
-    qtaDaImplementare: rawRow.qtaDaImplementare || '0'
-  };
-
-  const hasAtLeastOneTypedValue = Object.values(rawRow).some((value) => value !== '');
-  if (!hasAtLeastOneTypedValue) {
-    window.alert('Inserisci almeno un valore prima di aggiungere la riga.');
-    return;
-  }
-
-  impiantisticaRows.push(newRow);
-  renderImpiantisticaTable();
-  resetImpiantisticaForm();
-}
-
-function handleSaveImpiantistica() {
-  if (editingImpiantisticaIndex === null) {
-    return;
-  }
-
-  const updatedRow = getImpiantisticaFormData();
-  if (!updatedRow.tipologia || !updatedRow.qtaPresenti) {
-    window.alert('Compila almeno Tipologia e Qta presenti per Impiantistica.');
-    return;
-  }
-
-  impiantisticaRows[editingImpiantisticaIndex] = updatedRow;
-  renderImpiantisticaTable();
-  resetImpiantisticaForm();
-}
-
 zoomInButton.addEventListener('click', handleZoomIn);
 zoomOutButton.addEventListener('click', handleZoomOut);
 zoomResetButton.addEventListener('click', handleZoomReset);
@@ -686,9 +739,6 @@ setupEditableFieldEvents('roomDepartment');
 appAddButton.addEventListener('click', handleAddApparecchiatura);
 appSaveButton.addEventListener('click', handleSaveApparecchiatura);
 appCancelButton.addEventListener('click', resetApparecchiaturaForm);
-impAddButton.addEventListener('click', handleAddImpiantistica);
-impSaveButton.addEventListener('click', handleSaveImpiantistica);
-impCancelButton.addEventListener('click', resetImpiantisticaForm);
 sectionApparecchiaturaButton.addEventListener('click', () => setActiveModalSection('apparecchiatura'));
 sectionImpiantisticaButton.addEventListener('click', () => setActiveModalSection('impiantistica'));
 modalOverlay.addEventListener('click', (event) => {

@@ -34,7 +34,7 @@
       <h2 id="modalTitle" class="modal-title">Dettagli stanza</h2>
       <div class="modal-header-fields">
         <div class="modal-field">
-          <span class="modal-field-label">Codice stanza</span>
+          <span class="modal-field-label">Id-stanza (Codice semplificato)</span>
           <div class="modal-field-main">
             <span id="roomCodeValue" class="modal-field-value">-</span>
             <input id="roomCodeInput" class="modal-field-input" type="text" hidden>
@@ -42,7 +42,15 @@
           </div>
         </div>
         <div class="modal-field">
-          <span class="modal-field-label">Descrizione</span>
+          <span class="modal-field-label">Codice</span>
+          <div class="modal-field-main">
+            <span id="roomDescriptionValue" class="modal-field-value">DG2 (Nome)</span>
+            <input id="roomDescriptionInput" class="modal-field-input" type="text" hidden>
+            <button id="editRoomDescriptionButton" class="modal-edit-button" type="button">Modifica</button>
+          </div>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field-label">Descrizione (Occupazione)</span>
           <div class="modal-field-main">
             <span id="roomDescriptionValue" class="modal-field-value">Placeholder descrizione stanza</span>
             <input id="roomDescriptionInput" class="modal-field-input" type="text" hidden>
@@ -50,7 +58,7 @@
           </div>
         </div>
         <div class="modal-field">
-          <span class="modal-field-label">Reparto</span>
+          <span class="modal-field-label">Reparto (no lo scrive lei)</span>
           <div class="modal-field-main">
             <span id="roomDepartmentValue" class="modal-field-value">cardiologia</span>
             <input id="roomDepartmentInput" class="modal-field-input" type="text" hidden>
@@ -131,33 +139,13 @@
         </table>
       </div>
       <div id="contentImpiantistica" class="modal-section-content" role="tabpanel" hidden>
-        <div class="table-editor" id="impiantisticaEditor">
-          <div class="table-editor-grid">
-            <label class="table-editor-field">
-              <span>Tipologia</span>
-              <input id="impTipologiaInput" type="text">
-            </label>
-            <label class="table-editor-field">
-              <span>Qta presenti</span>
-              <input id="impQtaPresentiInput" type="number" min="0">
-            </label>
-            <label class="table-editor-field">
-              <span>Qta da implementare</span>
-              <input id="impQtaImplementareInput" type="number" min="0">
-            </label>
-          </div>
-          <div class="table-editor-actions">
-            <button id="impAddButton" class="table-editor-button table-editor-button-primary" type="button">Aggiungi</button>
-            <button id="impSaveButton" class="table-editor-button table-editor-button-success" type="button" hidden>Salva modifica</button>
-            <button id="impCancelButton" class="table-editor-button table-editor-button-muted" type="button" hidden>Annulla</button>
-          </div>
-        </div>
         <table class="modal-table">
           <thead>
             <tr>
               <th>Tipologia</th>
               <th>Qta presenti</th>
               <th>Qta da implementare</th>
+              <th>Note</th>
               <th>Azioni</th>
             </tr>
           </thead>

@@ -454,6 +454,21 @@ body::-webkit-scrollbar-corner,
   border-bottom: none;
 }
 
+.table-inline-input {
+  width: 100%;
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  padding: 7px 9px;
+  font-size: 13px;
+  background: #ffffff;
+}
+
+.table-inline-input:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+  border-color: #3b82f6;
+}
+
 /* Styles scoped to index.html */
 body.page-structure {
   background-color: #f8fafc;
