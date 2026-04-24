@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mappa SVG con Zoom</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="../style.css">
 </head>
 <body>
   <div class="toolbar">
@@ -16,7 +16,7 @@
 
   <div id="viewer" class="viewer">
     <div id="mapWrapper" class="map-wrapper">
-      <object id="mapObject" data="planimetrie/mappa.svg" type="image/svg+xml" class="map-image" aria-label="Mappa SVG"></object>
+      <object id="mapObject" data="../planimetrie/mappa.svg" type="image/svg+xml" class="map-image" aria-label="Mappa SVG"></object>
     </div>
   </div>
 
@@ -55,6 +55,39 @@
         <button id="sectionImpiantistica" class="modal-section-button" type="button" role="tab" aria-selected="false">Impiantistica</button>
       </div>
       <div id="contentApparecchiatura" class="modal-section-content is-active" role="tabpanel">
+        <div class="table-editor" id="apparecchiaturaEditor">
+          <div class="table-editor-grid">
+            <label class="table-editor-field">
+              <span>Tipologia</span>
+              <input id="appTipologiaInput" type="text">
+            </label>
+            <label class="table-editor-field">
+              <span>QTA</span>
+              <input id="appQtaInput" type="number" min="0">
+            </label>
+            <label class="table-editor-field">
+              <span>Nuovo</span>
+              <input id="appNuovoInput" type="text">
+            </label>
+            <label class="table-editor-field">
+              <span>trasferimento</span>
+              <input id="appTrasferimentoInput" type="text">
+            </label>
+            <label class="table-editor-field">
+              <span>inv</span>
+              <input id="appInvInput" type="text">
+            </label>
+            <label class="table-editor-field">
+              <span>note</span>
+              <input id="appNoteInput" type="text">
+            </label>
+          </div>
+          <div class="table-editor-actions">
+            <button id="appAddButton" class="table-editor-button table-editor-button-primary" type="button">Aggiungi</button>
+            <button id="appSaveButton" class="table-editor-button table-editor-button-success" type="button" hidden>Salva modifica</button>
+            <button id="appCancelButton" class="table-editor-button table-editor-button-muted" type="button" hidden>Annulla</button>
+          </div>
+        </div>
         <table class="modal-table">
           <thead>
             <tr>
@@ -64,54 +97,49 @@
               <th>trasferimento</th>
               <th>inv</th>
               <th>note</th>
+              <th>Azioni</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Monitor paziente</td>
-              <td>2</td>
-              <td>Si</td>
-              <td>No</td>
-              <td>INV-001245</td>
-              <td>Verifica annuale pianificata</td>
-            </tr>
-            <tr>
-              <td>Defibrillatore</td>
-              <td>1</td>
-              <td>No</td>
-              <td>Si</td>
-              <td>INV-004872</td>
-              <td>Trasferito da terapia intensiva</td>
-            </tr>
-          </tbody>
+          <tbody id="apparecchiaturaTableBody"></tbody>
         </table>
       </div>
       <div id="contentImpiantistica" class="modal-section-content" role="tabpanel" hidden>
+        <div class="table-editor" id="impiantisticaEditor">
+          <div class="table-editor-grid">
+            <label class="table-editor-field">
+              <span>Tipologia</span>
+              <input id="impTipologiaInput" type="text">
+            </label>
+            <label class="table-editor-field">
+              <span>Qta presenti</span>
+              <input id="impQtaPresentiInput" type="number" min="0">
+            </label>
+            <label class="table-editor-field">
+              <span>Qta da implementare</span>
+              <input id="impQtaImplementareInput" type="number" min="0">
+            </label>
+          </div>
+          <div class="table-editor-actions">
+            <button id="impAddButton" class="table-editor-button table-editor-button-primary" type="button">Aggiungi</button>
+            <button id="impSaveButton" class="table-editor-button table-editor-button-success" type="button" hidden>Salva modifica</button>
+            <button id="impCancelButton" class="table-editor-button table-editor-button-muted" type="button" hidden>Annulla</button>
+          </div>
+        </div>
         <table class="modal-table">
           <thead>
             <tr>
               <th>Tipologia</th>
               <th>Qta presenti</th>
               <th>Qta da implementare</th>
+              <th>Azioni</th>
             </tr>
           </thead>
-          <tbody>
-            <tr>
-              <td>Punti rete dati</td>
-              <td>6</td>
-              <td>2</td>
-            </tr>
-            <tr>
-              <td>Prese elettriche dedicate</td>
-              <td>8</td>
-              <td>4</td>
-            </tr>
-          </tbody>
+          <tbody id="impiantisticaTableBody"></tbody>
         </table>
       </div>
     </div>
   </div>
 
-  <script src="script.js"></script>
+  <script src="../script.js"></script>
 </body>
 </html>

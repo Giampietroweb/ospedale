@@ -19,6 +19,23 @@ const sectionApparecchiaturaButton = document.getElementById('sectionApparecchia
 const sectionImpiantisticaButton = document.getElementById('sectionImpiantistica');
 const contentApparecchiatura = document.getElementById('contentApparecchiatura');
 const contentImpiantistica = document.getElementById('contentImpiantistica');
+const apparecchiaturaTableBody = document.getElementById('apparecchiaturaTableBody');
+const impiantisticaTableBody = document.getElementById('impiantisticaTableBody');
+const appTipologiaInput = document.getElementById('appTipologiaInput');
+const appQtaInput = document.getElementById('appQtaInput');
+const appNuovoInput = document.getElementById('appNuovoInput');
+const appTrasferimentoInput = document.getElementById('appTrasferimentoInput');
+const appInvInput = document.getElementById('appInvInput');
+const appNoteInput = document.getElementById('appNoteInput');
+const appAddButton = document.getElementById('appAddButton');
+const appSaveButton = document.getElementById('appSaveButton');
+const appCancelButton = document.getElementById('appCancelButton');
+const impTipologiaInput = document.getElementById('impTipologiaInput');
+const impQtaPresentiInput = document.getElementById('impQtaPresentiInput');
+const impQtaImplementareInput = document.getElementById('impQtaImplementareInput');
+const impAddButton = document.getElementById('impAddButton');
+const impSaveButton = document.getElementById('impSaveButton');
+const impCancelButton = document.getElementById('impCancelButton');
 
 const minZoom = 0.1;
 const maxZoom = 50;
@@ -27,6 +44,40 @@ let currentZoom = 2;
 let baseImageWidth = 0;
 let baseImageHeight = 0;
 let activeFieldBeingEdited = null;
+let editingApparecchiaturaIndex = null;
+let editingImpiantisticaIndex = null;
+
+const apparecchiaturaRows = [
+  {
+    tipologia: 'Monitor paziente',
+    qta: '2',
+    nuovo: 'Si',
+    trasferimento: 'No',
+    inv: 'INV-001245',
+    note: 'Verifica annuale pianificata'
+  },
+  {
+    tipologia: 'Defibrillatore',
+    qta: '1',
+    nuovo: 'No',
+    trasferimento: 'Si',
+    inv: 'INV-004872',
+    note: 'Trasferito da terapia intensiva'
+  }
+];
+
+const impiantisticaRows = [
+  {
+    tipologia: 'Punti rete dati',
+    qtaPresenti: '6',
+    qtaDaImplementare: '2'
+  },
+  {
+    tipologia: 'Prese elettriche dedicate',
+    qtaPresenti: '8',
+    qtaDaImplementare: '4'
+  }
+];
 
 function updateZoomDisplay() {
   mapObject.style.width = `${baseImageWidth * currentZoom}px`;
@@ -162,6 +213,133 @@ function resetEditableFieldsState() {
   activeFieldBeingEdited = null;
 }
 
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;');
+}
+
+function setApparecchiaturaEditMode(isEditing) {
+  appAddButton.hidden = isEditing;
+  appSaveButton.hidden = !isEditing;
+  appCancelButton.hidden = !isEditing;
+}
+
+function setImpiantisticaEditMode(isEditing) {
+  impAddButton.hidden = isEditing;
+  impSaveButton.hidden = !isEditing;
+  impCancelButton.hidden = !isEditing;
+}
+
+function getApparecchiaturaFormData() {
+  return {
+    tipologia: appTipologiaInput.value.trim(),
+    qta: appQtaInput.value.trim(),
+    nuovo: appNuovoInput.value.trim(),
+    trasferimento: appTrasferimentoInput.value.trim(),
+    inv: appInvInput.value.trim(),
+    note: appNoteInput.value.trim()
+  };
+}
+
+function getImpiantisticaFormData() {
+  return {
+    tipologia: impTipologiaInput.value.trim(),
+    qtaPresenti: impQtaPresentiInput.value.trim(),
+    qtaDaImplementare: impQtaImplementareInput.value.trim()
+  };
+}
+
+function resetApparecchiaturaForm() {
+  appTipologiaInput.value = '';
+  appQtaInput.value = '';
+  appNuovoInput.value = '';
+  appTrasferimentoInput.value = '';
+  appInvInput.value = '';
+  appNoteInput.value = '';
+  editingApparecchiaturaIndex = null;
+  setApparecchiaturaEditMode(false);
+}
+
+function resetImpiantisticaForm() {
+  impTipologiaInput.value = '';
+  impQtaPresentiInput.value = '';
+  impQtaImplementareInput.value = '';
+  editingImpiantisticaIndex = null;
+  setImpiantisticaEditMode(false);
+}
+
+function renderApparecchiaturaTable() {
+  const rowsHtml = apparecchiaturaRows.map((row, index) => `
+    <tr>
+      <td>${escapeHtml(row.tipologia)}</td>
+      <td>${escapeHtml(row.qta)}</td>
+      <td>${escapeHtml(row.nuovo)}</td>
+      <td>${escapeHtml(row.trasferimento)}</td>
+      <td>${escapeHtml(row.inv)}</td>
+      <td>${escapeHtml(row.note)}</td>
+      <td><button type="button" class="row-edit-button" data-app-edit="${index}">Modifica</button></td>
+    </tr>
+  `).join('');
+
+  apparecchiaturaTableBody.innerHTML = rowsHtml || `
+    <tr><td colspan="7">Nessun dato inserito.</td></tr>
+  `;
+
+  apparecchiaturaTableBody.querySelectorAll('[data-app-edit]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const rowIndex = Number(button.dataset.appEdit);
+      const selectedRow = apparecchiaturaRows[rowIndex];
+      if (!selectedRow) {
+        return;
+      }
+
+      appTipologiaInput.value = selectedRow.tipologia;
+      appQtaInput.value = selectedRow.qta;
+      appNuovoInput.value = selectedRow.nuovo;
+      appTrasferimentoInput.value = selectedRow.trasferimento;
+      appInvInput.value = selectedRow.inv;
+      appNoteInput.value = selectedRow.note;
+      editingApparecchiaturaIndex = rowIndex;
+      setApparecchiaturaEditMode(true);
+    });
+  });
+}
+
+function renderImpiantisticaTable() {
+  const rowsHtml = impiantisticaRows.map((row, index) => `
+    <tr>
+      <td>${escapeHtml(row.tipologia)}</td>
+      <td>${escapeHtml(row.qtaPresenti)}</td>
+      <td>${escapeHtml(row.qtaDaImplementare)}</td>
+      <td><button type="button" class="row-edit-button" data-imp-edit="${index}">Modifica</button></td>
+    </tr>
+  `).join('');
+
+  impiantisticaTableBody.innerHTML = rowsHtml || `
+    <tr><td colspan="4">Nessun dato inserito.</td></tr>
+  `;
+
+  impiantisticaTableBody.querySelectorAll('[data-imp-edit]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const rowIndex = Number(button.dataset.impEdit);
+      const selectedRow = impiantisticaRows[rowIndex];
+      if (!selectedRow) {
+        return;
+      }
+
+      impTipologiaInput.value = selectedRow.tipologia;
+      impQtaPresentiInput.value = selectedRow.qtaPresenti;
+      impQtaImplementareInput.value = selectedRow.qtaDaImplementare;
+      editingImpiantisticaIndex = rowIndex;
+      setImpiantisticaEditMode(true);
+    });
+  });
+}
+
 function setActiveModalSection(sectionName) {
   const isApparecchiatura = sectionName === 'apparecchiatura';
 
@@ -182,6 +360,8 @@ function openModal(textValue) {
   roomDescriptionValue.textContent = 'Placeholder descrizione stanza';
   roomDepartmentValue.textContent = 'cardiologia';
   resetEditableFieldsState();
+  resetApparecchiaturaForm();
+  resetImpiantisticaForm();
   setActiveModalSection('apparecchiatura');
   modalOverlay.classList.add('is-open');
   modalOverlay.setAttribute('aria-hidden', 'false');
@@ -281,6 +461,79 @@ function initializeMapDimensions() {
   centerMapInViewport();
 }
 
+function handleAddApparecchiatura() {
+  const rawRow = getApparecchiaturaFormData();
+  const newRow = {
+    tipologia: rawRow.tipologia || '-',
+    qta: rawRow.qta || '0',
+    nuovo: rawRow.nuovo || '-',
+    trasferimento: rawRow.trasferimento || '-',
+    inv: rawRow.inv || '-',
+    note: rawRow.note || '-'
+  };
+
+  const hasAtLeastOneTypedValue = Object.values(rawRow).some((value) => value !== '');
+  if (!hasAtLeastOneTypedValue) {
+    window.alert('Inserisci almeno un valore prima di aggiungere la riga.');
+    return;
+  }
+
+  apparecchiaturaRows.push(newRow);
+  renderApparecchiaturaTable();
+  resetApparecchiaturaForm();
+}
+
+function handleSaveApparecchiatura() {
+  if (editingApparecchiaturaIndex === null) {
+    return;
+  }
+
+  const updatedRow = getApparecchiaturaFormData();
+  if (!updatedRow.tipologia || !updatedRow.qta) {
+    window.alert('Compila almeno Tipologia e QTA per Apparecchiatura.');
+    return;
+  }
+
+  apparecchiaturaRows[editingApparecchiaturaIndex] = updatedRow;
+  renderApparecchiaturaTable();
+  resetApparecchiaturaForm();
+}
+
+function handleAddImpiantistica() {
+  const rawRow = getImpiantisticaFormData();
+  const newRow = {
+    tipologia: rawRow.tipologia || '-',
+    qtaPresenti: rawRow.qtaPresenti || '0',
+    qtaDaImplementare: rawRow.qtaDaImplementare || '0'
+  };
+
+  const hasAtLeastOneTypedValue = Object.values(rawRow).some((value) => value !== '');
+  if (!hasAtLeastOneTypedValue) {
+    window.alert('Inserisci almeno un valore prima di aggiungere la riga.');
+    return;
+  }
+
+  impiantisticaRows.push(newRow);
+  renderImpiantisticaTable();
+  resetImpiantisticaForm();
+}
+
+function handleSaveImpiantistica() {
+  if (editingImpiantisticaIndex === null) {
+    return;
+  }
+
+  const updatedRow = getImpiantisticaFormData();
+  if (!updatedRow.tipologia || !updatedRow.qtaPresenti) {
+    window.alert('Compila almeno Tipologia e Qta presenti per Impiantistica.');
+    return;
+  }
+
+  impiantisticaRows[editingImpiantisticaIndex] = updatedRow;
+  renderImpiantisticaTable();
+  resetImpiantisticaForm();
+}
+
 zoomInButton.addEventListener('click', handleZoomIn);
 zoomOutButton.addEventListener('click', handleZoomOut);
 zoomResetButton.addEventListener('click', handleZoomReset);
@@ -288,6 +541,12 @@ modalCloseButton.addEventListener('click', closeModal);
 setupEditableFieldEvents('roomCode');
 setupEditableFieldEvents('roomDescription');
 setupEditableFieldEvents('roomDepartment');
+appAddButton.addEventListener('click', handleAddApparecchiatura);
+appSaveButton.addEventListener('click', handleSaveApparecchiatura);
+appCancelButton.addEventListener('click', resetApparecchiaturaForm);
+impAddButton.addEventListener('click', handleAddImpiantistica);
+impSaveButton.addEventListener('click', handleSaveImpiantistica);
+impCancelButton.addEventListener('click', resetImpiantisticaForm);
 sectionApparecchiaturaButton.addEventListener('click', () => setActiveModalSection('apparecchiatura'));
 sectionImpiantisticaButton.addEventListener('click', () => setActiveModalSection('impiantistica'));
 modalOverlay.addEventListener('click', (event) => {
@@ -301,3 +560,6 @@ mapObject.addEventListener('load', initializeMapDimensions);
 if (mapObject.contentDocument) {
   initializeMapDimensions();
 }
+
+renderApparecchiaturaTable();
+renderImpiantisticaTable();
