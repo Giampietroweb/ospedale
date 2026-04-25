@@ -14,22 +14,40 @@ const roomCodeValue = document.getElementById('roomCodeValue');
 const roomCodeNameValue = document.getElementById('roomCodeNameValue');
 const roomOccupazioneValue = document.getElementById('roomOccupazioneValue');
 const roomDepartmentValue = document.getElementById('roomDepartmentValue');
-const roomCodeInput = document.getElementById('roomCodeInput');
+const roomSurfaceValue = document.getElementById('roomSurfaceValue');
+const roomHemifloorValue = document.getElementById('roomHemifloorValue');
+const roomAccreditationValue = document.getElementById('roomAccreditationValue');
+const roomBedCountValue = document.getElementById('roomBedCountValue');
+const roomFurnitureNotesValue = document.getElementById('roomFurnitureNotesValue');
 const roomCodeNameInput = document.getElementById('roomCodeNameInput');
 const roomOccupazioneInput = document.getElementById('roomOccupazioneInput');
 const roomDepartmentInput = document.getElementById('roomDepartmentInput');
-const editRoomCodeButton = document.getElementById('editRoomCodeButton');
+const roomSurfaceInput = document.getElementById('roomSurfaceInput');
+const roomHemifloorInput = document.getElementById('roomHemifloorInput');
+const roomAccreditationInput = document.getElementById('roomAccreditationInput');
+const roomBedCountInput = document.getElementById('roomBedCountInput');
+const roomFurnitureNotesInput = document.getElementById('roomFurnitureNotesInput');
 const editRoomCodeNameButton = document.getElementById('editRoomCodeNameButton');
 const editRoomOccupazioneButton = document.getElementById('editRoomOccupazioneButton');
 const editRoomDepartmentButton = document.getElementById('editRoomDepartmentButton');
+const editRoomSurfaceButton = document.getElementById('editRoomSurfaceButton');
+const editRoomHemifloorButton = document.getElementById('editRoomHemifloorButton');
+const editRoomAccreditationButton = document.getElementById('editRoomAccreditationButton');
+const editRoomBedCountButton = document.getElementById('editRoomBedCountButton');
+const editRoomFurnitureNotesButton = document.getElementById('editRoomFurnitureNotesButton');
 const sectionApparecchiaturaButton = document.getElementById('sectionApparecchiatura');
 const sectionImpiantisticaButton = document.getElementById('sectionImpiantistica');
+const sectionAltreDotazioniButton = document.getElementById('sectionAltreDotazioni');
 const contentApparecchiatura = document.getElementById('contentApparecchiatura');
 const contentImpiantistica = document.getElementById('contentImpiantistica');
+const contentAltreDotazioni = document.getElementById('contentAltreDotazioni');
 const apparecchiaturaTableBody = document.getElementById('apparecchiaturaTableBody');
 const impiantisticaTableBody = document.getElementById('impiantisticaTableBody');
+const altreDotazioniTableBody = document.getElementById('altreDotazioniTableBody');
 const appTipologiaInput = document.getElementById('appTipologiaInput');
 const appInstallazioneTipologiaInput = document.getElementById('appInstallazioneTipologiaInput');
+const appProduttoreInput = document.getElementById('appProduttoreInput');
+const appModelloInput = document.getElementById('appModelloInput');
 const appQtaInput = document.getElementById('appQtaInput');
 const appNuovoInput = document.getElementById('appNuovoInput');
 const appTrasferimentoInput = document.getElementById('appTrasferimentoInput');
@@ -48,6 +66,7 @@ let baseImageHeight = 0;
 let activeFieldBeingEdited = null;
 let editingApparecchiaturaIndex = null;
 let editingImpiantisticaIndex = null;
+let editingAltreDotazioniIndex = null;
 let requestedFloorName = '';
 const floorNamePattern = /^[a-z0-9-]+$/i;
 const mapLoadMinMs = 2000;
@@ -55,6 +74,381 @@ let mapLoadMinMet = false;
 let mapLoadResourceMet = false;
 let mapLoadMinTimeoutId = null;
 const apparecchiaturaTipologiaOptions = ['', 'Carrellato', 'Parete', 'Pensile', 'Soffitto'];
+const apparecchiaturaCatalogText = `
+ABLATORE PER ARTERIECTOMIA
+ABLAZIONE CARDIACA A RADIOFREQUENZA, APPARECCHIO PER
+AEROSOL, APPARECCHIO PER
+AGITATORE DA LABORATORIO
+ANALISI FUNZIONALITA ESOFAGEA, SISTEMA PER
+ANALISI SFORZO, SISTEMA PER
+ANALIZZATORE DI GAS
+ANALIZZATORE DI PARTICELLE
+ANALIZZATORE DI SEQUENZE NUCLEOTIDICHE
+ANALIZZATORE FIBRINOGENO
+ANALIZZATORE GRUPPO SANGUIGNO
+ANALIZZATORE VISIONE PERIFERICA
+ANALIZZATORE/PROGRAMMATORE PER CARDIOSTIMOLATORI
+ANESTESIA, APPARECCHIO PER
+ANESTESIA, APPARECCHIO PER (AMAGNETICO)
+ANGIOGRAFIA DIGITALE, SISTEMA PER
+APPARECCHIO MOTORIZZATO, GENERATORE PER
+APPARECCHIO PER SEDAZIONE COSCIENTE
+APPLICAZIONE FILI CHIRURGICI, APPARECCHIO PER
+ARMADIO STERILE PER ENDOSCOPI
+ARTROSCOPIO
+ASPIRATORE FUMI CHIRURGICI
+ASPIRATORE MEDICO CHIRURGICO (ELETTRICO)
+ASPIRATORE PER BIOPSIA
+ASPIRATORE POLVERI DERIVANTI DAL TAGLIO GESSO
+ASSISTENZA VENTRICOLARE, SISTEMA PER
+AUDIOMETRO
+AUTOCAMPIONATORE
+AUTOCLAVE
+AUTOCLAVE PER PICCOLI CARICHI
+AUTOREFRATTOMETRO
+AUTOTRASFUSIONE, APPARECCHIO PER
+BAGNO TERMOSTATICO
+BARELLA PER RISONANZA MAGNETICA
+BASE PER TESTIERA
+BETA/GAMMA DETECTOR
+BILANCIA ANALITICA
+BILANCIA PESA NEONATI
+BILANCIA PESA PERSONE
+BILANCIA PESA PERSONE CON ALTIMETRO
+BILANCIA TECNICA
+BILIRUBINOMETRO
+BILIRUBINOMETRO CUTANEO
+BIO-FEEDBACK, APPARECCHIATURA PER
+BIOMETRO OTTICO COMPUTERIZZATO
+BIOREATTORE
+BISTURI AD ULTRASUONI
+BOBINA PER TRM
+BRACCIO ROBOTIZZATO PER CHIRURGIA
+BRACCIO ROBOTIZZATO PER VIDEOENDOSCOPIO
+BRONCOSCOPIO
+CALIBRATORE PER FONOMETRO
+CALIBRO OSSEO
+CAMERA FREDDA
+CABINA AUDIOMETRICA
+CAMPIONATORE ARIA, APPARECCHIO PER
+CAMPIONATORE AUTOMATICO
+CAPILLARISCOPIO
+CAPNOMETRO/CAPNOGRAFO
+CAPPA ASPIRANTE
+CAPPA BIOLOGICA
+CAPPA STERILE
+CAPPA STERILE A RAGGI ULTRAVIOLETTI
+CARDIOSTIMOLATORE ESTERNO
+CARRELLO PORTAPIANO
+CASCO STEREOTASSICO
+CATENA TV
+CENTRALE MONITORAGGIO
+CENTRIFUGA
+CENTRIFUGA REFRIGERATA
+CICLO PER USI FISIOTERAPICI E/O DIAGNOSTICI
+CICLOERGOMETRO
+CIRCOLAZIONE EXTRACORPOREA, SISTEMA PER
+CISTOSCOPIO
+CISTOURETROSCOPIO
+CITOCENTRIFUGA
+CITOFLUORIMETRO
+CITOMETRO A FLUSSO
+CLORURIMETRO
+COAGULOMETRO
+COLEDOCOSCOPIO
+COLONNA ENDOSCOPIA FLESSIBILE
+COLONNA PER LAPAROSCOPIA
+COLORATORE AUTOMATICO
+COLORATORE AUTOMATICO DI TESSUTI
+COLPOSCOPIO
+COMPRESSORE
+COMPRESSORE CARDIACO
+CONFEZIONATRICE SOTTOVUOTO
+CONGELATORE DA LABORATORIO
+CONGELAZIONE CONTROLLATA, APPARECCHIATURA PER
+CONSOLE DI COMANDO INIETTORE PER ANGIOGRAFIA
+CONSOLE DI COMANDO INIETTORE PER MEZZI DI CONTRASTO
+CONSOLE DI COMANDO INIETTORE PER RISONANZA MAGNETICA
+CONSOLLE PER GRUPPO RADIOLOGICO
+CONTRANGOLO
+CONTROLLO PER POMPE DI INFUSIONE, SISTEMA DI
+CONTROPULSATORE AORTICO
+CRIOCHIRURGIA, APPARECCHIO PER
+CRIOSTATO
+CROMATOGRAFO IN FASE LIQUIDA AD ELEVATE PRESTAZIONI
+CROMATOGRAFO SU STRATO SOTTILE
+DATALOGGER, SISTEMA PER
+DEFIBRILLATORE
+DENTALE A LUCE FREDDA, APPARECCHIO
+DERMATOSCOPIO
+DERMOGRAFO
+DERMOTOMIA, APPARECCHIATURA PER
+DIAFANOSCOPIO
+DIAGNOSI DELL APPARATO DIGERENTE A CAPSULA DEGLUTTIBILE
+DIALISI PERITONEALE, APPARECCHIO PER
+DIFFRATTOMETRO
+DISPENSATORE DOSE FDG
+DISPLAY
+DISPOSITIVO STIMOLAZIONE TRANSCUTANEA
+DISTACCO SPIRALI PER ANEURISMI CEREBRALI, APPARECCHIO PER
+DOSATORE
+DOSIMETRO
+ECOGASTROSCOPIO
+ECOOFTALMOGRAFO
+ECOTOMOGRAFO
+ECOTOMOGRAFO PORTATILE
+ECOVIDEOBRONCOSCOPIO
+ECTOCITOMETRO
+ELASTOMETRO
+ELETTROBISTURI
+ELETTROBISTURI PER ENDOSCOPIA
+ELETTROCARDIOGRAFO
+ELETTROENCEFALOGRAFO
+ELETTROFISIOLOGIA OCULARE, SISTEMA PER
+ELETTROFORESI, APPARECCHIO PER
+ELETTROMETRO
+ELETTROMIOGRAFO
+ELETTROPORAZIONE, APPARECCHIO PER
+ELETTRORETINOGRAFO
+ELETTROTERAPIA, APPARECCHIO PER
+EMETTITORE RAGGI UVA
+EMISSIONI OTOACUSTICHE, APPARECCHIO PER
+EMODIALISI, APPARECCHIO PER
+EMOFILTRAZIONE, APPARECCHIO PER
+EMOFLUSSIMETRO
+EMOGASANALIZZATORE
+EMOGLOBINA GLICOSILATA, APPARECCHIO PER
+EMOGLOBINOMETRO
+EMOSSIMETRO
+EMOVELOCIMETRO
+ENCEFALOSCOPIO
+ENDOSCOPIO
+ENDOSCOPIO PER INDAGINI AVANZATE
+EROGATORE DI OSSIGENO
+ESOFTALMOMETRO
+ESOSCOPIO
+EVACUATORE DI GAS ANESTETICI
+EVAPORATORE
+FANTOCCIO CONTROLLI QUALITA RX
+FANTOCCIO PER ANGIOGRAFIA
+FANTOCCIO PER PROVE DI RIANIMAZIONE
+FANTOCCIO PER ULTRASUONI
+FANTOCCIO X IMMAGINE MAMMOGRAFICA
+FETOSCOPIO
+FIBROSCOPIO PER INTUBAZIONE
+FILTRAZIONE, SISTEMA PER
+FISIOTERAPIA APPARECCHIO PER
+FLUORANGIOGRAFO
+FLUORIMETRO
+FLUSSIMETRO ARIA 15 l/min
+FLUSSIMETRO ARIA 30 l/min
+FLUSSIMETRO OSSIGENO 30 l/min
+FOTOTERAPIA PEDIATRICA, APPARECCHIO PER
+FRIGOEMOTECA
+FRIGOEMOTECA INTELLIGENTE
+FRIGORIFERO BIOLOGICO
+FRONTIFOCOMETRO
+GASCROMATOGRAFO
+GENERATORE DI ENERGIA A RADIOFREQUENZA/MICROONDE
+GENERATORE DI IDROGENO
+GENERATORE RADIOFREQUENZE
+GENERATORE ULTRASUONI
+GRUPPO DI CONTINUITA
+IMPEDENZA CORPOREA, ANALIZZATORE DI
+IMPEDENZOMETRO
+INCLUSORE AUTOMATICO DI PARAFFINA
+INCUBATORE
+INCUBATORE AD ANIDRIDE CARBONICA
+INCUBATRICE NEONATALE
+INCUBATRICE NEONATALE DA TRASPORTO
+INFANTOMETRO
+INFUSIONE INTRAOSSEA. APPARECCHIO PER
+INIETTORE ANGIOGRAFICO
+INIETTORE MULTIPLO DI MEZZI DI CONTRASTO
+INIETTORE PER RISONANZA MAGNETICA
+INSUFFLATORE DI GAS
+INTOLLERANZA AL LATTOSIO, APPARECCHIO PER
+IONOFORESI, APPARECCHIO PER
+IPO-IPERTERMIA, APPARECCHIO PER
+IRRAGGIATORE DI ULTRAVIOLETTI
+IRRIGATORE
+ISTEROSCOPIO
+ISTEROSUTTORE
+KIT PER PROCEDURE CHIRURGICHE
+LACCIO EMOSTATICO PNEUMATICO
+LAMA VIDEOLARINGOSCOPIO
+LAMPADA A FESSURA
+LAMPADA A FLUORESCENZA
+LAMPADA CROMOTERAPIA
+LAMPADA DA FOTOTERAPIA CON MATERASSINO
+LAMPADA FRONTALE
+LAMPADA RAGGI INFRAROSSI
+LAMPADA RAGGI ULTRAVIOLETTI
+LAMPADA RAGGI ULTRAVIOLETTI-INFRAROSSI
+LAMPADA SCIALITICA
+LAMPADA SCIALITICA PORTATILE/MOBILE
+LAPAROSCOPIO
+LARINGOSCOPIO
+LARINGOSTROBOSCOPIO
+LASER A DIODI
+LASER CHIRURGICO
+LAVAGGIO AD ULTRASUONI, APPARECCHIATURA PER
+LAVAGGIO E DISINFEZIONE, APPARECCHIO PER
+LAVATRICE PER ENDOSCOPI
+LETTINO ELETTRICO PER VISITE, ESAMI E TRATTAMENTI
+LETTO ELETTROCOMANDATO PER TERAPIA INTENSIVA O RIANIMAZIONE
+LETTO GINECOLOGICO
+LETTO O POLTRONA A BILANCIA PER DIALISI
+LETTO PER DEGENZA ELETTRIFICATO
+LETTO PER RIANIMAZIONE NEONATALE
+LETTO/POLTRONA ELETTRIFICATO DA PARTO
+LETTORE HOLTER EEG
+LITOTRITORE ENDOSCOPICO
+LOCALIZZATORE DI FORAME APICALE
+LUMINOMETRO
+MAGNETOMETRO
+MANOMETRIA GASTROENTEROLOGICA, APPARECCHIO PER
+MAPPATURA CARDIACA, APPARECCHIO PER
+MASTOSUTTORE
+MEDIASTINOSCOPIO
+MICROINFUSORE PORTATILE
+MICROINIETTORE
+MICROMANIPOLATORE
+MICROSCOPIO DIGITALE DA LABORATORIO
+MICROSCOPIO OPERATORIO
+MICROSCOPIO OTTICO DA LABORATORIO
+MICROTOMO
+MICROTOMO AD ULTRASUONI
+SPOT CHECK
+MISURATORE DI PRESSIONE INTRACRANICA
+MISURATORE DOPPLER DELLA GITTATA CARDIACA
+MISURATORE GITTATA CARDIACA
+MODULO PER LA COAGULAZIONE AD ARGON
+MONITOR
+MONITOR CENTRALIZZATO
+MONITOR FETALE
+MONITOR TELEVISIVO PER BIOIMMAGINI
+MONITOR TRANSCUTANEO PCO2/SPO2
+MONITOR TRANSCUTANEO PO2/PCO2
+MONITORAGGIO DEL SISTEMA NERVOSO, SISTEMA PER IL
+MONITORAGGIO DELLA TRASMISSIONE NEUROMUSCOLARE, APPARECCHIO PER
+MONTA VETRINI AUTOMATICO
+MORCELLATORE
+NASO FARINGO/LARINGOSCOPIO
+NEFROSCOPIO
+OFTALMOMETRO
+OFTALMOSCOPIO
+OSSIDO NITRICO, EROGATORE DI
+OSSIMETRO CEREBRALE
+OTOSCOPIO
+OTTICA PER ENDOSCOPIA
+OTTICA RIGIDA
+PASTORIZZATORE
+PENSILE
+PENSILE DOPPIO
+PIATTAFORMA PER INCUBATRICE NEONATALE DA TRASPORTO
+PLETISMOGRAFO
+POLIGRAFO
+POLISONNIGRAFO
+POMPA A SIRINGA
+POMPA A SIRINGA (TIVA)
+POMPA DI INFUSIONE
+POMPA PER IRRIGAZIONE LAPAROSCOPIA
+PORTATILE PER RADIOGRAFIA, APPARECCHIO
+PORTATILE PER RADIOSCOPIA, APPARECCHIO
+POSIZIONAMENTO ELETTRODI DI STIMOLAZIONE CEREBRALE, SISTEMA
+POTENZIALI EVOCATI, APPARECCHIO PER L ANALISI DEI
+PREPARATORE LIQUIDO DI DIALISI
+PRESSIONE POSITIVA CONTINUA, APPARECCHIO PER (CPAP)
+PRESSOTERAPIA, APPARECCHIO PER
+PRODUZIONE ACQUA PURA, APPARECCHIO PER
+PROGRAMMATORE PER VALVOLA IDROCEFALICA
+PROGRAMMATORE PORTATILE PER NEUROSTIMOLATORE
+PULSOSSIMETRO
+PUPILLOMETRIA, APPARECCHIO PER
+RADIOBISTURI
+RECUPERO LIQUIDI ORGANICI, APPARECCHIO PER
+HOLTER DELLA PRESSIONE SANGUIGNA
+HOLTER ECG
+HOLTER PER PARAMETRI FISIOLOGICI
+REGOLATORE PER VUOTO
+RESECTOSCOPIO
+RETINOGRAFO
+RETINOSCOPIO
+RINOSCOPIO
+RIPRODUTTORE VIDEO O DIGITALE DI BIOIMMAGINI
+RISCALDATORE LIQUIDI PER IRRIGAZIONE
+RISCALDATORE PER INFUSIONE
+RISCALDATORE RADIANTE PER NEONATI
+RISCALDATORE SANGUIGNO
+RIUNITO DENTISTICO
+RIUNITO OFTALMOLOGICO
+RIUNITO OTORINOLARINGOIATRICO
+RIVELATORE BATTITO CARDIACO FETALE
+SALDATORE DI SACCHE
+SCALDASACCHE A BAGNO TERMOSTATICO
+SCALDASACCHE A SECCO
+CIRCOLAZIONE EXTRACORPOREA (CEC)
+SEGA PER GESSI
+SEGA PER ORTOPEDIA
+SFIGMOMANOMETRO
+SISTEMA ANTIDECUBITO
+SISTEMA DI DI LAVAGGIO DEGLI ENDOSCOPI FLESSIBILI
+SISTEMA DI NAVIGAZIONE
+NEURONAVIGATORE
+SISTEMA DI PERFUSIONE DEL FEGATO
+SISTEMA DI PERFUSIONE POLMONARE
+SISTEMA LITOTRISSIA INTRAOPERATORIA
+SISTEMA MOTORIZZATO PER CHIRURGIA ORTOPEDICA
+SISTEMA MOTORIZZATO PER CHIRURGIA OTORINOLARINGOIATRICA
+SISTEMA PASSAMALATI
+SISTEMA PER LA RIABILITAZIONE DEL PAVIMENTO PELVICO
+SISTEMA PER RADIOLOGIA DIGITALE
+SISTEMA DI VIDEO-INTEGRAZIONE
+SISTEMA POLIFUNZIONALE PER RADIOLOGIA DIGITALE
+SISTEMA ROBOTIZZATO PER CHIRURGIA ENDOSCOPICA
+SISTEMA ROBOTIZZATO PREPARAZIONE FARMACI
+SOLLEVAMENTO MALATI, APPARECCHIO PER
+SONDA ECOGRAFICA
+SPIROMETRO AD USO CLINICO DIAGNOSTICO
+SPREMISACCA
+STAMPANTE PER ETICHETTE
+STERILIZZATRICE PER ENDOSCOPI
+STERILIZZAZIONE CHIMICA, APPARECCHIO PER
+STERNOTOMO
+TAVOLO OPERATORIO
+TELECAMERA PER TECNICHE ENDOSCOPICHE
+TELEMETRIA
+TERMOREGOLAZIONE CORPOREA NEONATALE
+TERMOREGOLAZIONE CORPOREA, APPARECCHIO PER
+TERMOSALDATRICE
+TELECAMERA AMBIENTALE
+TELECAMERA CHIRURGICA
+RISONANZA MAGNETICA
+TOMOGRAFO AD IMPEDENZA ELETTRICA PER VENTILAZIONE POLMONARE
+TOMOGRAFO ASSIALE COMPUTERIZZATO
+TOUCH PANEL
+TRANSILLUMINATORE
+TRAPANO DA DENTISTA
+TRAPANO ORTOPEDICO
+TRAPANO OTOLOGICO
+TRASPORTO MATERIALE ORGANICO, APPARECCHIO PER IL
+TRATTAMENTO TESSUTI BIOLOGICI, APPARECCHIO PER
+TROMBOELASTOGRAFO
+UMIDIFICATORE
+UMIDICATORE (AIRVO)
+URETERONEFROSCOPIO
+URODINAMICA, SISTEMA PER
+UROFLUSSOMETRO
+VAPORIZZATORE
+VASCA DA PARTO
+VELOCITA\` DI ERITRO-SEDIMENTAZIONE, APPARECCHIO PER
+VENTILATORE POLMONARE AMAGNETICO
+VENTILATORE POLMONARE PER USO EXTRAOSPEDALIERO
+VENTILATORE POLMONARE PER USO OSPEDALIERO
+VENTILATORE POLMONARE TRASPORTABILE D EMERGENZA
+VIDEOLARINGOSCOPIO
+`;
 let occurrencesMap = null;
 
 function resetMapLoadSequence() {
@@ -191,57 +585,150 @@ const apparecchiaturaRows = [];
 
 const impiantisticaRows = [
   {
-    tipologia: 'Presa O2',
+    tipologia: 'Presa elettrica',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
   },
   {
-    tipologia: 'Presa Aria med',
+    tipologia: 'Presa 16A',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
   },
   {
-    tipologia: 'Presa vuoto',
+    tipologia: 'Presa 32A',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
   },
   {
-    tipologia: 'Presa Evac',
+    tipologia: 'Presa dati RJ45',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
-  },{
+  },
+  {
+    tipologia: 'Remorizzazione allarme frigo',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa Ossigeno',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa Aria med 3-4 bar',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa Aria tec 7-8 bar',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa CO2',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Presa EVAC',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
     tipologia: 'Presa Protossido',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
-  },{
-    tipologia: 'Presa Elettrica',
+  },
+  {
+    tipologia: 'Punto acqua fredda',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
-  },{
-    tipologia: 'Presa Dati',
+  },
+  {
+    tipologia: 'Punto acqua calda',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
-  },{
-    tipologia: 'Punto Acqua',
+  },
+  {
+    tipologia: 'Scarico acqua',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
-  },{
-    tipologia: 'Scarico Acqua',
+  },
+  {
+    tipologia: 'Aspirazione esterna',
     qtaPresenti: '',
     qtaDaImplementare: '',
     note: ''
-  },{
-    tipologia: 'Presa Interbloccata',
+  },
+  {
+    tipologia: 'Vapore',
     qtaPresenti: '',
     qtaDaImplementare: '',
+    note: ''
+  },
+  {
+    tipologia: 'Placche prese video',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  }
+];
+
+const altreDotazioniRows = [
+  {
+    altraDotazione: 'Climatizzazione dedicata',
+    presente: '',
+    daImplementare: '',
+    note: ''
+  },
+  {
+    altraDotazione: 'Badge',
+    presente: '',
+    daImplementare: '',
+    note: ''
+  },
+  {
+    altraDotazione: 'Telecamera IT',
+    presente: '',
+    daImplementare: '',
+    note: ''
+  },
+  {
+    altraDotazione: 'Armadio farmaci intelligente',
+    presente: '',
+    daImplementare: '',
+    note: ''
+  },
+  {
+    altraDotazione: 'Testa-letto',
+    presente: '',
+    daImplementare: '',
+    note: ''
+  },
+  {
+    altraDotazione: 'Barra normalizzata verticale',
+    presente: '',
+    daImplementare: '',
+    note: ''
+  },
+  {
+    altraDotazione: 'Barra normalizzata orizzontale',
+    presente: '',
+    daImplementare: '',
     note: ''
   }
 ];
@@ -299,11 +786,6 @@ function getRoomCodeWithoutAsterisks(textValue) {
 }
 
 const editableFieldConfigs = {
-  roomCode: {
-    valueElement: roomCodeValue,
-    inputElement: roomCodeInput,
-    buttonElement: editRoomCodeButton
-  },
   roomCodeName: {
     valueElement: roomCodeNameValue,
     inputElement: roomCodeNameInput,
@@ -318,8 +800,47 @@ const editableFieldConfigs = {
     valueElement: roomDepartmentValue,
     inputElement: roomDepartmentInput,
     buttonElement: editRoomDepartmentButton
+  },
+  roomSurface: {
+    valueElement: roomSurfaceValue,
+    inputElement: roomSurfaceInput,
+    buttonElement: editRoomSurfaceButton
+  },
+  roomHemifloor: {
+    valueElement: roomHemifloorValue,
+    inputElement: roomHemifloorInput,
+    buttonElement: editRoomHemifloorButton
+  },
+  roomAccreditation: {
+    valueElement: roomAccreditationValue,
+    inputElement: roomAccreditationInput,
+    buttonElement: editRoomAccreditationButton
+  },
+  roomBedCount: {
+    valueElement: roomBedCountValue,
+    inputElement: roomBedCountInput,
+    buttonElement: editRoomBedCountButton
+  },
+  roomFurnitureNotes: {
+    valueElement: roomFurnitureNotesValue,
+    inputElement: roomFurnitureNotesInput,
+    buttonElement: editRoomFurnitureNotesButton
   }
 };
+
+function getSafeRecordValue(record, key) {
+  return String((record && record[key]) || '-').trim() || '-';
+}
+
+function getSafeRecordValueFromKeys(record, keys) {
+  for (const key of keys) {
+    const candidateValue = String((record && record[key]) || '').trim();
+    if (candidateValue !== '') {
+      return candidateValue;
+    }
+  }
+  return '-';
+}
 
 function stopEditingField(fieldName, saveChanges) {
   const fieldConfig = editableFieldConfigs[fieldName];
@@ -422,6 +943,29 @@ function normalizeApparecchiaturaTipologiaValue(value) {
   return legacyToCurrentTipologiaMap[normalizedValue] || '';
 }
 
+function populateApparecchiaturaSelectOptions() {
+  if (!appTipologiaInput) {
+    return;
+  }
+
+  const optionValues = Array.from(
+    new Set(
+      apparecchiaturaCatalogText
+        .split('\n')
+        .map((item) => item.trim())
+        .filter((item) => item !== '')
+    )
+  );
+
+  appTipologiaInput.innerHTML = '<option value="" selected></option>';
+  optionValues.forEach((optionValue) => {
+    const optionElement = document.createElement('option');
+    optionElement.value = optionValue;
+    optionElement.textContent = optionValue;
+    appTipologiaInput.appendChild(optionElement);
+  });
+}
+
 function normalizeApparecchiaturaRow(row) {
   const safeRow = row && typeof row === 'object' ? row : {};
   const apparecchiaturaValue = String(safeRow.apparecchiatura || safeRow.tipologia || '-').trim() || '-';
@@ -429,6 +973,8 @@ function normalizeApparecchiaturaRow(row) {
   return {
     apparecchiatura: apparecchiaturaValue,
     tipologia: normalizeApparecchiaturaTipologiaValue(safeRow.tipologia),
+    produttore: String(safeRow.produttore || '-').trim() || '-',
+    modello: String(safeRow.modello || '-').trim() || '-',
     qta: String(safeRow.qta || '0').trim() || '0',
     nuovo: String(safeRow.nuovo || '-').trim() || '-',
     trasferimento: String(safeRow.trasferimento || '-').trim() || '-',
@@ -447,6 +993,8 @@ function getApparecchiaturaFormData() {
   return {
     apparecchiatura: appTipologiaInput.value.trim(),
     tipologia: normalizeApparecchiaturaTipologiaValue(appInstallazioneTipologiaInput.value),
+    produttore: appProduttoreInput.value.trim(),
+    modello: appModelloInput.value.trim(),
     qta: appQtaInput.value.trim(),
     nuovo: appNuovoInput.value.trim(),
     trasferimento: appTrasferimentoInput.value.trim(),
@@ -458,6 +1006,8 @@ function getApparecchiaturaFormData() {
 function resetApparecchiaturaForm() {
   appTipologiaInput.value = '';
   appInstallazioneTipologiaInput.value = '';
+  appProduttoreInput.value = '';
+  appModelloInput.value = '';
   appQtaInput.value = '';
   appNuovoInput.value = '';
   appTrasferimentoInput.value = '';
@@ -475,6 +1025,8 @@ function renderApparecchiaturaTable() {
     <tr>
       <td>${escapeHtml(normalizedRow.apparecchiatura)}</td>
       <td>${escapeHtml(normalizedRow.tipologia || '-')}</td>
+      <td>${escapeHtml(normalizedRow.produttore)}</td>
+      <td>${escapeHtml(normalizedRow.modello)}</td>
       <td>${escapeHtml(normalizedRow.qta)}</td>
       <td>${escapeHtml(normalizedRow.nuovo)}</td>
       <td>${escapeHtml(normalizedRow.trasferimento)}</td>
@@ -486,7 +1038,7 @@ function renderApparecchiaturaTable() {
   }).join('');
 
   apparecchiaturaTableBody.innerHTML = rowsHtml || `
-    <tr><td colspan="8">Nessun dato inserito.</td></tr>
+    <tr><td colspan="10">Nessun dato inserito.</td></tr>
   `;
 
   apparecchiaturaTableBody.querySelectorAll('[data-app-edit]').forEach((button) => {
@@ -502,6 +1054,8 @@ function renderApparecchiaturaTable() {
 
       appTipologiaInput.value = normalizedSelectedRow.apparecchiatura;
       appInstallazioneTipologiaInput.value = normalizedSelectedRow.tipologia;
+      appProduttoreInput.value = normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore;
+      appModelloInput.value = normalizedSelectedRow.modello === '-' ? '' : normalizedSelectedRow.modello;
       appQtaInput.value = normalizedSelectedRow.qta;
       appNuovoInput.value = normalizedSelectedRow.nuovo;
       appTrasferimentoInput.value = normalizedSelectedRow.trasferimento;
@@ -605,18 +1159,123 @@ function renderImpiantisticaTable() {
   });
 }
 
+function renderAltreDotazioniTable() {
+  const yesNoOptions = [
+    { value: '', label: '' },
+    { value: 'Si', label: 'Si' },
+    { value: 'No', label: 'No' }
+  ];
+
+  const rowsHtml = altreDotazioniRows.map((row, index) => {
+    const isRowEditing = editingAltreDotazioniIndex === index;
+    const presenteOptions = yesNoOptions.map((option) => {
+      const isSelected = row.presente === option.value ? 'selected' : '';
+      return `<option value="${escapeHtml(option.value)}" ${isSelected}>${escapeHtml(option.label)}</option>`;
+    }).join('');
+
+    const daImplementareOptions = yesNoOptions.map((option) => {
+      const isSelected = row.daImplementare === option.value ? 'selected' : '';
+      return `<option value="${escapeHtml(option.value)}" ${isSelected}>${escapeHtml(option.label)}</option>`;
+    }).join('');
+
+    return `
+    <tr>
+      <td>${escapeHtml(row.altraDotazione || '-')}</td>
+      <td>
+        <select class="table-inline-input" data-alt-presente="${index}" ${isRowEditing ? '' : 'disabled'}>
+          ${presenteOptions}
+        </select>
+      </td>
+      <td>
+        <select class="table-inline-input" data-alt-implementare="${index}" ${isRowEditing ? '' : 'disabled'}>
+          ${daImplementareOptions}
+        </select>
+      </td>
+      <td>
+        <input
+          type="text"
+          class="table-inline-input"
+          data-alt-note="${index}"
+          value="${escapeHtml(row.note || '')}"
+          ${isRowEditing ? '' : 'disabled'}
+        >
+      </td>
+      <td>
+        <button type="button" class="row-edit-button" data-alt-edit="${index}">
+          ${isRowEditing ? 'Salva' : 'Modifica'}
+        </button>
+      </td>
+    </tr>
+  `;
+  }).join('');
+
+  altreDotazioniTableBody.innerHTML = rowsHtml || '<tr><td colspan="5">Nessun dato inserito.</td></tr>';
+
+  altreDotazioniTableBody.querySelectorAll('[data-alt-presente]').forEach((selectElement) => {
+    selectElement.addEventListener('change', () => {
+      const rowIndex = Number(selectElement.dataset.altPresente);
+      const selectedRow = altreDotazioniRows[rowIndex];
+      if (!selectedRow) {
+        return;
+      }
+      selectedRow.presente = selectElement.value;
+    });
+  });
+
+  altreDotazioniTableBody.querySelectorAll('[data-alt-implementare]').forEach((selectElement) => {
+    selectElement.addEventListener('change', () => {
+      const rowIndex = Number(selectElement.dataset.altImplementare);
+      const selectedRow = altreDotazioniRows[rowIndex];
+      if (!selectedRow) {
+        return;
+      }
+      selectedRow.daImplementare = selectElement.value;
+    });
+  });
+
+  altreDotazioniTableBody.querySelectorAll('[data-alt-note]').forEach((inputElement) => {
+    inputElement.addEventListener('input', () => {
+      const rowIndex = Number(inputElement.dataset.altNote);
+      const selectedRow = altreDotazioniRows[rowIndex];
+      if (!selectedRow) {
+        return;
+      }
+      selectedRow.note = inputElement.value.trim();
+    });
+  });
+
+  altreDotazioniTableBody.querySelectorAll('[data-alt-edit]').forEach((buttonElement) => {
+    buttonElement.addEventListener('click', () => {
+      const rowIndex = Number(buttonElement.dataset.altEdit);
+      if (editingAltreDotazioniIndex === rowIndex) {
+        editingAltreDotazioniIndex = null;
+      } else {
+        editingAltreDotazioniIndex = rowIndex;
+      }
+      renderAltreDotazioniTable();
+    });
+  });
+}
+
 function setActiveModalSection(sectionName) {
   const isApparecchiatura = sectionName === 'apparecchiatura';
+  const isImpiantistica = sectionName === 'impiantistica';
+  const isAltreDotazioni = sectionName === 'altre-dotazioni';
 
   sectionApparecchiaturaButton.classList.toggle('is-active', isApparecchiatura);
   sectionApparecchiaturaButton.setAttribute('aria-selected', String(isApparecchiatura));
   contentApparecchiatura.classList.toggle('is-active', isApparecchiatura);
   contentApparecchiatura.hidden = !isApparecchiatura;
 
-  sectionImpiantisticaButton.classList.toggle('is-active', !isApparecchiatura);
-  sectionImpiantisticaButton.setAttribute('aria-selected', String(!isApparecchiatura));
-  contentImpiantistica.classList.toggle('is-active', !isApparecchiatura);
-  contentImpiantistica.hidden = isApparecchiatura;
+  sectionImpiantisticaButton.classList.toggle('is-active', isImpiantistica);
+  sectionImpiantisticaButton.setAttribute('aria-selected', String(isImpiantistica));
+  contentImpiantistica.classList.toggle('is-active', isImpiantistica);
+  contentImpiantistica.hidden = !isImpiantistica;
+
+  sectionAltreDotazioniButton.classList.toggle('is-active', isAltreDotazioni);
+  sectionAltreDotazioniButton.setAttribute('aria-selected', String(isAltreDotazioni));
+  contentAltreDotazioni.classList.toggle('is-active', isAltreDotazioni);
+  contentAltreDotazioni.hidden = !isAltreDotazioni;
 }
 
 function clearRoomValidationStatus() {
@@ -651,8 +1310,13 @@ function validateRoomOccurrence(roomCode) {
     return;
   }
 
-  roomCodeNameValue.textContent = String(record.Nome || '-').trim() || '-';
-  roomOccupazioneValue.textContent = String(record.Occupazione || '-').trim() || '-';
+  roomCodeNameValue.textContent = getSafeRecordValue(record, 'Nome');
+  roomOccupazioneValue.textContent = getSafeRecordValue(record, 'Occupazione');
+  roomSurfaceValue.textContent = getSafeRecordValueFromKeys(record, ['Area', 'Superficie']);
+  roomHemifloorValue.textContent = getSafeRecordValue(record, 'Emipiano');
+  roomAccreditationValue.textContent = getSafeRecordValue(record, 'Accreditamento Locale');
+  roomBedCountValue.textContent = getSafeRecordValue(record, 'Posti letto');
+  roomFurnitureNotesValue.textContent = getSafeRecordValue(record, 'Note arredi e segnaletica');
   showRoomValidationOk();
 }
 
@@ -662,11 +1326,17 @@ function openModal(textValue) {
   roomCodeNameValue.textContent = '-';
   roomOccupazioneValue.textContent = '-';
   roomDepartmentValue.textContent = 'cardiologia';
+  roomSurfaceValue.textContent = '-';
+  roomHemifloorValue.textContent = '-';
+  roomAccreditationValue.textContent = '-';
+  roomBedCountValue.textContent = '-';
+  roomFurnitureNotesValue.textContent = '-';
   clearRoomValidationStatus();
   validateRoomOccurrence(roomCode);
   resetEditableFieldsState();
   resetApparecchiaturaForm();
   editingImpiantisticaIndex = null;
+  editingAltreDotazioniIndex = null;
   setActiveModalSection('apparecchiatura');
   modalOverlay.classList.add('is-open');
   modalOverlay.setAttribute('aria-hidden', 'false');
@@ -777,6 +1447,8 @@ function handleAddApparecchiatura() {
   const newRow = normalizeApparecchiaturaRow({
     apparecchiatura: rawRow.apparecchiatura || '-',
     tipologia: rawRow.tipologia,
+    produttore: rawRow.produttore || '-',
+    modello: rawRow.modello || '-',
     qta: rawRow.qta || '0',
     nuovo: rawRow.nuovo || '-',
     trasferimento: rawRow.trasferimento || '-',
@@ -815,15 +1487,20 @@ zoomInButton.addEventListener('click', handleZoomIn);
 zoomOutButton.addEventListener('click', handleZoomOut);
 zoomResetButton.addEventListener('click', handleZoomReset);
 modalCloseButton.addEventListener('click', closeModal);
-setupEditableFieldEvents('roomCode');
 setupEditableFieldEvents('roomCodeName');
 setupEditableFieldEvents('roomOccupazione');
 setupEditableFieldEvents('roomDepartment');
+setupEditableFieldEvents('roomSurface');
+setupEditableFieldEvents('roomHemifloor');
+setupEditableFieldEvents('roomAccreditation');
+setupEditableFieldEvents('roomBedCount');
+setupEditableFieldEvents('roomFurnitureNotes');
 appAddButton.addEventListener('click', handleAddApparecchiatura);
 appSaveButton.addEventListener('click', handleSaveApparecchiatura);
 appCancelButton.addEventListener('click', resetApparecchiaturaForm);
 sectionApparecchiaturaButton.addEventListener('click', () => setActiveModalSection('apparecchiatura'));
 sectionImpiantisticaButton.addEventListener('click', () => setActiveModalSection('impiantistica'));
+sectionAltreDotazioniButton.addEventListener('click', () => setActiveModalSection('altre-dotazioni'));
 modalOverlay.addEventListener('click', (event) => {
   if (event.target === modalOverlay) {
     closeModal();
@@ -885,3 +1562,5 @@ if (isFloorMapReady) {
 
 renderApparecchiaturaTable();
 renderImpiantisticaTable();
+renderAltreDotazioniTable();
+populateApparecchiaturaSelectOptions();

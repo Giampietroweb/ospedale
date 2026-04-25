@@ -5,6 +5,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mappa SVG con Zoom</title>
   <link rel="stylesheet" href="../style.css">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="googlebot" content="noindex, nofollow">
+  <meta name="bingbot" content="noindex, nofollow">
+  <meta name="yandexbot" content="noindex, nofollow">
+  <meta name="duckduckbot" content="noindex, nofollow">
+  <meta name="baidu" content="noindex, nofollow">
+  <meta name="sogou" content="noindex, nofollow">
+  <meta name="360" content="noindex, nofollow">
+  <meta name="sogou" content="noindex, nofollow">
+  <meta name="sogou" content="noindex, nofollow">
 </head>
 <body>
   <div class="toolbar">
@@ -31,17 +41,16 @@
   <div id="modalOverlay" class="modal-overlay" aria-hidden="true">
     <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <button id="modalClose" class="modal-close" type="button" aria-label="Chiudi modale">&times;</button>
-      <h2 id="modalTitle" class="modal-title">Dettagli stanza</h2>
-      <div id="roomValidationStatus" class="modal-validation-status" hidden></div>
-      <div class="modal-header-fields">
-        <div class="modal-field">
-          <span class="modal-field-label">Id-stanza (Codice semplificato)</span>
-          <div class="modal-field-main">
-            <span id="roomCodeValue" class="modal-field-value">-</span>
-            <input id="roomCodeInput" class="modal-field-input" type="text" hidden>
-            <button id="editRoomCodeButton" class="modal-edit-button" type="button">Modifica</button>
-          </div>
+      <div class="modal-title-row">
+        <h2 id="modalTitle" class="modal-title">Dettagli stanza</h2>
+        <div class="modal-title-meta">
+          <span id="roomCodeValue" class="modal-room-code-badge" aria-label="Id-stanza">-</span>
+          <div id="roomValidationStatus" class="modal-validation-status" hidden></div>
         </div>
+      </div>
+      <details class="modal-header-secondary">
+        <summary class="modal-header-secondary-toggle">Altri attributi stanza</summary>
+        <div class="modal-header-fields modal-header-fields-secondary">
         <div class="modal-field">
           <span class="modal-field-label">Codice (Nome)</span>
           <div class="modal-field-main">
@@ -59,24 +68,73 @@
           </div>
         </div>
         <div class="modal-field">
-          <span class="modal-field-label">Reparto (no lo scrive lei)</span>
+          <span class="modal-field-label">Emipiano</span>
           <div class="modal-field-main">
-            <span id="roomDepartmentValue" class="modal-field-value">cardiologia</span>
+            <span id="roomHemifloorValue" class="modal-field-value">-</span>
+            <select id="roomHemifloorInput" class="modal-field-input" hidden>
+              <option value=""></option>
+              <option value="ovest">ovest</option>
+              <option value="est">est</option>
+              <option value="vuoto">vuoto</option>
+            </select>
+            <button id="editRoomHemifloorButton" class="modal-edit-button" type="button">Modifica</button>
+          </div>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field-label">Superficie</span>
+          <div class="modal-field-main">
+            <span id="roomSurfaceValue" class="modal-field-value">-</span>
+            <input id="roomSurfaceInput" class="modal-field-input" type="text" hidden>
+            <button id="editRoomSurfaceButton" class="modal-edit-button" type="button">Modifica</button>
+          </div>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field-label">Reparto</span>
+          <div class="modal-field-main">
+            <span id="roomDepartmentValue" class="modal-field-value"></span>
             <input id="roomDepartmentInput" class="modal-field-input" type="text" hidden>
             <button id="editRoomDepartmentButton" class="modal-edit-button" type="button">Modifica</button>
           </div>
         </div>
-      </div>
+        <div class="modal-field">
+          <span class="modal-field-label">Accreditamento Locale</span>
+          <div class="modal-field-main">
+            <span id="roomAccreditationValue" class="modal-field-value">-</span>
+            <input id="roomAccreditationInput" class="modal-field-input" type="text" hidden>
+            <button id="editRoomAccreditationButton" class="modal-edit-button" type="button">Modifica</button>
+          </div>
+        </div>
+        <div class="modal-field">
+          <span class="modal-field-label">Posti letto (numero)</span>
+          <div class="modal-field-main">
+            <span id="roomBedCountValue" class="modal-field-value">-</span>
+            <input id="roomBedCountInput" class="modal-field-input" type="number" min="0" hidden>
+            <button id="editRoomBedCountButton" class="modal-edit-button" type="button">Modifica</button>
+          </div>
+        </div>
+        <div class="modal-field modal-field-full-width">
+          <span class="modal-field-label">Note arredi e segnaletica</span>
+          <div class="modal-field-main">
+            <span id="roomFurnitureNotesValue" class="modal-field-value">-</span>
+            <textarea id="roomFurnitureNotesInput" class="modal-field-input" rows="3" hidden></textarea>
+            <button id="editRoomFurnitureNotesButton" class="modal-edit-button" type="button">Modifica</button>
+          </div>
+        </div>
+        </div>
+      </details>
       <div class="modal-sections" role="tablist" aria-label="Sezioni dati stanza">
         <button id="sectionApparecchiatura" class="modal-section-button is-active" type="button" role="tab" aria-selected="true">Apparecchiatura</button>
-        <button id="sectionImpiantistica" class="modal-section-button" type="button" role="tab" aria-selected="false">Impiantistica</button>
+        <button id="sectionImpiantistica" class="modal-section-button" type="button" role="tab" aria-selected="false">Dotazioni impiantistiche</button>
+        <button id="sectionAltreDotazioni" class="modal-section-button" type="button" role="tab" aria-selected="false">Altre dotazioni</button>
       </div>
       <div id="contentApparecchiatura" class="modal-section-content is-active" role="tabpanel">
         <div class="table-editor" id="apparecchiaturaEditor">
           <div class="table-editor-grid">
             <label class="table-editor-field">
               <span>Apparecchiatura</span>
-              <input id="appTipologiaInput" type="text">
+              <select id="appTipologiaInput">
+                <option value="" selected></option>
+              </select>
             </label>
             <label class="table-editor-field">
               <span>Ancoraggio</span>
@@ -86,7 +144,16 @@
                 <option value="Parete">Parete</option>
                 <option value="Pensile">Pensile</option>
                 <option value="Soffitto">Soffitto</option>
+                <option value="Barra">Barra</option>
               </select>
+            </label>
+            <label class="table-editor-field">
+              <span>Produttore</span>
+              <input id="appProduttoreInput" type="text">
+            </label>
+            <label class="table-editor-field">
+              <span>Modello</span>
+              <input id="appModelloInput" type="text">
             </label>
             <label class="table-editor-field">
               <span>Qta</span>
@@ -128,6 +195,8 @@
             <tr>
               <th>Apparecchiatura</th>
               <th>Tipologia</th>
+              <th>Produttore</th>
+              <th>Modello</th>
               <th>Qta</th>
               <th>Nuovo</th>
               <th>Trasferimento</th>
@@ -151,6 +220,20 @@
             </tr>
           </thead>
           <tbody id="impiantisticaTableBody"></tbody>
+        </table>
+      </div>
+      <div id="contentAltreDotazioni" class="modal-section-content" role="tabpanel" hidden>
+        <table class="modal-table">
+          <thead>
+            <tr>
+              <th>Altre dotazioni</th>
+              <th>Presente</th>
+              <th>Da implementare</th>
+              <th>Note</th>
+              <th>Azioni</th>
+            </tr>
+          </thead>
+          <tbody id="altreDotazioniTableBody"></tbody>
         </table>
       </div>
     </div>

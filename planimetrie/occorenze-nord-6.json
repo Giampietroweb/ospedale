@@ -2,1331 +2,1597 @@
     {
       "Codice semplificato": "P6-191-029",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,2 m²"
     },
     {
       "Codice semplificato": "P6-191-032",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-191-035",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-191-038",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-191-040",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-191-042",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,6 m²"
     },
     {
       "Codice semplificato": "P6-191-045",
       "Nome": "CSA",
-      "Occupazione": "Caposala"
+      "Occupazione": "Caposala",
+      "Area": "18,9 m²"
     },
     {
       "Codice semplificato": "P6-191-046",
       "Nome": "MED",
-      "Occupazione": "Medicheria"
+      "Occupazione": "Medicheria",
+      "Area": "18,7 m²"
     },
     {
       "Codice semplificato": "P6-191-048",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
     },
     {
       "Codice semplificato": "P6-191-050",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
     },
     {
       "Codice semplificato": "P6-191-052",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
     },
     {
       "Codice semplificato": "P6-191-054",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-191-056",
       "Nome": "LME",
-      "Occupazione": "Locale medici"
+      "Occupazione": "Locale medici",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-191-058",
       "Nome": "LME",
-      "Occupazione": "Locale medici"
+      "Occupazione": "Locale medici",
+      "Area": "17,2 m²"
     },
     {
       "Codice semplificato": "P6-191-060",
       "Nome": "ABP",
-      "Occupazione": "Antibagno personale"
+      "Occupazione": "Antibagno personale",
+      "Area": "5,0 m²"
     },
     {
       "Codice semplificato": "P6-191-062",
       "Nome": "WPU",
-      "Occupazione": "WC personale uomini"
+      "Occupazione": "WC personale uomini",
+      "Area": "1,6 m²"
     },
     {
       "Codice semplificato": "P6-191-061",
       "Nome": "WPD",
-      "Occupazione": "WC personale donne"
+      "Occupazione": "WC personale donne",
+      "Area": "1,5 m²"
     },
     {
       "Codice semplificato": "P6-191-065",
       "Nome": "DAP",
-      "Occupazione": "Deposito apparecchiature"
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "9,7 m²"
     },
     {
       "Codice semplificato": "P6-191-066",
       "Nome": "DPU",
-      "Occupazione": "Deposito pulito"
+      "Occupazione": "Deposito pulito",
+      "Area": "6,7 m²"
     },
     {
       "Codice semplificato": "P6-191-068",
       "Nome": "PAN",
-      "Occupazione": "Tisaneria"
+      "Occupazione": "Tisaneria",
+      "Area": "10,2 m²"
     },
     {
       "Codice semplificato": "P6-191-070",
       "Nome": "LPU",
-      "Occupazione": "Lavoro pulito"
+      "Occupazione": "Lavoro pulito",
+      "Area": "9,8 m²"
     },
     {
       "Codice semplificato": "P6-191-071",
       "Nome": "LSP",
-      "Occupazione": "Lavoro sporco"
+      "Occupazione": "Lavoro sporco",
+      "Area": "9,6 m²"
     },
     {
       "Codice semplificato": "P6-191-072",
       "Nome": "AAF",
-      "Occupazione": "Armadi automatizzati farmaci"
+      "Occupazione": "Armadi automatizzati farmaci",
+      "Area": "6,1 m²"
     },
     {
       "Codice semplificato": "P6-191-025",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
     },
     {
       "Codice semplificato": "P6-191-026",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-024",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-023",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-191-022",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-020",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-018",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-016",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-013a",
       "Nome": "SOG",
-      "Occupazione": "Soggiorno"
+      "Occupazione": "Soggiorno",
+      "Area": "21,9 m²"
     },
     {
       "Codice semplificato": "P6-191-011",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-009",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-007",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-005",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-003",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-002",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-191-004",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-191-006",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
     },
     {
       "Codice semplificato": "P6-191-008",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
     },
     {
       "Codice semplificato": "P6-191-010",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "7,3 m²"
     },
     {
       "Codice semplificato": "P6-191-015",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
     },
     {
       "Codice semplificato": "P6-191-019",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,4 m²"
     },
     {
       "Codice semplificato": "P6-191-021",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-191-033",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-030",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-036",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-039",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-041",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-043",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-049",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-051",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-053",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-055",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-057",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-059",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-191-069",
       "Nome": "GUI",
-      "Occupazione": "Guardia infermieri"
+      "Occupazione": "Guardia infermieri",
+      "Area": "11,1 m²"
     },
     {
       "Codice semplificato": "P6-191-073",
       "Nome": "ATT",
-      "Occupazione": "Attesa"
+      "Occupazione": "Attesa",
+      "Area": "21,0 m²"
     },
     {
       "Codice semplificato": "P6-191-047",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "63,7 m²"
     },
     {
       "Codice semplificato": "P6-191-001",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "47,2 m²"
     },
     {
       "Codice semplificato": "P6-191-014",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "65,7 m²"
     },
     {
       "Codice semplificato": "P6-191-047d",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "2,8 m²"
     },
     {
       "Codice semplificato": "P6-191-048a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
     },
     {
       "Codice semplificato": "P6-191-050a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-191-047c",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,2 m²"
     },
     {
       "Codice semplificato": "P6-191-054a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-191-047b",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "6,1 m²"
     },
     {
       "Codice semplificato": "P6-191-058a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-191-047a",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
     },
     {
       "Codice semplificato": "P6-191-052a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-191-056a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,8 m²"
     },
     {
       "Codice semplificato": "P6-191-029a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,4 m²"
     },
     {
       "Codice semplificato": "P6-191-027d",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-191-032a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-191-027c",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
     },
     {
       "Codice semplificato": "P6-191-035a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-191-038a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-191-027b",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
     },
     {
       "Codice semplificato": "P6-191-040a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-191-042a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,3 m²"
     },
     {
       "Codice semplificato": "P6-191-027e",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "17,5 m²"
     },
     {
       "Codice semplificato": "P6-191-067",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "12,6 m²"
     },
     {
       "Codice semplificato": "P6-191-014d",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "2,8 m²"
     },
     {
       "Codice semplificato": "P6-191-025a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,8 m²"
     },
     {
       "Codice semplificato": "P6-191-023a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,4 m²"
     },
     {
       "Codice semplificato": "P6-191-014c",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,2 m²"
     },
     {
       "Codice semplificato": "P6-191-021a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,4 m²"
     },
     {
       "Codice semplificato": "P6-191-189b",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,4 m²"
     },
     {
       "Codice semplificato": "P6-191-014b",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
     },
     {
       "Codice semplificato": "P6-191-017a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,4 m²"
     },
     {
       "Codice semplificato": "P6-191-015a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,5 m²"
     },
     {
       "Codice semplificato": "P6-191-014e",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "11,0 m²"
     },
     {
       "Codice semplificato": "P6-191-010a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
     },
     {
       "Codice semplificato": "P6-191-008a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-191-006a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-191-004a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-191-002a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,1 m²"
     },
     {
       "Codice semplificato": "P6-191-001d",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "4,7 m²"
     },
     {
       "Codice semplificato": "P6-191-001a",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
     },
     {
       "Codice semplificato": "P6-191-001b",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "4,0 m²"
     },
     {
       "Codice semplificato": "P6-191-017",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-191-025b",
       "Nome": "AMU",
-      "Occupazione": "Armadio a muro"
+      "Occupazione": "Armadio a muro",
+      "Area": "0,7 m²"
     },
     {
       "Codice semplificato": "P6-191-023b",
       "Nome": "AMU",
-      "Occupazione": "Armadio a muro"
+      "Occupazione": "Armadio a muro",
+      "Area": "0,7 m²"
     },
     {
       "Codice semplificato": "P6-191-021b",
       "Nome": "AMU",
-      "Occupazione": "Armadio a muro"
+      "Occupazione": "Armadio a muro",
+      "Area": "0,7 m²"
     },
     {
       "Codice semplificato": "P6-191-019b",
       "Nome": "AMU",
-      "Occupazione": "Armadio a muro"
+      "Occupazione": "Armadio a muro",
+      "Area": "0,7 m²"
     },
     {
       "Codice semplificato": "P6-191-017b",
       "Nome": "AMU",
-      "Occupazione": "Armadio a muro"
+      "Occupazione": "Armadio a muro",
+      "Area": "0,7 m²"
     },
     {
       "Codice semplificato": "P6-191-015b",
       "Nome": "AMU",
-      "Occupazione": "Armadio a muro"
+      "Occupazione": "Armadio a muro",
+      "Area": "0,7 m²"
     },
     {
       "Codice semplificato": "P6-192-009",
       "Nome": "DAP",
-      "Occupazione": "Deposito apparecchiature"
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "20,4 m²"
     },
     {
       "Codice semplificato": "P6-192-010",
       "Nome": "LME",
-      "Occupazione": "Locale medici"
+      "Occupazione": "Locale medici",
+      "Area": "23,4 m²"
     },
     {
       "Codice semplificato": "P6-192-011",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
     },
     {
       "Codice semplificato": "P6-192-013",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-192-015",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-192-017",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
     },
     {
       "Codice semplificato": "P6-192-019",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
     },
     {
       "Codice semplificato": "P6-192-021",
       "Nome": "DG2",
-      "Occupazione": "Degenza 2 PL"
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,1 m²"
     },
     {
       "Codice semplificato": "P6-192-026",
       "Nome": "MED",
-      "Occupazione": "Medicheria"
+      "Occupazione": "Medicheria",
+      "Area": "22,8 m²"
     },
     {
       "Codice semplificato": "P6-192-029",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "17,3 m²"
     },
     {
       "Codice semplificato": "P6-192-032",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "6,6 m²"
     },
     {
       "Codice semplificato": "P6-192-027",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-030",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-028",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,7 m²"
     },
     {
       "Codice semplificato": "P6-192-031",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-192-034",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-192-033",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-036",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-037",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-192-040",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-192-039",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-042",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-043",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,7 m²"
     },
     {
       "Codice semplificato": "P6-192-035",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-192-038",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-192-041",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-192-044",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "17,1 m²"
     },
     {
       "Codice semplificato": "P6-192-046",
       "Nome": "DPU",
-      "Occupazione": "Deposito pulito"
+      "Occupazione": "Deposito pulito",
+      "Area": "6,5 m²"
     },
     {
       "Codice semplificato": "P6-192-007",
       "Nome": "PAN",
-      "Occupazione": "Tisaneria"
+      "Occupazione": "Tisaneria",
+      "Area": "8,9 m²"
     },
     {
       "Codice semplificato": "P6-192-050",
       "Nome": "PUL",
-      "Occupazione": "Ripostiglio materiale pulizia"
+      "Occupazione": "Ripostiglio materiale pulizia",
+      "Area": "3,9 m²"
     },
     {
       "Codice semplificato": "P6-192-049",
       "Nome": "LSP",
-      "Occupazione": "Lavoro sporco"
+      "Occupazione": "Lavoro sporco",
+      "Area": "4,4 m²"
     },
     {
       "Codice semplificato": "P6-192-005",
       "Nome": "CSA",
-      "Occupazione": "Caposala"
+      "Occupazione": "Caposala",
+      "Area": "8,8 m²"
     },
     {
       "Codice semplificato": "P6-192-002",
       "Nome": "LPE",
-      "Occupazione": "Lavoro personale"
+      "Occupazione": "Lavoro personale",
+      "Area": "8,5 m²"
     },
     {
       "Codice semplificato": "P6-192-012",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-014",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-016",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-018",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-020",
       "Nome": "BA7",
-      "Occupazione": "Bagno degenza disabile"
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-022",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-003",
       "Nome": "SOG",
-      "Occupazione": "Soggiorno"
+      "Occupazione": "Soggiorno",
+      "Area": "20,1 m²"
     },
     {
       "Codice semplificato": "P6-192-023e",
       "Nome": "POP",
-      "Occupazione": "Posta pneumatica"
+      "Occupazione": "Posta pneumatica",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-192-024",
       "Nome": "LPE",
-      "Occupazione": "Lavoro personale"
+      "Occupazione": "Lavoro personale",
+      "Area": "19,7 m²"
     },
     {
       "Codice semplificato": "P6-192-006",
       "Nome": "FIL",
-      "Occupazione": "Filtro VVF"
+      "Occupazione": "Filtro VVF",
+      "Area": "8,2 m²"
     },
     {
       "Codice semplificato": "P6-192-001",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "30,0 m²"
     },
     {
       "Codice semplificato": "P6-192-023",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "65,5 m²"
     },
     {
       "Codice semplificato": "P6-192-128",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-023c",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-192-023d",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "2,1 m²"
     },
     {
       "Codice semplificato": "P6-192-023a",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "8,6 m²"
     },
     {
       "Codice semplificato": "P6-192-008a",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "12,4 m²"
     },
     {
       "Codice semplificato": "P6-192-011a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
     },
     {
       "Codice semplificato": "P6-192-013a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-192-008b",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
     },
     {
       "Codice semplificato": "P6-192-015a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
     },
     {
       "Codice semplificato": "P6-192-017a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-192-019a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
     },
     {
       "Codice semplificato": "P6-192-008c",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,2 m²"
     },
     {
       "Codice semplificato": "P6-192-008d",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "2,8 m²"
     },
     {
       "Codice semplificato": "P6-192-021a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
     },
     {
       "Codice semplificato": "P6-192-025b",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "71,0 m²"
     },
     {
       "Codice semplificato": "P6-193-029",
       "Nome": "PAN",
-      "Occupazione": "Tisaneria"
+      "Occupazione": "Tisaneria",
+      "Area": "12,7 m²"
     },
     {
       "Codice semplificato": "P6-193-031",
       "Nome": "DPU",
-      "Occupazione": "Deposito pulito"
+      "Occupazione": "Deposito pulito",
+      "Area": "6,6 m²"
     },
     {
       "Codice semplificato": "P6-193-032",
       "Nome": "DAP",
-      "Occupazione": "Deposito apparecchiature"
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "9,5 m²"
     },
     {
       "Codice semplificato": "P6-193-001",
       "Nome": "AB1",
-      "Occupazione": "Antibagno senza lavabo"
+      "Occupazione": "Antibagno senza lavabo",
+      "Area": "3,1 m²"
     },
     {
       "Codice semplificato": "P6-193-005",
       "Nome": "WCU",
-      "Occupazione": "WC uomini"
+      "Occupazione": "WC uomini",
+      "Area": "2,6 m²"
     },
     {
       "Codice semplificato": "P6-193-002",
       "Nome": "WCD",
-      "Occupazione": "WC donne"
+      "Occupazione": "WC donne",
+      "Area": "2,6 m²"
     },
     {
       "Codice semplificato": "P6-193-010",
       "Nome": "AB1",
-      "Occupazione": "Antibagno senza lavabo"
+      "Occupazione": "Antibagno senza lavabo",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-007",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "9,0 m²"
     },
     {
       "Codice semplificato": "P6-193-006",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "15,1 m²"
     },
     {
       "Codice semplificato": "P6-193-004",
       "Nome": "VES",
-      "Occupazione": "Vestizione"
+      "Occupazione": "Vestizione",
+      "Area": "4,2 m²"
     },
     {
       "Codice semplificato": "P6-193-027",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-026",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "17,0 m²"
     },
     {
       "Codice semplificato": "P6-193-024",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-193-022",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-193-020",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-193-018",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,6 m²"
     },
     {
       "Codice semplificato": "P6-193-016",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-193-014",
       "Nome": "DGI",
-      "Occupazione": "Degenza isolato"
+      "Occupazione": "Degenza isolato",
+      "Area": "16,8 m²"
     },
     {
       "Codice semplificato": "P6-193-008",
       "Nome": "LME",
-      "Occupazione": "Locale medici"
+      "Occupazione": "Locale medici",
+      "Area": "17,1 m²"
     },
     {
       "Codice semplificato": "P6-193-009",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-013",
       "Nome": "BA2",
-      "Occupazione": "Bagno degenza 2pl"
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-015",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-017",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-019",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-021",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-023",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-025",
       "Nome": "BA6",
-      "Occupazione": "Bagno degenza isolato disabile"
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-030",
       "Nome": "GUI",
-      "Occupazione": "Guardia infermieri"
+      "Occupazione": "Guardia infermieri",
+      "Area": "10,9 m²"
     },
     {
       "Codice semplificato": "P6-193-028",
       "Nome": "LPU",
-      "Occupazione": "Lavoro pulito"
+      "Occupazione": "Lavoro pulito",
+      "Area": "9,6 m²"
     },
     {
       "Codice semplificato": "P6-193-035",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "7,4 m²"
     },
     {
       "Codice semplificato": "P6-193-034",
       "Nome": "LSP",
-      "Occupazione": "Lavoro sporco"
+      "Occupazione": "Lavoro sporco",
+      "Area": "4,8 m²"
     },
     {
       "Codice semplificato": "P6-193-011",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "79,8 m²"
     },
     {
       "Codice semplificato": "P6-193-011e",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "3,9 m²"
     },
     {
       "Codice semplificato": "P6-193-011d",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-011c",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-011b",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "3,8 m²"
     },
     {
       "Codice semplificato": "P6-193-011a",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "2,7 m²"
     },
     {
       "Codice semplificato": "P6-193-003",
       "Nome": "DSM",
-      "Occupazione": "Disimpegno"
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
     },
     {
       "Codice semplificato": "P6-193-008a",
       "Nome": "ANC",
-      "Occupazione": "Anticamera"
+      "Occupazione": "Anticamera",
+      "Area": "3,3 m²"
     },
     {
       "Codice semplificato": "P6-193-012a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-193-014a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-193-016a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-193-018a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-193-020a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-193-022a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-193-024a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-193-026a",
       "Nome": "FLS",
-      "Occupazione": "Filtro sanitario"
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,6 m²"
     },
     {
       "Codice semplificato": "P6-197-008",
       "Nome": "PUL",
-      "Occupazione": "Ripostiglio materiale pulizia"
+      "Occupazione": "Ripostiglio materiale pulizia",
+      "Area": "3,3 m²"
     },
     {
       "Codice semplificato": "P6-197-003",
       "Nome": "WC3",
-      "Occupazione": "WC per disabili"
+      "Occupazione": "WC per disabili",
+      "Area": "3,9 m²"
     },
     {
       "Codice semplificato": "P6-197-005",
       "Nome": "WC3",
-      "Occupazione": "WC per disabili"
+      "Occupazione": "WC per disabili",
+      "Area": "3,3 m²"
     },
     {
       "Codice semplificato": "P6-197-007",
       "Nome": "BAS",
-      "Occupazione": "Bagno assistito"
+      "Occupazione": "Bagno assistito",
+      "Area": "8,8 m²"
     },
     {
       "Codice semplificato": "P6-197-002",
       "Nome": "MED",
-      "Occupazione": "Medicheria"
+      "Occupazione": "Medicheria",
+      "Area": "16,3 m²"
     },
     {
       "Codice semplificato": "P6-197-004",
       "Nome": "ATT",
-      "Occupazione": "Attesa"
+      "Occupazione": "Attesa",
+      "Area": "10,5 m²"
     },
     {
       "Codice semplificato": "P6-197-006",
       "Nome": "AB1",
-      "Occupazione": "Antibagno senza lavabo"
+      "Occupazione": "Antibagno senza lavabo",
+      "Area": "3,4 m²"
     },
     {
       "Codice semplificato": "P6-197-001",
       "Nome": "FIL",
-      "Occupazione": "Filtro VVF"
+      "Occupazione": "Filtro VVF",
+      "Area": "16,0 m²"
     },
     {
       "Codice semplificato": "P6-591-001",
       "Nome": "ADI",
-      "Occupazione": "Area dipartimentale-Studi medici open space"
+      "Occupazione": "Area dipartimentale-Studi medici open space",
+      "Area": "50,4 m²"
     },
     {
       "Codice semplificato": "P6-972-001",
       "Nome": "FIL",
-      "Occupazione": "Filtro VVF"
+      "Occupazione": "Filtro VVF",
+      "Area": "12,2 m²"
     },
     {
       "Codice semplificato": "P6-991-002",
       "Nome": "SPC",
-      "Occupazione": "Spazio calmo"
+      "Occupazione": "Spazio calmo",
+      "Area": "19,0 m²"
     },
     {
       "Codice semplificato": "P6-991-001",
       "Nome": "FIL",
-      "Occupazione": "Filtro VVF"
+      "Occupazione": "Filtro VVF",
+      "Area": "12,4 m²"
     },
     {
       "Codice semplificato": "P6-991-006",
       "Nome": "FIL",
-      "Occupazione": "Filtro VVF"
+      "Occupazione": "Filtro VVF",
+      "Area": "12,9 m²"
     },
     {
       "Codice semplificato": "P6-991-007",
       "Nome": "SBA",
-      "Occupazione": "Sbarco ascensore"
+      "Occupazione": "Sbarco ascensore",
+      "Area": "18,5 m²"
     },
     {
       "Codice semplificato": "P6-991-004",
       "Nome": "SBA",
-      "Occupazione": "Sbarco ascensore"
+      "Occupazione": "Sbarco ascensore",
+      "Area": "30,8 m²"
     },
     {
       "Codice semplificato": "P6-991-005",
       "Nome": "SBA",
-      "Occupazione": "Sbarco ascensore"
+      "Occupazione": "Sbarco ascensore",
+      "Area": "30,5 m²"
     },
     {
       "Codice semplificato": "P6-991-003",
       "Nome": "COR",
-      "Occupazione": "Corridoio"
+      "Occupazione": "Corridoio",
+      "Area": "39,4 m²"
     },
     {
       "Codice semplificato": "P6-992-002",
       "Nome": "FIL",
-      "Occupazione": "Filtro VVF"
+      "Occupazione": "Filtro VVF",
+      "Area": "12,2 m²"
     },
     {
       "Codice semplificato": "P6-C9I-112",
       "Nome": "CEE",
-      "Occupazione": "Cavedio elettrico energia"
+      "Occupazione": "Cavedio elettrico energia",
+      "Area": "3,3 m²"
     },
     {
       "Codice semplificato": "P6-C91-101",
       "Nome": "CES",
-      "Occupazione": "Cavedio elettrico sicurezza (UPS-GE)"
+      "Occupazione": "Cavedio elettrico sicurezza (UPS-GE)",
+      "Area": "3,6 m²"
     },
     {
       "Codice semplificato": "P6-C91-102",
       "Nome": "CEE",
-      "Occupazione": "Cavedio elettrico energia"
+      "Occupazione": "Cavedio elettrico energia",
+      "Area": "7,0 m²"
     },
     {
       "Codice semplificato": "P6-C9I-110",
       "Nome": "CEE",
-      "Occupazione": "Cavedio elettrico energia"
+      "Occupazione": "Cavedio elettrico energia",
+      "Area": "7,0 m²"
     },
     {
       "Codice semplificato": "P6-C91-109",
       "Nome": "CES",
-      "Occupazione": "Cavedio elettrico sicurezza (UPS-GE)"
+      "Occupazione": "Cavedio elettrico sicurezza (UPS-GE)",
+      "Area": "3,6 m²"
     },
     {
       "Codice semplificato": "P6-C9M-152",
       "Nome": "CAV",
-      "Occupazione": "Cavedio"
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
     },
     {
       "Codice semplificato": "P6-C9M-151",
       "Nome": "CAV",
-      "Occupazione": "Cavedio"
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
     },
     {
       "Codice semplificato": "P6-C9M-104",
       "Nome": "CET",
-      "Occupazione": "Cavedio elettrico tecnico speciali"
+      "Occupazione": "Cavedio elettrico tecnico speciali",
+      "Area": "3,9 m²"
     },
     {
       "Codice semplificato": "P6-C9M-111",
       "Nome": "CIM",
-      "Occupazione": "Cavedio meccanico"
+      "Occupazione": "Cavedio meccanico",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-C9M-153",
       "Nome": "CAV",
-      "Occupazione": "Cavedio"
+      "Occupazione": "Cavedio",
+      "Area": "0,6 m²"
     },
     {
       "Codice semplificato": "P6-C9M-155",
       "Nome": "CAV",
-      "Occupazione": "Cavedio"
+      "Occupazione": "Cavedio",
+      "Area": "0,6 m²"
     },
     {
       "Codice semplificato": "P6-C9M-154",
       "Nome": "CAV",
-      "Occupazione": "Cavedio"
+      "Occupazione": "Cavedio",
+      "Area": "0,6 m²"
     },
     {
       "Codice semplificato": "P6-C9M-113",
       "Nome": "CME",
-      "Occupazione": "Cavedio elettrico-meccanico"
+      "Occupazione": "Cavedio elettrico-meccanico",
+      "Area": "3,5 m²"
     },
     {
       "Codice semplificato": "P6-C9M-157",
       "Nome": "CAV",
-      "Occupazione": "Cavedio"
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
     },
     {
       "Codice semplificato": "P6-C9M-156",
       "Nome": "CAV",
-      "Occupazione": "Cavedio"
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
     },
     {
       "Codice semplificato": "P6-C9M-108",
       "Nome": "CIM",
-      "Occupazione": "Cavedio meccanico"
+      "Occupazione": "Cavedio meccanico",
+      "Area": "19,6 m²"
     },
     {
       "Codice semplificato": "P6-C9M-106",
       "Nome": "CET",
-      "Occupazione": "Cavedio elettrico tecnico speciali"
+      "Occupazione": "Cavedio elettrico tecnico speciali",
+      "Area": "3,9 m²"
     },
     {
       "Codice semplificato": "P6-C9M-103",
       "Nome": "CIM",
-      "Occupazione": "Cavedio meccanico"
+      "Occupazione": "Cavedio meccanico",
+      "Area": "19,6 m²"
     },
     {
       "Codice semplificato": "P6-C9S-105",
       "Nome": "LTD",
-      "Occupazione": "Locale tecnico rete dati"
+      "Occupazione": "Locale tecnico rete dati",
+      "Area": "3,9 m²"
     },
     {
       "Codice semplificato": "P6-C9S-107",
       "Nome": "LTD",
-      "Occupazione": "Locale tecnico rete dati"
+      "Occupazione": "Locale tecnico rete dati",
+      "Area": "3,9 m²"
     },
     {
       "Codice semplificato": "P6-E91-001",
       "Nome": "ASC",
-      "Occupazione": "Ascensore"
+      "Occupazione": "Ascensore",
+      "Area": "6,6 m²"
     },
     {
       "Codice semplificato": "P6-E91-002",
       "Nome": "ASC",
-      "Occupazione": "Ascensore"
+      "Occupazione": "Ascensore",
+      "Area": "6,8 m²"
     },
     {
       "Codice semplificato": "P6-E91-003",
       "Nome": "ASC",
-      "Occupazione": "Ascensore"
+      "Occupazione": "Ascensore",
+      "Area": "6,5 m²"
     },
     {
       "Codice semplificato": "P6-E92-001",
       "Nome": "MCA",
-      "Occupazione": "Montacarichi"
+      "Occupazione": "Montacarichi",
+      "Area": "5,7 m²"
     },
     {
       "Codice semplificato": "P6-E92-002",
       "Nome": "MCA",
-      "Occupazione": "Montacarichi"
+      "Occupazione": "Montacarichi",
+      "Area": "6,7 m²"
     },
     {
       "Codice semplificato": "P6-E93-002",
       "Nome": "MLE",
-      "Occupazione": "Montalettighe"
+      "Occupazione": "Montalettighe",
+      "Area": "8,5 m²"
     },
     {
       "Codice semplificato": "P6-E93-001",
       "Nome": "MLE",
-      "Occupazione": "Montalettighe"
+      "Occupazione": "Montalettighe",
+      "Area": "6,4 m²"
     },
     {
       "Codice semplificato": "P6-E93-003",
       "Nome": "MLE",
-      "Occupazione": "Montalettighe"
+      "Occupazione": "Montalettighe",
+      "Area": "8,3 m²"
     },
     {
       "Codice semplificato": "P6-E93-004",
       "Nome": "MLE",
-      "Occupazione": "Montalettighe"
+      "Occupazione": "Montalettighe",
+      "Area": "8,2 m²"
     },
     {
       "Codice semplificato": "P6-E93-005",
       "Nome": "MLE",
-      "Occupazione": "Montalettighe"
+      "Occupazione": "Montalettighe",
+      "Area": "7,2 m²"
     },
     {
       "Codice semplificato": "P6-S91-002",
       "Nome": "VSC",
-      "Occupazione": "Vano scale"
+      "Occupazione": "Vano scale",
+      "Area": "39,5 m²"
     },
     {
       "Codice semplificato": "P6-592-001",
       "Nome": "VSC",
-      "Occupazione": "Vano scale"
+      "Occupazione": "Vano scale",
+      "Area": "39,3 m²"
     },
     {
       "Codice semplificato": "P6-S92-003",
       "Nome": "VSC",
-      "Occupazione": "Vano scale"
+      "Occupazione": "Vano scale",
+      "Area": "39,2 m²"
     }
   ]
