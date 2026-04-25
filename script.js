@@ -68,6 +68,8 @@ let editingApparecchiaturaIndex = null;
 let editingImpiantisticaIndex = null;
 let editingAltreDotazioniIndex = null;
 let requestedFloorName = '';
+let activeRoomContext = null;
+let lastModalRequestToken = 0;
 const floorNamePattern = /^[a-z0-9-]+$/i;
 const mapLoadMinMs = 2000;
 let mapLoadMinMet = false;
@@ -549,6 +551,106 @@ function validateFloorFromQueryString() {
   return true;
 }
 
+function parseFloorContext(floorName) {
+  const floorMatch = String(floorName || '').trim().match(/^(nord|sud|piastra|sotterraneo)-(\d+)$/i);
+  if (!floorMatch) {
+    return null;
+  }
+
+  const blocco = floorMatch[1].toLowerCase();
+  const rawLevel = Number(floorMatch[2]);
+  if (!Number.isInteger(rawLevel)) {
+    return null;
+  }
+
+  const piano = blocco === 'sotterraneo' ? String(-Math.abs(rawLevel)) : String(rawLevel);
+  return { blocco, piano };
+}
+
+function normalizeDisplayValue(value, fallback = '-') {
+  const trimmedValue = String(value ?? '').trim();
+  if (trimmedValue === '' || trimmedValue.toLowerCase() === 'null' || trimmedValue.toLowerCase() === 'undefined') {
+    return fallback;
+  }
+  return trimmedValue;
+}
+
+function normalizeInputValue(value) {
+  return normalizeDisplayValue(value, '');
+}
+
+function getCurrentRoomRef() {
+  return {
+    blocco: activeRoomContext?.blocco || '',
+    piano: activeRoomContext?.piano || '',
+    roomCode: roomCodeValue.textContent.trim()
+  };
+}
+
+function buildAutoAttributesPayload() {
+  return {
+    roomCodeName: normalizeInputValue(roomCodeNameValue.textContent),
+    occupazione: normalizeInputValue(roomOccupazioneValue.textContent),
+    superficie: normalizeInputValue(roomSurfaceValue.textContent),
+    emipiano: normalizeInputValue(roomHemifloorValue.textContent),
+    accreditamentoLocale: normalizeInputValue(roomAccreditationValue.textContent),
+    postiLetto: normalizeInputValue(roomBedCountValue.textContent),
+    noteArrediSegnaletica: normalizeInputValue(roomFurnitureNotesValue.textContent)
+  };
+}
+
+async function saveRoomFragment(action, extraPayload) {
+  const roomRef = getCurrentRoomRef();
+  if (!roomRef.blocco || !roomRef.piano || !roomRef.roomCode) {
+    throw new Error('Contesto stanza non valido');
+  }
+
+  const response = await fetch('../api/save-modal.php', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      action,
+      roomRef,
+      autoAttributes: buildAutoAttributesPayload(),
+      ...extraPayload
+    })
+  });
+
+  const payload = await response.json();
+  if (!response.ok || !payload?.ok) {
+    throw new Error(payload?.error || `HTTP ${response.status}`);
+  }
+
+  return payload;
+}
+
+function showSaveError(message) {
+  window.alert(message);
+}
+
+function resetRoomTables() {
+  apparecchiaturaRows.length = 0;
+  impiantisticaRows.forEach((row) => {
+    row.qtaPresenti = '';
+    row.qtaDaImplementare = '';
+    row.note = '';
+  });
+  altreDotazioniRows.forEach((row) => {
+    row.presente = '';
+    row.daImplementare = '';
+    row.note = '';
+  });
+  editingImpiantisticaIndex = null;
+  editingAltreDotazioniIndex = null;
+  editingApparecchiaturaIndex = null;
+  resetApparecchiaturaForm();
+  renderApparecchiaturaTable();
+  renderImpiantisticaTable();
+  renderAltreDotazioniTable();
+}
+
 async function loadOccurrencesData(floorName) {
   try {
     const response = await fetch(`../planimetrie/occorenze-${floorName}.json`);
@@ -828,6 +930,17 @@ const editableFieldConfigs = {
   }
 };
 
+const editableFieldPayloadKeyMap = {
+  roomCodeName: 'roomCodeName',
+  roomOccupazione: 'occupazione',
+  roomDepartment: 'reparto',
+  roomSurface: 'superficie',
+  roomHemifloor: 'emipiano',
+  roomAccreditation: 'accreditamentoLocale',
+  roomBedCount: 'postiLetto',
+  roomFurnitureNotes: 'noteArrediSegnaletica'
+};
+
 function getSafeRecordValue(record, key) {
   return String((record && record[key]) || '-').trim() || '-';
 }
@@ -865,7 +978,7 @@ function startEditingField(fieldName) {
   }
 
   if (activeFieldBeingEdited && activeFieldBeingEdited !== fieldName) {
-    stopEditingField(activeFieldBeingEdited, true);
+    stopEditingField(activeFieldBeingEdited, false);
   }
 
   fieldConfig.inputElement.value = fieldConfig.valueElement.textContent.trim();
@@ -873,13 +986,46 @@ function startEditingField(fieldName) {
   fieldConfig.inputElement.hidden = false;
   fieldConfig.buttonElement.textContent = 'Salva';
   fieldConfig.inputElement.focus();
-  fieldConfig.inputElement.select();
   activeFieldBeingEdited = fieldName;
+
+  if (typeof fieldConfig.inputElement.select === 'function') {
+    fieldConfig.inputElement.select();
+  }
 }
 
-function handleEditFieldClick(fieldName) {
+async function saveSingleRoomField(fieldName) {
+  const fieldConfig = editableFieldConfigs[fieldName];
+  const payloadFieldName = editableFieldPayloadKeyMap[fieldName];
+  if (!fieldConfig || !payloadFieldName) {
+    return;
+  }
+
+  const rawValue = fieldConfig.inputElement.value;
+  const normalizedValue = normalizeInputValue(rawValue);
+  await saveRoomFragment('saveField', {
+    fieldName: payloadFieldName,
+    value: normalizedValue
+  });
+}
+
+async function handleEditFieldClick(fieldName) {
   if (activeFieldBeingEdited === fieldName) {
+    const fieldConfig = editableFieldConfigs[fieldName];
+    if (!fieldConfig) {
+      return;
+    }
+
+    fieldConfig.buttonElement.disabled = true;
+    try {
+      await saveSingleRoomField(fieldName);
+    } catch (error) {
+      console.error('[RoomFieldSave] Errore salvataggio campo', { fieldName, error });
+      showSaveError(`Errore salvataggio campo: ${error.message || 'errore sconosciuto'}`);
+      fieldConfig.buttonElement.disabled = false;
+      return;
+    }
     stopEditingField(fieldName, true);
+    fieldConfig.buttonElement.disabled = false;
     return;
   }
 
@@ -888,10 +1034,13 @@ function handleEditFieldClick(fieldName) {
 
 function setupEditableFieldEvents(fieldName) {
   const fieldConfig = editableFieldConfigs[fieldName];
-  fieldConfig.buttonElement.addEventListener('click', () => handleEditFieldClick(fieldName));
-  fieldConfig.inputElement.addEventListener('keydown', (event) => {
+  fieldConfig.buttonElement.addEventListener('click', async () => {
+    await handleEditFieldClick(fieldName);
+  });
+  fieldConfig.inputElement.addEventListener('keydown', async (event) => {
     if (event.key === 'Enter') {
-      stopEditingField(fieldName, true);
+      event.preventDefault();
+      await handleEditFieldClick(fieldName);
     }
 
     if (event.key === 'Escape') {
@@ -1067,6 +1216,62 @@ function renderApparecchiaturaTable() {
   });
 }
 
+async function saveImpiantisticaRow(rowIndex) {
+  const row = impiantisticaRows[rowIndex];
+  if (!row) {
+    return;
+  }
+
+  await saveRoomFragment('saveImpiantisticaRow', {
+    rowIndex,
+    row: {
+      tipologia: row.tipologia,
+      qtaPresenti: normalizeInputValue(row.qtaPresenti),
+      qtaDaImplementare: normalizeInputValue(row.qtaDaImplementare),
+      note: normalizeInputValue(row.note)
+    }
+  });
+}
+
+async function saveAltreDotazioniRow(rowIndex) {
+  const row = altreDotazioniRows[rowIndex];
+  if (!row) {
+    return;
+  }
+
+  await saveRoomFragment('saveAltreDotazioniRow', {
+    rowIndex,
+    row: {
+      altraDotazione: row.altraDotazione,
+      presente: normalizeInputValue(row.presente),
+      daImplementare: normalizeInputValue(row.daImplementare),
+      note: normalizeInputValue(row.note)
+    }
+  });
+}
+
+async function saveApparecchiaturaRow(rowIndex) {
+  const row = apparecchiaturaRows[rowIndex];
+  if (!row) {
+    return;
+  }
+
+  await saveRoomFragment('saveApparecchiaturaRow', {
+    rowIndex,
+    row: {
+      apparecchiatura: normalizeInputValue(row.apparecchiatura),
+      tipologia: normalizeInputValue(row.tipologia),
+      produttore: normalizeInputValue(row.produttore),
+      modello: normalizeInputValue(row.modello),
+      qta: normalizeInputValue(row.qta),
+      nuovo: normalizeInputValue(row.nuovo),
+      trasferimento: normalizeInputValue(row.trasferimento),
+      inv: normalizeInputValue(row.inv),
+      note: normalizeInputValue(row.note)
+    }
+  });
+}
+
 function renderImpiantisticaTable() {
   const rowsHtml = impiantisticaRows.map((row, index) => {
     const isRowEditing = editingImpiantisticaIndex === index;
@@ -1147,9 +1352,18 @@ function renderImpiantisticaTable() {
   });
 
   impiantisticaTableBody.querySelectorAll('[data-imp-edit]').forEach((buttonElement) => {
-    buttonElement.addEventListener('click', () => {
+    buttonElement.addEventListener('click', async () => {
       const rowIndex = Number(buttonElement.dataset.impEdit);
       if (editingImpiantisticaIndex === rowIndex) {
+        buttonElement.disabled = true;
+        try {
+          await saveImpiantisticaRow(rowIndex);
+        } catch (error) {
+          console.error('[ImpiantisticaSave] Errore salvataggio riga', { rowIndex, error });
+          showSaveError(`Errore salvataggio impiantistica: ${error.message || 'errore sconosciuto'}`);
+          buttonElement.disabled = false;
+          return;
+        }
         editingImpiantisticaIndex = null;
       } else {
         editingImpiantisticaIndex = rowIndex;
@@ -1245,9 +1459,18 @@ function renderAltreDotazioniTable() {
   });
 
   altreDotazioniTableBody.querySelectorAll('[data-alt-edit]').forEach((buttonElement) => {
-    buttonElement.addEventListener('click', () => {
+    buttonElement.addEventListener('click', async () => {
       const rowIndex = Number(buttonElement.dataset.altEdit);
       if (editingAltreDotazioniIndex === rowIndex) {
+        buttonElement.disabled = true;
+        try {
+          await saveAltreDotazioniRow(rowIndex);
+        } catch (error) {
+          console.error('[AltreDotazioniSave] Errore salvataggio riga', { rowIndex, error });
+          showSaveError(`Errore salvataggio altre dotazioni: ${error.message || 'errore sconosciuto'}`);
+          buttonElement.disabled = false;
+          return;
+        }
         editingAltreDotazioniIndex = null;
       } else {
         editingAltreDotazioniIndex = rowIndex;
@@ -1255,6 +1478,109 @@ function renderAltreDotazioniTable() {
       renderAltreDotazioniTable();
     });
   });
+}
+
+function applyRoomAttributesFromPayload(attributiStanza) {
+  const safeAttributes = attributiStanza && typeof attributiStanza === 'object' ? attributiStanza : {};
+  roomCodeNameValue.textContent = normalizeDisplayValue(safeAttributes.roomCodeName);
+  roomOccupazioneValue.textContent = normalizeDisplayValue(safeAttributes.occupazione);
+  roomDepartmentValue.textContent = normalizeDisplayValue(safeAttributes.reparto, '');
+  roomSurfaceValue.textContent = normalizeDisplayValue(safeAttributes.superficie);
+  roomHemifloorValue.textContent = normalizeDisplayValue(safeAttributes.emipiano);
+  roomAccreditationValue.textContent = normalizeDisplayValue(safeAttributes.accreditamentoLocale);
+  roomBedCountValue.textContent = normalizeDisplayValue(safeAttributes.postiLetto);
+  roomFurnitureNotesValue.textContent = normalizeDisplayValue(safeAttributes.noteArrediSegnaletica);
+}
+
+function applyTableRowsFromPayload(payload) {
+  const safePayload = payload && typeof payload === 'object' ? payload : {};
+  const savedApparecchiature = Array.isArray(safePayload.apparecchiature) ? safePayload.apparecchiature : [];
+  const savedImpiantistica = Array.isArray(safePayload.impiantistica) ? safePayload.impiantistica : [];
+  const savedAltreDotazioni = Array.isArray(safePayload.altreDotazioni) ? safePayload.altreDotazioni : [];
+
+  apparecchiaturaRows.length = 0;
+  savedApparecchiature.forEach((row) => {
+    apparecchiaturaRows.push(normalizeApparecchiaturaRow(row));
+  });
+
+  impiantisticaRows.forEach((row) => {
+    row.qtaPresenti = '';
+    row.qtaDaImplementare = '';
+    row.note = '';
+  });
+  const impiantisticaByTipologia = new Map();
+  savedImpiantistica.forEach((row) => {
+    if (!row || typeof row !== 'object') {
+      return;
+    }
+    impiantisticaByTipologia.set(String(row.tipologia || '').trim(), row);
+  });
+  impiantisticaRows.forEach((row) => {
+    const sourceRow = impiantisticaByTipologia.get(row.tipologia);
+    if (!sourceRow) {
+      return;
+    }
+    row.qtaPresenti = normalizeInputValue(sourceRow.qtaPresenti);
+    row.qtaDaImplementare = normalizeInputValue(sourceRow.qtaDaImplementare);
+    row.note = normalizeInputValue(sourceRow.note);
+  });
+
+  altreDotazioniRows.forEach((row) => {
+    row.presente = '';
+    row.daImplementare = '';
+    row.note = '';
+  });
+  const altreDotazioniByName = new Map();
+  savedAltreDotazioni.forEach((row) => {
+    if (!row || typeof row !== 'object') {
+      return;
+    }
+    altreDotazioniByName.set(String(row.altraDotazione || '').trim(), row);
+  });
+  altreDotazioniRows.forEach((row) => {
+    const sourceRow = altreDotazioniByName.get(row.altraDotazione);
+    if (!sourceRow) {
+      return;
+    }
+    row.presente = normalizeInputValue(sourceRow.presente);
+    row.daImplementare = normalizeInputValue(sourceRow.daImplementare);
+    row.note = normalizeInputValue(sourceRow.note);
+  });
+
+  editingImpiantisticaIndex = null;
+  editingAltreDotazioniIndex = null;
+  resetApparecchiaturaForm();
+  renderApparecchiaturaTable();
+  renderImpiantisticaTable();
+  renderAltreDotazioniTable();
+}
+
+async function loadRoomDataFromDatabase(roomContext, roomCode, requestToken) {
+  const params = new URLSearchParams({
+    blocco: roomContext.blocco,
+    piano: roomContext.piano,
+    roomCode
+  });
+
+  const response = await fetch(`../api/get-room.php?${params.toString()}`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+
+  const payload = await response.json();
+  if (!payload?.ok) {
+    throw new Error(payload?.error || 'Errore caricamento stanza');
+  }
+
+  if (requestToken !== lastModalRequestToken) {
+    return;
+  }
+
+  if (payload.exists) {
+    applyRoomAttributesFromPayload(payload.attributiStanza);
+    applyTableRowsFromPayload(payload);
+    return;
+  }
 }
 
 function setActiveModalSection(sectionName) {
@@ -1322,6 +1648,11 @@ function validateRoomOccurrence(roomCode) {
 
 function openModal(textValue) {
   const roomCode = getRoomCodeWithoutAsterisks(textValue);
+  const floorContext = parseFloorContext(requestedFloorName);
+  activeRoomContext = floorContext;
+  lastModalRequestToken += 1;
+  const requestToken = lastModalRequestToken;
+
   roomCodeValue.textContent = roomCode;
   roomCodeNameValue.textContent = '-';
   roomOccupazioneValue.textContent = '-';
@@ -1334,15 +1665,26 @@ function openModal(textValue) {
   clearRoomValidationStatus();
   validateRoomOccurrence(roomCode);
   resetEditableFieldsState();
-  resetApparecchiaturaForm();
-  editingImpiantisticaIndex = null;
-  editingAltreDotazioniIndex = null;
+  resetRoomTables();
   setActiveModalSection('apparecchiatura');
   modalOverlay.classList.add('is-open');
   modalOverlay.setAttribute('aria-hidden', 'false');
+
+  if (!floorContext) {
+    showSaveError('Impossibile derivare blocco e piano dalla URL');
+    return;
+  }
+
+  loadRoomDataFromDatabase(floorContext, roomCode, requestToken).catch((error) => {
+    console.error('[RoomLoad] Errore caricamento stanza', error);
+    if (requestToken === lastModalRequestToken) {
+      showSaveError(`Errore caricamento stanza: ${error.message || 'errore sconosciuto'}`);
+    }
+  });
 }
 
 function closeModal() {
+  lastModalRequestToken += 1;
   modalOverlay.classList.remove('is-open');
   modalOverlay.setAttribute('aria-hidden', 'true');
 }
@@ -1442,7 +1784,7 @@ function initializeMapDimensions() {
   markMapResourceReady();
 }
 
-function handleAddApparecchiatura() {
+async function handleAddApparecchiatura() {
   const rawRow = getApparecchiaturaFormData();
   const newRow = normalizeApparecchiaturaRow({
     apparecchiatura: rawRow.apparecchiatura || '-',
@@ -1463,11 +1805,22 @@ function handleAddApparecchiatura() {
   }
 
   apparecchiaturaRows.push(newRow);
+  const rowIndex = apparecchiaturaRows.length - 1;
+  appAddButton.disabled = true;
+  try {
+    await saveApparecchiaturaRow(rowIndex);
+  } catch (error) {
+    console.error('[ApparecchiaturaSave] Errore salvataggio nuova riga', { rowIndex, error });
+    showSaveError(`Errore salvataggio apparecchiatura: ${error.message || 'errore sconosciuto'}`);
+    appAddButton.disabled = false;
+    return;
+  }
+  appAddButton.disabled = false;
   renderApparecchiaturaTable();
   resetApparecchiaturaForm();
 }
 
-function handleSaveApparecchiatura() {
+async function handleSaveApparecchiatura() {
   if (editingApparecchiaturaIndex === null) {
     return;
   }
@@ -1478,7 +1831,18 @@ function handleSaveApparecchiatura() {
     return;
   }
 
-  apparecchiaturaRows[editingApparecchiaturaIndex] = updatedRow;
+  const rowIndex = editingApparecchiaturaIndex;
+  apparecchiaturaRows[rowIndex] = updatedRow;
+  appSaveButton.disabled = true;
+  try {
+    await saveApparecchiaturaRow(rowIndex);
+  } catch (error) {
+    console.error('[ApparecchiaturaSave] Errore salvataggio riga', { rowIndex, error });
+    showSaveError(`Errore salvataggio apparecchiatura: ${error.message || 'errore sconosciuto'}`);
+    appSaveButton.disabled = false;
+    return;
+  }
+  appSaveButton.disabled = false;
   renderApparecchiaturaTable();
   resetApparecchiaturaForm();
 }
@@ -1495,8 +1859,12 @@ setupEditableFieldEvents('roomHemifloor');
 setupEditableFieldEvents('roomAccreditation');
 setupEditableFieldEvents('roomBedCount');
 setupEditableFieldEvents('roomFurnitureNotes');
-appAddButton.addEventListener('click', handleAddApparecchiatura);
-appSaveButton.addEventListener('click', handleSaveApparecchiatura);
+appAddButton.addEventListener('click', async () => {
+  await handleAddApparecchiatura();
+});
+appSaveButton.addEventListener('click', async () => {
+  await handleSaveApparecchiatura();
+});
 appCancelButton.addEventListener('click', resetApparecchiaturaForm);
 sectionApparecchiaturaButton.addEventListener('click', () => setActiveModalSection('apparecchiatura'));
 sectionImpiantisticaButton.addEventListener('click', () => setActiveModalSection('impiantistica'));

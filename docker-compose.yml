@@ -1,0 +1,45 @@
+services:
+  web:
+    build:
+      context: .
+      dockerfile: docker/php/Dockerfile
+    container_name: ospedale-web
+    ports:
+      - "8000:80"
+    volumes:
+      - ./:/var/www/html
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_NAME: ospedale
+      DB_USER: ospedale_user
+      DB_PASS: ospedale_password
+    depends_on:
+      - db
+
+  db:
+    image: mysql:8.4
+    container_name: ospedale-db
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ospedale
+      MYSQL_USER: ospedale_user
+      MYSQL_PASSWORD: ospedale_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./database/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+
+  phpmyadmin:
+    image: phpmyadmin:5.2-apache
+    container_name: ospedale-phpmyadmin
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: "3306"
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - db
+
+volumes:
+  mysql_data:
