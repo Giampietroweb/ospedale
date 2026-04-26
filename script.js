@@ -56,6 +56,7 @@ const appNoteInput = document.getElementById('appNoteInput');
 const appAddButton = document.getElementById('appAddButton');
 const appSaveButton = document.getElementById('appSaveButton');
 const appCancelButton = document.getElementById('appCancelButton');
+const apparecchiaturaEditor = document.getElementById('apparecchiaturaEditor');
 let appTipologiaTomSelect = null;
 
 const minZoom = 0.1;
@@ -66,12 +67,19 @@ let baseImageWidth = 0;
 let baseImageHeight = 0;
 let activeFieldBeingEdited = null;
 let editingApparecchiaturaIndex = null;
-let editingImpiantisticaIndex = null;
-let editingAltreDotazioniIndex = null;
+const editingImpiantisticaIndexes = new Set();
+const editingAltreDotazioniIndexes = new Set();
 let requestedFloorName = '';
 let activeRoomContext = null;
 let lastModalRequestToken = 0;
 const floorNamePattern = /^[a-z0-9-]+$/i;
+const INLINE_STATUS = {
+  saved: 'saved',
+  dirty: 'dirty',
+  saving: 'saving',
+  error: 'error',
+  neutral: 'neutral'
+};
 const mapLoadMinMs = 2000;
 let mapLoadMinMet = false;
 let mapLoadResourceMet = false;
@@ -645,9 +653,10 @@ function resetRoomTables() {
     row.daImplementare = '';
     row.note = '';
   });
-  editingImpiantisticaIndex = null;
-  editingAltreDotazioniIndex = null;
+  editingImpiantisticaIndexes.clear();
+  editingAltreDotazioniIndexes.clear();
   editingApparecchiaturaIndex = null;
+  resetInlineRowStatusMaps();
   resetApparecchiaturaForm();
   renderApparecchiaturaTable();
   renderImpiantisticaTable();
@@ -896,6 +905,495 @@ function getRoomCodeWithoutAsterisks(textValue) {
   return textValue.replace(/^\*/, '').replace(/\*$/, '');
 }
 
+const inlineStatusState = {
+  apparecchiatura: {
+    rowStatus: INLINE_STATUS.neutral,
+    rowMessage: '',
+    fieldStatus: new Map()
+  },
+  impiantistica: new Map(),
+  altreDotazioni: new Map()
+};
+
+const inlineStatusTimers = {
+  apparecchiatura: null,
+  impiantistica: new Map(),
+  altreDotazioni: new Map()
+};
+
+const inlineEditBaselines = {
+  apparecchiatura: null,
+  impiantistica: new Map(),
+  altreDotazioni: new Map()
+};
+const roomFieldEditBaselines = new Map();
+const roomFieldStatusMap = new Map();
+const roomFieldStatusTimers = new Map();
+
+const apparecchiaturaFieldKeys = ['apparecchiatura', 'tipologia', 'produttore', 'modello', 'qta', 'nuovo', 'trasferimento', 'inv', 'note'];
+const impiantisticaFieldKeys = ['qtaPresenti', 'qtaDaImplementare', 'note'];
+const altreDotazioniFieldKeys = ['presente', 'daImplementare', 'note'];
+
+function createInlineRowStatusState() {
+  return {
+    rowStatus: INLINE_STATUS.neutral,
+    rowMessage: '',
+    fieldStatus: new Map()
+  };
+}
+
+function normalizeComparableInlineValue(value) {
+  return String(value || '').trim();
+}
+
+function getInlineFieldStatusClass(status) {
+  return `is-inline-field-${status || INLINE_STATUS.neutral}`;
+}
+
+function getInlineRowBadgeClass(status) {
+  return `is-inline-row-${status || INLINE_STATUS.neutral}`;
+}
+
+function getInlineStatusLabel(status) {
+  if (status === INLINE_STATUS.dirty) {
+    return 'Da salvare';
+  }
+  if (status === INLINE_STATUS.saving) {
+    return 'Salvataggio in corso';
+  }
+  if (status === INLINE_STATUS.saved) {
+    return 'Salvato';
+  }
+  if (status === INLINE_STATUS.error) {
+    return 'Errore salvataggio';
+  }
+  return 'Nessuna modifica';
+}
+
+function clearRoomFieldStatusTimer(fieldName) {
+  const timerId = roomFieldStatusTimers.get(fieldName);
+  if (!timerId) {
+    return;
+  }
+  window.clearTimeout(timerId);
+  roomFieldStatusTimers.delete(fieldName);
+}
+
+function applyRoomFieldInputStatusClass(fieldName, status) {
+  const fieldConfig = editableFieldConfigs[fieldName];
+  if (!fieldConfig) {
+    return;
+  }
+  applyInlineInputStatusClass(fieldConfig.inputElement, status);
+}
+
+function ensureRoomFieldStatusDot(fieldName) {
+  const fieldConfig = editableFieldConfigs[fieldName];
+  if (!fieldConfig || !fieldConfig.buttonElement || !fieldConfig.buttonElement.parentElement) {
+    return null;
+  }
+  let dotElement = fieldConfig.buttonElement.parentElement.querySelector(`[data-room-field-status="${fieldName}"]`);
+  if (!dotElement) {
+    dotElement = document.createElement('span');
+    dotElement.className = 'inline-field-status-dot is-inline-row-neutral';
+    dotElement.setAttribute('data-room-field-status', fieldName);
+    dotElement.setAttribute('aria-live', 'polite');
+    fieldConfig.buttonElement.before(dotElement);
+  }
+  return dotElement;
+}
+
+function renderRoomFieldStatus(fieldName) {
+  const dotElement = ensureRoomFieldStatusDot(fieldName);
+  if (!dotElement) {
+    return;
+  }
+  const status = roomFieldStatusMap.get(fieldName) || INLINE_STATUS.neutral;
+  const statusLabel = getInlineStatusLabel(status);
+  dotElement.className = `inline-field-status-dot ${getInlineRowBadgeClass(status)}`;
+  dotElement.setAttribute('aria-label', statusLabel);
+  dotElement.title = statusLabel;
+  applyRoomFieldInputStatusClass(fieldName, status);
+}
+
+function setRoomFieldStatus(fieldName, status) {
+  clearRoomFieldStatusTimer(fieldName);
+  roomFieldStatusMap.set(fieldName, status);
+  renderRoomFieldStatus(fieldName);
+}
+
+function scheduleRoomFieldStatusReset(fieldName) {
+  clearRoomFieldStatusTimer(fieldName);
+  const timeoutId = window.setTimeout(() => {
+    roomFieldStatusMap.set(fieldName, INLINE_STATUS.neutral);
+    renderRoomFieldStatus(fieldName);
+    roomFieldStatusTimers.delete(fieldName);
+  }, 2500);
+  roomFieldStatusTimers.set(fieldName, timeoutId);
+}
+
+function ensureInlineRowState(sectionName, rowIndex) {
+  const sectionMap = sectionName === 'impiantistica'
+    ? inlineStatusState.impiantistica
+    : inlineStatusState.altreDotazioni;
+  if (!sectionMap.has(rowIndex)) {
+    sectionMap.set(rowIndex, createInlineRowStatusState());
+  }
+  return sectionMap.get(rowIndex);
+}
+
+function getInlineRowState(sectionName, rowIndex) {
+  const sectionMap = sectionName === 'impiantistica'
+    ? inlineStatusState.impiantistica
+    : inlineStatusState.altreDotazioni;
+  return sectionMap.get(rowIndex) || createInlineRowStatusState();
+}
+
+function clearInlineStatusTimer(sectionName, rowIndex = null) {
+  if (sectionName === 'apparecchiatura') {
+    if (inlineStatusTimers.apparecchiatura !== null) {
+      window.clearTimeout(inlineStatusTimers.apparecchiatura);
+      inlineStatusTimers.apparecchiatura = null;
+    }
+    return;
+  }
+
+  const timerMap = sectionName === 'impiantistica'
+    ? inlineStatusTimers.impiantistica
+    : inlineStatusTimers.altreDotazioni;
+  const timerId = timerMap.get(rowIndex);
+  if (timerId) {
+    window.clearTimeout(timerId);
+    timerMap.delete(rowIndex);
+  }
+}
+
+function scheduleInlineSavedReset(sectionName, renderFn, rowIndex = null) {
+  clearInlineStatusTimer(sectionName, rowIndex);
+  const timeoutId = window.setTimeout(() => {
+    if (sectionName === 'apparecchiatura') {
+      inlineStatusState.apparecchiatura.rowStatus = INLINE_STATUS.neutral;
+      inlineStatusState.apparecchiatura.rowMessage = '';
+      apparecchiaturaFieldKeys.forEach((fieldKey) => {
+        inlineStatusState.apparecchiatura.fieldStatus.set(fieldKey, INLINE_STATUS.neutral);
+      });
+      renderFn();
+      inlineStatusTimers.apparecchiatura = null;
+      return;
+    }
+    const rowState = ensureInlineRowState(sectionName, rowIndex);
+    const sectionFieldKeys = sectionName === 'impiantistica'
+      ? impiantisticaFieldKeys
+      : altreDotazioniFieldKeys;
+    sectionFieldKeys.forEach((fieldKey) => {
+      rowState.fieldStatus.set(fieldKey, INLINE_STATUS.neutral);
+    });
+    rowState.rowStatus = INLINE_STATUS.neutral;
+    rowState.rowMessage = '';
+    renderFn();
+    const timerMap = sectionName === 'impiantistica'
+      ? inlineStatusTimers.impiantistica
+      : inlineStatusTimers.altreDotazioni;
+    timerMap.delete(rowIndex);
+  }, 2500);
+
+  if (sectionName === 'apparecchiatura') {
+    inlineStatusTimers.apparecchiatura = timeoutId;
+    return;
+  }
+  const timerMap = sectionName === 'impiantistica'
+    ? inlineStatusTimers.impiantistica
+    : inlineStatusTimers.altreDotazioni;
+  timerMap.set(rowIndex, timeoutId);
+}
+
+function updateInlineRowStatusFromFields(rowState) {
+  const fieldStatuses = Array.from(rowState.fieldStatus.values());
+  if (fieldStatuses.includes(INLINE_STATUS.error)) {
+    rowState.rowStatus = INLINE_STATUS.error;
+    rowState.rowMessage = 'Errore salvataggio';
+    return;
+  }
+  if (fieldStatuses.includes(INLINE_STATUS.dirty)) {
+    rowState.rowStatus = INLINE_STATUS.dirty;
+    rowState.rowMessage = 'Da salvare';
+    return;
+  }
+  if (fieldStatuses.includes(INLINE_STATUS.saving)) {
+    rowState.rowStatus = INLINE_STATUS.saving;
+    rowState.rowMessage = 'Salvataggio...';
+    return;
+  }
+  if (fieldStatuses.includes(INLINE_STATUS.saved)) {
+    rowState.rowStatus = INLINE_STATUS.saved;
+    rowState.rowMessage = 'Salvato';
+    return;
+  }
+  rowState.rowStatus = INLINE_STATUS.neutral;
+  rowState.rowMessage = '';
+}
+
+function setApparecchiaturaFieldStatus(fieldKey, status) {
+  inlineStatusState.apparecchiatura.fieldStatus.set(fieldKey, status);
+  updateInlineRowStatusFromFields(inlineStatusState.apparecchiatura);
+}
+
+function getApparecchiaturaFormBaseline() {
+  if (inlineEditBaselines.apparecchiatura) {
+    return inlineEditBaselines.apparecchiatura;
+  }
+  return {
+    apparecchiatura: '',
+    tipologia: '',
+    produttore: '',
+    modello: '',
+    qta: '',
+    nuovo: '',
+    trasferimento: '',
+    inv: '',
+    note: ''
+  };
+}
+
+function setApparecchiaturaFormBaseline(values) {
+  inlineEditBaselines.apparecchiatura = {
+    apparecchiatura: normalizeComparableInlineValue(values.apparecchiatura),
+    tipologia: normalizeComparableInlineValue(values.tipologia),
+    produttore: normalizeComparableInlineValue(values.produttore),
+    modello: normalizeComparableInlineValue(values.modello),
+    qta: normalizeComparableInlineValue(values.qta),
+    nuovo: normalizeComparableInlineValue(values.nuovo),
+    trasferimento: normalizeComparableInlineValue(values.trasferimento),
+    inv: normalizeComparableInlineValue(values.inv),
+    note: normalizeComparableInlineValue(values.note)
+  };
+}
+
+function getApparecchiaturaCurrentComparableValues() {
+  return {
+    apparecchiatura: normalizeComparableInlineValue(appTipologiaInput.value),
+    tipologia: normalizeComparableInlineValue(appInstallazioneTipologiaInput.value),
+    produttore: normalizeComparableInlineValue(appProduttoreInput.value),
+    modello: normalizeComparableInlineValue(appModelloInput.value),
+    qta: normalizeComparableInlineValue(appQtaInput.value),
+    nuovo: normalizeComparableInlineValue(appNuovoInput.value),
+    trasferimento: normalizeComparableInlineValue(appTrasferimentoInput.value),
+    inv: normalizeComparableInlineValue(serializeInventarioList(appInvInput.value)),
+    note: normalizeComparableInlineValue(appNoteInput.value)
+  };
+}
+
+function updateApparecchiaturaInlineStatusesFromInput() {
+  const baselineValues = getApparecchiaturaFormBaseline();
+  const currentValues = getApparecchiaturaCurrentComparableValues();
+  apparecchiaturaFieldKeys.forEach((fieldKey) => {
+    const isDirty = currentValues[fieldKey] !== baselineValues[fieldKey];
+    setApparecchiaturaFieldStatus(fieldKey, isDirty ? INLINE_STATUS.dirty : INLINE_STATUS.neutral);
+  });
+  applyApparecchiaturaFieldStatusClasses();
+  renderApparecchiaturaEditorStatusBadge();
+}
+
+function resetApparecchiaturaInlineStatusState() {
+  clearInlineStatusTimer('apparecchiatura');
+  inlineStatusState.apparecchiatura.rowStatus = INLINE_STATUS.neutral;
+  inlineStatusState.apparecchiatura.rowMessage = '';
+  inlineStatusState.apparecchiatura.fieldStatus.clear();
+  setApparecchiaturaFormBaseline({
+    apparecchiatura: '',
+    tipologia: '',
+    produttore: '',
+    modello: '',
+    qta: '',
+    nuovo: '',
+    trasferimento: '',
+    inv: '',
+    note: ''
+  });
+}
+
+function resetInlineRowStatusMaps() {
+  clearInlineStatusTimer('apparecchiatura');
+  Array.from(inlineStatusTimers.impiantistica.keys()).forEach((rowIndex) => clearInlineStatusTimer('impiantistica', rowIndex));
+  Array.from(inlineStatusTimers.altreDotazioni.keys()).forEach((rowIndex) => clearInlineStatusTimer('altreDotazioni', rowIndex));
+  inlineStatusState.impiantistica.clear();
+  inlineStatusState.altreDotazioni.clear();
+  inlineEditBaselines.impiantistica.clear();
+  inlineEditBaselines.altreDotazioni.clear();
+}
+
+function ensureApparecchiaturaStatusBadgeElement() {
+  if (!apparecchiaturaEditor) {
+    return null;
+  }
+  let statusElement = apparecchiaturaEditor.querySelector('#apparecchiaturaEditorStatus');
+  if (!statusElement) {
+    const actionsElement = apparecchiaturaEditor.querySelector('.table-editor-actions');
+    if (!actionsElement) {
+      return null;
+    }
+    statusElement = document.createElement('span');
+    statusElement.id = 'apparecchiaturaEditorStatus';
+    statusElement.className = 'inline-row-status-badge is-inline-row-neutral';
+    statusElement.hidden = true;
+    statusElement.setAttribute('aria-live', 'polite');
+    actionsElement.appendChild(statusElement);
+  }
+  return statusElement;
+}
+
+function renderApparecchiaturaEditorStatusBadge() {
+  const statusElement = ensureApparecchiaturaStatusBadgeElement();
+  if (!statusElement) {
+    return;
+  }
+  const { rowStatus } = inlineStatusState.apparecchiatura;
+  statusElement.className = `inline-row-status-badge ${getInlineRowBadgeClass(rowStatus)}`;
+  statusElement.textContent = '';
+  statusElement.hidden = false;
+  statusElement.setAttribute('aria-label', getInlineStatusLabel(rowStatus));
+  statusElement.title = getInlineStatusLabel(rowStatus);
+}
+
+function applyApparecchiaturaFieldStatusClasses() {
+  const fieldConfig = [
+    ['apparecchiatura', appTipologiaInput],
+    ['tipologia', appInstallazioneTipologiaInput],
+    ['produttore', appProduttoreInput],
+    ['modello', appModelloInput],
+    ['qta', appQtaInput],
+    ['nuovo', appNuovoInput],
+    ['trasferimento', appTrasferimentoInput],
+    ['inv', appInvInput],
+    ['note', appNoteInput]
+  ];
+
+  fieldConfig.forEach(([fieldKey, fieldElement]) => {
+    if (!fieldElement) {
+      return;
+    }
+    const status = inlineStatusState.apparecchiatura.fieldStatus.get(fieldKey) || INLINE_STATUS.neutral;
+    fieldElement.classList.remove(
+      getInlineFieldStatusClass(INLINE_STATUS.saved),
+      getInlineFieldStatusClass(INLINE_STATUS.dirty),
+      getInlineFieldStatusClass(INLINE_STATUS.saving),
+      getInlineFieldStatusClass(INLINE_STATUS.error),
+      getInlineFieldStatusClass(INLINE_STATUS.neutral)
+    );
+    fieldElement.classList.add(getInlineFieldStatusClass(status));
+  });
+}
+
+function setAllApparecchiaturaFieldsStatus(status) {
+  apparecchiaturaFieldKeys.forEach((fieldKey) => {
+    setApparecchiaturaFieldStatus(fieldKey, status);
+  });
+  applyApparecchiaturaFieldStatusClasses();
+  renderApparecchiaturaEditorStatusBadge();
+}
+
+function setApparecchiaturaFieldsStatusByKeys(fieldKeys, status) {
+  const keysSet = new Set(fieldKeys);
+  apparecchiaturaFieldKeys.forEach((fieldKey) => {
+    setApparecchiaturaFieldStatus(fieldKey, keysSet.has(fieldKey) ? status : INLINE_STATUS.neutral);
+  });
+  applyApparecchiaturaFieldStatusClasses();
+  renderApparecchiaturaEditorStatusBadge();
+}
+
+function getDirtyApparecchiaturaFieldKeys() {
+  return apparecchiaturaFieldKeys.filter((fieldKey) => {
+    const fieldStatus = inlineStatusState.apparecchiatura.fieldStatus.get(fieldKey) || INLINE_STATUS.neutral;
+    return fieldStatus === INLINE_STATUS.dirty;
+  });
+}
+
+function markApparecchiaturaSavedAndReset(dirtyFieldKeys) {
+  setApparecchiaturaFieldsStatusByKeys(dirtyFieldKeys, INLINE_STATUS.saved);
+  scheduleInlineSavedReset('apparecchiatura', renderApparecchiaturaEditorStatusBadge);
+  window.setTimeout(() => {
+    resetApparecchiaturaForm();
+  }, 400);
+}
+
+function getDirtyImpiantisticaFieldKeys(rowIndex) {
+  const baseline = inlineEditBaselines.impiantistica.get(rowIndex);
+  const currentRow = impiantisticaRows[rowIndex];
+  if (!baseline || !currentRow) {
+    return [];
+  }
+
+  return impiantisticaFieldKeys.filter((fieldKey) => {
+    const currentValue = normalizeComparableInlineValue(currentRow[fieldKey]);
+    return currentValue !== baseline[fieldKey];
+  });
+}
+
+function getDirtyAltreDotazioniFieldKeys(rowIndex) {
+  const baseline = inlineEditBaselines.altreDotazioni.get(rowIndex);
+  const currentRow = altreDotazioniRows[rowIndex];
+  if (!baseline || !currentRow) {
+    return [];
+  }
+
+  return altreDotazioniFieldKeys.filter((fieldKey) => {
+    const currentValue = normalizeComparableInlineValue(currentRow[fieldKey]);
+    return currentValue !== baseline[fieldKey];
+  });
+}
+
+function setInlineRowFieldStatus(sectionName, rowIndex, fieldKey, status) {
+  const rowState = ensureInlineRowState(sectionName, rowIndex);
+  rowState.fieldStatus.set(fieldKey, status);
+  updateInlineRowStatusFromFields(rowState);
+}
+
+function getInlineRowFieldStatus(sectionName, rowIndex, fieldKey) {
+  const rowState = getInlineRowState(sectionName, rowIndex);
+  return rowState.fieldStatus.get(fieldKey) || INLINE_STATUS.neutral;
+}
+
+function getInlineRowBadgeMarkup(sectionName, rowIndex) {
+  const rowState = getInlineRowState(sectionName, rowIndex);
+  const statusLabel = getInlineStatusLabel(rowState.rowStatus);
+  return `<span class="inline-row-status-badge ${getInlineRowBadgeClass(rowState.rowStatus)}" aria-label="${escapeHtml(statusLabel)}" title="${escapeHtml(statusLabel)}"></span>`;
+}
+
+function applyInlineInputStatusClass(inputElement, status) {
+  if (!inputElement) {
+    return;
+  }
+  inputElement.classList.remove(
+    getInlineFieldStatusClass(INLINE_STATUS.saved),
+    getInlineFieldStatusClass(INLINE_STATUS.dirty),
+    getInlineFieldStatusClass(INLINE_STATUS.saving),
+    getInlineFieldStatusClass(INLINE_STATUS.error),
+    getInlineFieldStatusClass(INLINE_STATUS.neutral)
+  );
+  inputElement.classList.add(getInlineFieldStatusClass(status));
+}
+
+function updateInlineRowBadgeElement(tableBodyElement, sectionName, rowIndex) {
+  if (!tableBodyElement) {
+    return;
+  }
+  const rowEditButton = tableBodyElement.querySelector(`[data-${sectionName === 'impiantistica' ? 'imp' : 'alt'}-edit="${rowIndex}"]`);
+  if (!rowEditButton || !rowEditButton.parentElement) {
+    return;
+  }
+  const statusBadge = rowEditButton.parentElement.querySelector('.inline-row-status-badge');
+  if (!statusBadge) {
+    return;
+  }
+  const rowState = getInlineRowState(sectionName, rowIndex);
+  const statusLabel = getInlineStatusLabel(rowState.rowStatus);
+  statusBadge.className = `inline-row-status-badge ${getInlineRowBadgeClass(rowState.rowStatus)}`;
+  statusBadge.textContent = '';
+  statusBadge.hidden = false;
+  statusBadge.setAttribute('aria-label', statusLabel);
+  statusBadge.title = statusLabel;
+}
+
 const editableFieldConfigs = {
   roomCodeName: {
     valueElement: roomCodeNameValue,
@@ -977,6 +1475,9 @@ function stopEditingField(fieldName, saveChanges) {
   fieldConfig.valueElement.hidden = false;
   fieldConfig.inputElement.hidden = true;
   fieldConfig.buttonElement.textContent = 'Modifica';
+  if (!saveChanges) {
+    setRoomFieldStatus(fieldName, INLINE_STATUS.neutral);
+  }
   activeFieldBeingEdited = null;
 }
 
@@ -991,6 +1492,8 @@ function startEditingField(fieldName) {
   }
 
   fieldConfig.inputElement.value = fieldConfig.valueElement.textContent.trim();
+  roomFieldEditBaselines.set(fieldName, normalizeComparableInlineValue(fieldConfig.valueElement.textContent));
+  setRoomFieldStatus(fieldName, INLINE_STATUS.neutral);
   fieldConfig.valueElement.hidden = true;
   fieldConfig.inputElement.hidden = false;
   fieldConfig.buttonElement.textContent = 'Salva';
@@ -1025,15 +1528,19 @@ async function handleEditFieldClick(fieldName) {
     }
 
     fieldConfig.buttonElement.disabled = true;
+    setRoomFieldStatus(fieldName, INLINE_STATUS.saving);
     try {
       await saveSingleRoomField(fieldName);
     } catch (error) {
       console.error('[RoomFieldSave] Errore salvataggio campo', { fieldName, error });
+      setRoomFieldStatus(fieldName, INLINE_STATUS.error);
       showSaveError(`Errore salvataggio campo: ${error.message || 'errore sconosciuto'}`);
       fieldConfig.buttonElement.disabled = false;
       return;
     }
     stopEditingField(fieldName, true);
+    setRoomFieldStatus(fieldName, INLINE_STATUS.saved);
+    scheduleRoomFieldStatusReset(fieldName);
     fieldConfig.buttonElement.disabled = false;
     return;
   }
@@ -1043,6 +1550,8 @@ async function handleEditFieldClick(fieldName) {
 
 function setupEditableFieldEvents(fieldName) {
   const fieldConfig = editableFieldConfigs[fieldName];
+  ensureRoomFieldStatusDot(fieldName);
+  renderRoomFieldStatus(fieldName);
   fieldConfig.buttonElement.addEventListener('click', async () => {
     await handleEditFieldClick(fieldName);
   });
@@ -1056,6 +1565,17 @@ function setupEditableFieldEvents(fieldName) {
       stopEditingField(fieldName, false);
     }
   });
+  const updateDirtyStatus = () => {
+    if (activeFieldBeingEdited !== fieldName) {
+      return;
+    }
+    const baselineValue = roomFieldEditBaselines.get(fieldName);
+    const currentValue = normalizeComparableInlineValue(fieldConfig.inputElement.value);
+    const isDirty = currentValue !== normalizeComparableInlineValue(baselineValue);
+    setRoomFieldStatus(fieldName, isDirty ? INLINE_STATUS.dirty : INLINE_STATUS.neutral);
+  };
+  fieldConfig.inputElement.addEventListener('input', updateDirtyStatus);
+  fieldConfig.inputElement.addEventListener('change', updateDirtyStatus);
 }
 
 function resetEditableFieldsState() {
@@ -1064,6 +1584,8 @@ function resetEditableFieldsState() {
     fieldConfig.valueElement.hidden = false;
     fieldConfig.inputElement.hidden = true;
     fieldConfig.buttonElement.textContent = 'Modifica';
+    roomFieldEditBaselines.delete(fieldName);
+    setRoomFieldStatus(fieldName, INLINE_STATUS.neutral);
   });
   activeFieldBeingEdited = null;
 }
@@ -1264,6 +1786,9 @@ function resetApparecchiaturaForm() {
   appInvInput.value = '';
   appNoteInput.value = '';
   editingApparecchiaturaIndex = null;
+  resetApparecchiaturaInlineStatusState();
+  applyApparecchiaturaFieldStatusClasses();
+  renderApparecchiaturaEditorStatusBadge();
   setApparecchiaturaEditMode(false);
 }
 
@@ -1311,6 +1836,10 @@ function renderApparecchiaturaTable() {
       appTrasferimentoInput.value = normalizedSelectedRow.trasferimento;
       appInvInput.value = normalizedSelectedRow.inv === '-' ? '' : normalizedSelectedRow.inv;
       appNoteInput.value = normalizedSelectedRow.note;
+      resetApparecchiaturaInlineStatusState();
+      setApparecchiaturaFormBaseline(getApparecchiaturaCurrentComparableValues());
+      applyApparecchiaturaFieldStatusClasses();
+      renderApparecchiaturaEditorStatusBadge();
       editingApparecchiaturaIndex = rowIndex;
       setApparecchiaturaEditMode(true);
     });
@@ -1375,7 +1904,11 @@ async function saveApparecchiaturaRow(rowIndex) {
 
 function renderImpiantisticaTable() {
   const rowsHtml = impiantisticaRows.map((row, index) => {
-    const isRowEditing = editingImpiantisticaIndex === index;
+    const isRowEditing = editingImpiantisticaIndexes.has(index);
+    const qtaPresentiStatusClass = getInlineFieldStatusClass(getInlineRowFieldStatus('impiantistica', index, 'qtaPresenti'));
+    const qtaDaImplementareStatusClass = getInlineFieldStatusClass(getInlineRowFieldStatus('impiantistica', index, 'qtaDaImplementare'));
+    const noteStatusClass = getInlineFieldStatusClass(getInlineRowFieldStatus('impiantistica', index, 'note'));
+    const rowStatusBadgeMarkup = getInlineRowBadgeMarkup('impiantistica', index);
     return `
     <tr>
       <td>${escapeHtml(row.tipologia)}</td>
@@ -1383,7 +1916,7 @@ function renderImpiantisticaTable() {
         <input
           type="number"
           min="0"
-          class="table-inline-input"
+          class="table-inline-input ${qtaPresentiStatusClass}"
           data-imp-qta-presenti="${index}"
           value="${escapeHtml(row.qtaPresenti || '')}"
           ${isRowEditing ? '' : 'disabled'}
@@ -1393,7 +1926,7 @@ function renderImpiantisticaTable() {
         <input
           type="number"
           min="0"
-          class="table-inline-input"
+          class="table-inline-input ${qtaDaImplementareStatusClass}"
           data-imp-qta-implementare="${index}"
           value="${escapeHtml(row.qtaDaImplementare || '')}"
           ${isRowEditing ? '' : 'disabled'}
@@ -1402,13 +1935,14 @@ function renderImpiantisticaTable() {
       <td>
         <input
           type="text"
-          class="table-inline-input"
+          class="table-inline-input ${noteStatusClass}"
           data-imp-note="${index}"
           value="${escapeHtml(row.note || '')}"
           ${isRowEditing ? '' : 'disabled'}
         >
       </td>
       <td>
+        ${rowStatusBadgeMarkup}
         <button type="button" class="row-edit-button" data-imp-edit="${index}">
           ${isRowEditing ? 'Salva' : 'Modifica'}
         </button>
@@ -1427,6 +1961,15 @@ function renderImpiantisticaTable() {
         return;
       }
       selectedRow.qtaPresenti = inputElement.value.trim();
+      const baseline = inlineEditBaselines.impiantistica.get(rowIndex);
+      if (baseline) {
+        const status = normalizeComparableInlineValue(selectedRow.qtaPresenti) === baseline.qtaPresenti
+          ? INLINE_STATUS.neutral
+          : INLINE_STATUS.dirty;
+        setInlineRowFieldStatus('impiantistica', rowIndex, 'qtaPresenti', status);
+        applyInlineInputStatusClass(inputElement, status);
+        updateInlineRowBadgeElement(impiantisticaTableBody, 'impiantistica', rowIndex);
+      }
     });
   });
 
@@ -1438,6 +1981,15 @@ function renderImpiantisticaTable() {
         return;
       }
       selectedRow.qtaDaImplementare = inputElement.value.trim();
+      const baseline = inlineEditBaselines.impiantistica.get(rowIndex);
+      if (baseline) {
+        const status = normalizeComparableInlineValue(selectedRow.qtaDaImplementare) === baseline.qtaDaImplementare
+          ? INLINE_STATUS.neutral
+          : INLINE_STATUS.dirty;
+        setInlineRowFieldStatus('impiantistica', rowIndex, 'qtaDaImplementare', status);
+        applyInlineInputStatusClass(inputElement, status);
+        updateInlineRowBadgeElement(impiantisticaTableBody, 'impiantistica', rowIndex);
+      }
     });
   });
 
@@ -1449,25 +2001,63 @@ function renderImpiantisticaTable() {
         return;
       }
       selectedRow.note = inputElement.value.trim();
+      const baseline = inlineEditBaselines.impiantistica.get(rowIndex);
+      if (baseline) {
+        const status = normalizeComparableInlineValue(selectedRow.note) === baseline.note
+          ? INLINE_STATUS.neutral
+          : INLINE_STATUS.dirty;
+        setInlineRowFieldStatus('impiantistica', rowIndex, 'note', status);
+        applyInlineInputStatusClass(inputElement, status);
+        updateInlineRowBadgeElement(impiantisticaTableBody, 'impiantistica', rowIndex);
+      }
     });
   });
 
   impiantisticaTableBody.querySelectorAll('[data-imp-edit]').forEach((buttonElement) => {
     buttonElement.addEventListener('click', async () => {
       const rowIndex = Number(buttonElement.dataset.impEdit);
-      if (editingImpiantisticaIndex === rowIndex) {
+      if (editingImpiantisticaIndexes.has(rowIndex)) {
+        const dirtyFieldKeys = getDirtyImpiantisticaFieldKeys(rowIndex);
         buttonElement.disabled = true;
+        impiantisticaFieldKeys.forEach((fieldKey) => {
+          const targetStatus = dirtyFieldKeys.includes(fieldKey) ? INLINE_STATUS.saving : INLINE_STATUS.neutral;
+          setInlineRowFieldStatus('impiantistica', rowIndex, fieldKey, targetStatus);
+        });
+        renderImpiantisticaTable();
         try {
           await saveImpiantisticaRow(rowIndex);
         } catch (error) {
           console.error('[ImpiantisticaSave] Errore salvataggio riga', { rowIndex, error });
+          impiantisticaFieldKeys.forEach((fieldKey) => {
+            const targetStatus = dirtyFieldKeys.includes(fieldKey) ? INLINE_STATUS.error : INLINE_STATUS.neutral;
+            setInlineRowFieldStatus('impiantistica', rowIndex, fieldKey, targetStatus);
+          });
+          renderImpiantisticaTable();
           showSaveError(`Errore salvataggio impiantistica: ${error.message || 'errore sconosciuto'}`);
-          buttonElement.disabled = false;
           return;
         }
-        editingImpiantisticaIndex = null;
+        const savedComparableRow = {
+          qtaPresenti: normalizeComparableInlineValue(impiantisticaRows[rowIndex].qtaPresenti),
+          qtaDaImplementare: normalizeComparableInlineValue(impiantisticaRows[rowIndex].qtaDaImplementare),
+          note: normalizeComparableInlineValue(impiantisticaRows[rowIndex].note)
+        };
+        inlineEditBaselines.impiantistica.set(rowIndex, savedComparableRow);
+        impiantisticaFieldKeys.forEach((fieldKey) => {
+          const targetStatus = dirtyFieldKeys.includes(fieldKey) ? INLINE_STATUS.saved : INLINE_STATUS.neutral;
+          setInlineRowFieldStatus('impiantistica', rowIndex, fieldKey, targetStatus);
+        });
+        editingImpiantisticaIndexes.delete(rowIndex);
+        scheduleInlineSavedReset('impiantistica', renderImpiantisticaTable, rowIndex);
       } else {
-        editingImpiantisticaIndex = rowIndex;
+        editingImpiantisticaIndexes.add(rowIndex);
+        inlineEditBaselines.impiantistica.set(rowIndex, {
+          qtaPresenti: normalizeComparableInlineValue(impiantisticaRows[rowIndex].qtaPresenti),
+          qtaDaImplementare: normalizeComparableInlineValue(impiantisticaRows[rowIndex].qtaDaImplementare),
+          note: normalizeComparableInlineValue(impiantisticaRows[rowIndex].note)
+        });
+        impiantisticaFieldKeys.forEach((fieldKey) => {
+          setInlineRowFieldStatus('impiantistica', rowIndex, fieldKey, INLINE_STATUS.neutral);
+        });
       }
       renderImpiantisticaTable();
     });
@@ -1482,7 +2072,11 @@ function renderAltreDotazioniTable() {
   ];
 
   const rowsHtml = altreDotazioniRows.map((row, index) => {
-    const isRowEditing = editingAltreDotazioniIndex === index;
+    const isRowEditing = editingAltreDotazioniIndexes.has(index);
+    const presenteStatusClass = getInlineFieldStatusClass(getInlineRowFieldStatus('altreDotazioni', index, 'presente'));
+    const daImplementareStatusClass = getInlineFieldStatusClass(getInlineRowFieldStatus('altreDotazioni', index, 'daImplementare'));
+    const noteStatusClass = getInlineFieldStatusClass(getInlineRowFieldStatus('altreDotazioni', index, 'note'));
+    const rowStatusBadgeMarkup = getInlineRowBadgeMarkup('altreDotazioni', index);
     const presenteOptions = yesNoOptions.map((option) => {
       const isSelected = row.presente === option.value ? 'selected' : '';
       return `<option value="${escapeHtml(option.value)}" ${isSelected}>${escapeHtml(option.label)}</option>`;
@@ -1497,25 +2091,26 @@ function renderAltreDotazioniTable() {
     <tr>
       <td>${escapeHtml(row.altraDotazione || '-')}</td>
       <td>
-        <select class="table-inline-input" data-alt-presente="${index}" ${isRowEditing ? '' : 'disabled'}>
+        <select class="table-inline-input ${presenteStatusClass}" data-alt-presente="${index}" ${isRowEditing ? '' : 'disabled'}>
           ${presenteOptions}
         </select>
       </td>
       <td>
-        <select class="table-inline-input" data-alt-implementare="${index}" ${isRowEditing ? '' : 'disabled'}>
+        <select class="table-inline-input ${daImplementareStatusClass}" data-alt-implementare="${index}" ${isRowEditing ? '' : 'disabled'}>
           ${daImplementareOptions}
         </select>
       </td>
       <td>
         <input
           type="text"
-          class="table-inline-input"
+          class="table-inline-input ${noteStatusClass}"
           data-alt-note="${index}"
           value="${escapeHtml(row.note || '')}"
           ${isRowEditing ? '' : 'disabled'}
         >
       </td>
       <td>
+        ${rowStatusBadgeMarkup}
         <button type="button" class="row-edit-button" data-alt-edit="${index}">
           ${isRowEditing ? 'Salva' : 'Modifica'}
         </button>
@@ -1534,6 +2129,15 @@ function renderAltreDotazioniTable() {
         return;
       }
       selectedRow.presente = selectElement.value;
+      const baseline = inlineEditBaselines.altreDotazioni.get(rowIndex);
+      if (baseline) {
+        const status = normalizeComparableInlineValue(selectedRow.presente) === baseline.presente
+          ? INLINE_STATUS.neutral
+          : INLINE_STATUS.dirty;
+        setInlineRowFieldStatus('altreDotazioni', rowIndex, 'presente', status);
+        applyInlineInputStatusClass(selectElement, status);
+        updateInlineRowBadgeElement(altreDotazioniTableBody, 'altreDotazioni', rowIndex);
+      }
     });
   });
 
@@ -1545,6 +2149,15 @@ function renderAltreDotazioniTable() {
         return;
       }
       selectedRow.daImplementare = selectElement.value;
+      const baseline = inlineEditBaselines.altreDotazioni.get(rowIndex);
+      if (baseline) {
+        const status = normalizeComparableInlineValue(selectedRow.daImplementare) === baseline.daImplementare
+          ? INLINE_STATUS.neutral
+          : INLINE_STATUS.dirty;
+        setInlineRowFieldStatus('altreDotazioni', rowIndex, 'daImplementare', status);
+        applyInlineInputStatusClass(selectElement, status);
+        updateInlineRowBadgeElement(altreDotazioniTableBody, 'altreDotazioni', rowIndex);
+      }
     });
   });
 
@@ -1556,25 +2169,63 @@ function renderAltreDotazioniTable() {
         return;
       }
       selectedRow.note = inputElement.value.trim();
+      const baseline = inlineEditBaselines.altreDotazioni.get(rowIndex);
+      if (baseline) {
+        const status = normalizeComparableInlineValue(selectedRow.note) === baseline.note
+          ? INLINE_STATUS.neutral
+          : INLINE_STATUS.dirty;
+        setInlineRowFieldStatus('altreDotazioni', rowIndex, 'note', status);
+        applyInlineInputStatusClass(inputElement, status);
+        updateInlineRowBadgeElement(altreDotazioniTableBody, 'altreDotazioni', rowIndex);
+      }
     });
   });
 
   altreDotazioniTableBody.querySelectorAll('[data-alt-edit]').forEach((buttonElement) => {
     buttonElement.addEventListener('click', async () => {
       const rowIndex = Number(buttonElement.dataset.altEdit);
-      if (editingAltreDotazioniIndex === rowIndex) {
+      if (editingAltreDotazioniIndexes.has(rowIndex)) {
+        const dirtyFieldKeys = getDirtyAltreDotazioniFieldKeys(rowIndex);
         buttonElement.disabled = true;
+        altreDotazioniFieldKeys.forEach((fieldKey) => {
+          const targetStatus = dirtyFieldKeys.includes(fieldKey) ? INLINE_STATUS.saving : INLINE_STATUS.neutral;
+          setInlineRowFieldStatus('altreDotazioni', rowIndex, fieldKey, targetStatus);
+        });
+        renderAltreDotazioniTable();
         try {
           await saveAltreDotazioniRow(rowIndex);
         } catch (error) {
           console.error('[AltreDotazioniSave] Errore salvataggio riga', { rowIndex, error });
+          altreDotazioniFieldKeys.forEach((fieldKey) => {
+            const targetStatus = dirtyFieldKeys.includes(fieldKey) ? INLINE_STATUS.error : INLINE_STATUS.neutral;
+            setInlineRowFieldStatus('altreDotazioni', rowIndex, fieldKey, targetStatus);
+          });
+          renderAltreDotazioniTable();
           showSaveError(`Errore salvataggio altre dotazioni: ${error.message || 'errore sconosciuto'}`);
-          buttonElement.disabled = false;
           return;
         }
-        editingAltreDotazioniIndex = null;
+        const savedComparableRow = {
+          presente: normalizeComparableInlineValue(altreDotazioniRows[rowIndex].presente),
+          daImplementare: normalizeComparableInlineValue(altreDotazioniRows[rowIndex].daImplementare),
+          note: normalizeComparableInlineValue(altreDotazioniRows[rowIndex].note)
+        };
+        inlineEditBaselines.altreDotazioni.set(rowIndex, savedComparableRow);
+        altreDotazioniFieldKeys.forEach((fieldKey) => {
+          const targetStatus = dirtyFieldKeys.includes(fieldKey) ? INLINE_STATUS.saved : INLINE_STATUS.neutral;
+          setInlineRowFieldStatus('altreDotazioni', rowIndex, fieldKey, targetStatus);
+        });
+        editingAltreDotazioniIndexes.delete(rowIndex);
+        scheduleInlineSavedReset('altreDotazioni', renderAltreDotazioniTable, rowIndex);
       } else {
-        editingAltreDotazioniIndex = rowIndex;
+        editingAltreDotazioniIndexes.add(rowIndex);
+        inlineEditBaselines.altreDotazioni.set(rowIndex, {
+          presente: normalizeComparableInlineValue(altreDotazioniRows[rowIndex].presente),
+          daImplementare: normalizeComparableInlineValue(altreDotazioniRows[rowIndex].daImplementare),
+          note: normalizeComparableInlineValue(altreDotazioniRows[rowIndex].note)
+        });
+        altreDotazioniFieldKeys.forEach((fieldKey) => {
+          setInlineRowFieldStatus('altreDotazioni', rowIndex, fieldKey, INLINE_STATUS.neutral);
+        });
       }
       renderAltreDotazioniTable();
     });
@@ -1648,8 +2299,8 @@ function applyTableRowsFromPayload(payload) {
     row.note = normalizeInputValue(sourceRow.note);
   });
 
-  editingImpiantisticaIndex = null;
-  editingAltreDotazioniIndex = null;
+  editingImpiantisticaIndexes.clear();
+  editingAltreDotazioniIndexes.clear();
   resetApparecchiaturaForm();
   renderApparecchiaturaTable();
   renderImpiantisticaTable();
@@ -1907,18 +2558,21 @@ async function handleAddApparecchiatura() {
 
   apparecchiaturaRows.push(newRow);
   const rowIndex = apparecchiaturaRows.length - 1;
+  const dirtyFieldKeys = getDirtyApparecchiaturaFieldKeys();
   appAddButton.disabled = true;
+  setApparecchiaturaFieldsStatusByKeys(dirtyFieldKeys, INLINE_STATUS.saving);
   try {
     await saveApparecchiaturaRow(rowIndex);
   } catch (error) {
     console.error('[ApparecchiaturaSave] Errore salvataggio nuova riga', { rowIndex, error });
+    setApparecchiaturaFieldsStatusByKeys(dirtyFieldKeys, INLINE_STATUS.error);
     showSaveError(`Errore salvataggio apparecchiatura: ${error.message || 'errore sconosciuto'}`);
     appAddButton.disabled = false;
     return;
   }
   appAddButton.disabled = false;
   renderApparecchiaturaTable();
-  resetApparecchiaturaForm();
+  markApparecchiaturaSavedAndReset(dirtyFieldKeys);
 }
 
 async function handleSaveApparecchiatura() {
@@ -1934,18 +2588,21 @@ async function handleSaveApparecchiatura() {
 
   const rowIndex = editingApparecchiaturaIndex;
   apparecchiaturaRows[rowIndex] = updatedRow;
+  const dirtyFieldKeys = getDirtyApparecchiaturaFieldKeys();
   appSaveButton.disabled = true;
+  setApparecchiaturaFieldsStatusByKeys(dirtyFieldKeys, INLINE_STATUS.saving);
   try {
     await saveApparecchiaturaRow(rowIndex);
   } catch (error) {
     console.error('[ApparecchiaturaSave] Errore salvataggio riga', { rowIndex, error });
+    setApparecchiaturaFieldsStatusByKeys(dirtyFieldKeys, INLINE_STATUS.error);
     showSaveError(`Errore salvataggio apparecchiatura: ${error.message || 'errore sconosciuto'}`);
     appSaveButton.disabled = false;
     return;
   }
   appSaveButton.disabled = false;
   renderApparecchiaturaTable();
-  resetApparecchiaturaForm();
+  markApparecchiaturaSavedAndReset(dirtyFieldKeys);
 }
 
 zoomInButton.addEventListener('click', handleZoomIn);
@@ -2034,3 +2691,13 @@ renderImpiantisticaTable();
 renderAltreDotazioniTable();
 initializeApparecchiaturaTomSelect();
 populateApparecchiaturaSelectOptions();
+ensureApparecchiaturaStatusBadgeElement();
+applyApparecchiaturaFieldStatusClasses();
+[appTipologiaInput, appInstallazioneTipologiaInput, appProduttoreInput, appModelloInput, appQtaInput, appNuovoInput, appTrasferimentoInput, appInvInput, appNoteInput]
+  .forEach((fieldElement) => {
+    if (!fieldElement) {
+      return;
+    }
+    fieldElement.addEventListener('input', updateApparecchiaturaInlineStatusesFromInput);
+    fieldElement.addEventListener('change', updateApparecchiaturaInlineStatusesFromInput);
+  });
