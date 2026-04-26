@@ -1807,7 +1807,20 @@ function renderApparecchiaturaTable() {
       <td>${escapeHtml(normalizedRow.trasferimento)}</td>
       <td>${escapeHtml(normalizedRow.inv)}</td>
       <td>${escapeHtml(normalizedRow.note)}</td>
-      <td><button type="button" class="row-edit-button" data-app-edit="${index}">Modifica</button></td>
+      <td>
+        <button type="button" class="row-edit-button" data-app-edit="${index}">Modifica</button>
+        <button
+          type="button"
+          class="row-delete-button"
+          data-app-delete="${index}"
+          aria-label="Elimina apparecchiatura"
+          title="Elimina apparecchiatura"
+        >
+          <svg class="row-delete-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm-2 6h2v9H7V9zm4 0h2v9h-2V9zm4 0h2v9h-2V9z"></path>
+          </svg>
+        </button>
+      </td>
     </tr>
   `;
   }).join('');
@@ -1842,6 +1855,13 @@ function renderApparecchiaturaTable() {
       renderApparecchiaturaEditorStatusBadge();
       editingApparecchiaturaIndex = rowIndex;
       setApparecchiaturaEditMode(true);
+    });
+  });
+
+  apparecchiaturaTableBody.querySelectorAll('[data-app-delete]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const rowIndex = Number(button.dataset.appDelete);
+      await handleDeleteApparecchiatura(rowIndex);
     });
   });
 }
@@ -1900,6 +1920,114 @@ async function saveApparecchiaturaRow(rowIndex) {
       note: normalizeInputValue(row.note)
     }
   });
+}
+
+function setApparecchiaturaRowButtonsDisabled(disabled) {
+  if (!apparecchiaturaTableBody) {
+    return;
+  }
+  apparecchiaturaTableBody.querySelectorAll('[data-app-edit], [data-app-delete]').forEach((buttonElement) => {
+    buttonElement.disabled = disabled;
+  });
+}
+
+function cloneApparecchiaturaRows(rows) {
+  return rows.map((row) => ({ ...row }));
+}
+
+async function persistApparecchiaturaRowsAfterDelete(previousRowsCount) {
+  for (let rowIndex = 0; rowIndex < apparecchiaturaRows.length; rowIndex += 1) {
+    await saveApparecchiaturaRow(rowIndex);
+  }
+
+  const orphanRowIndex = previousRowsCount - 1;
+  if (orphanRowIndex >= apparecchiaturaRows.length) {
+    await saveRoomFragment('saveApparecchiaturaRow', {
+      rowIndex: orphanRowIndex,
+      row: {
+        apparecchiatura: null,
+        tipologia: null,
+        produttore: null,
+        modello: null,
+        qta: null,
+        nuovo: null,
+        trasferimento: null,
+        inv: [],
+        note: null
+      }
+    });
+  }
+}
+
+async function handleDeleteApparecchiatura(rowIndex) {
+  const selectedRow = apparecchiaturaRows[rowIndex];
+  if (!selectedRow) {
+    return;
+  }
+
+  const readableLabel = selectedRow.apparecchiatura && selectedRow.apparecchiatura !== '-'
+    ? selectedRow.apparecchiatura
+    : `riga ${rowIndex + 1}`;
+  const shouldDelete = window.confirm(`Confermi l'eliminazione di "${readableLabel}"?`);
+  if (!shouldDelete) {
+    return;
+  }
+
+  const previousRowsSnapshot = cloneApparecchiaturaRows(apparecchiaturaRows);
+  const previousRowsCount = previousRowsSnapshot.length;
+  const previousEditingIndex = editingApparecchiaturaIndex;
+
+  apparecchiaturaRows.splice(rowIndex, 1);
+  if (previousEditingIndex !== null) {
+    if (previousEditingIndex === rowIndex) {
+      resetApparecchiaturaForm();
+    } else if (previousEditingIndex > rowIndex) {
+      editingApparecchiaturaIndex = previousEditingIndex - 1;
+    }
+  }
+
+  renderApparecchiaturaTable();
+  setApparecchiaturaRowButtonsDisabled(true);
+  appAddButton.disabled = true;
+  appSaveButton.disabled = true;
+  appCancelButton.disabled = true;
+
+  try {
+    await persistApparecchiaturaRowsAfterDelete(previousRowsCount);
+  } catch (error) {
+    console.error('[ApparecchiaturaDelete] Errore eliminazione riga', { rowIndex, error });
+    showSaveError(`Errore eliminazione apparecchiatura: ${error.message || 'errore sconosciuto'}`);
+    apparecchiaturaRows.length = 0;
+    previousRowsSnapshot.forEach((row) => {
+      apparecchiaturaRows.push(row);
+    });
+    editingApparecchiaturaIndex = previousEditingIndex;
+    if (editingApparecchiaturaIndex !== null && apparecchiaturaRows[editingApparecchiaturaIndex]) {
+      const restoredRow = normalizeApparecchiaturaRow(apparecchiaturaRows[editingApparecchiaturaIndex]);
+      setApparecchiaturaValue(restoredRow.apparecchiatura);
+      appInstallazioneTipologiaInput.value = restoredRow.tipologia;
+      appProduttoreInput.value = restoredRow.produttore === '-' ? '' : restoredRow.produttore;
+      appModelloInput.value = restoredRow.modello === '-' ? '' : restoredRow.modello;
+      appQtaInput.value = restoredRow.qta;
+      appNuovoInput.value = restoredRow.nuovo;
+      appTrasferimentoInput.value = restoredRow.trasferimento;
+      appInvInput.value = restoredRow.inv === '-' ? '' : restoredRow.inv;
+      appNoteInput.value = restoredRow.note;
+      setApparecchiaturaEditMode(true);
+    }
+    renderApparecchiaturaTable();
+    setApparecchiaturaRowButtonsDisabled(false);
+    appAddButton.disabled = false;
+    appSaveButton.disabled = false;
+    appCancelButton.disabled = false;
+    return;
+  }
+
+  renderApparecchiaturaTable();
+  setApparecchiaturaRowButtonsDisabled(false);
+  appAddButton.disabled = false;
+  appSaveButton.disabled = false;
+  appCancelButton.disabled = false;
 }
 
 function renderImpiantisticaTable() {
