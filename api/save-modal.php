@@ -55,6 +55,47 @@ function isTruthyValue(mixed $value): bool
     return true;
 }
 
+function normalizeInventoryCode(mixed $value): string
+{
+    return strtoupper(trim((string)($value ?? '')));
+}
+
+function normalizeInventoryList(mixed $value): array
+{
+    $rawValues = [];
+
+    if (is_array($value)) {
+        $rawValues = $value;
+    } else {
+        $stringValue = trim((string)($value ?? ''));
+        if ($stringValue === '' || $stringValue === '-' || strtolower($stringValue) === 'null') {
+            return [];
+        }
+
+        if (str_starts_with($stringValue, '[') && str_ends_with($stringValue, ']')) {
+            $decoded = json_decode($stringValue, true);
+            if (is_array($decoded)) {
+                $rawValues = $decoded;
+            } else {
+                $rawValues = preg_split('/\s*,\s*/', $stringValue) ?: [];
+            }
+        } else {
+            $rawValues = preg_split('/\s*,\s*/', $stringValue) ?: [];
+        }
+    }
+
+    $normalized = [];
+    foreach ($rawValues as $rawItem) {
+        $normalizedCode = normalizeInventoryCode($rawItem);
+        if ($normalizedCode === '') {
+            continue;
+        }
+        $normalized[] = $normalizedCode;
+    }
+
+    return array_values(array_unique($normalized));
+}
+
 function fetchExistingRoom(PDO $pdo, string $blocco, string $piano, string $roomCode): ?array
 {
     $statement = $pdo->prepare(
@@ -340,6 +381,14 @@ try {
             jsonError('row mancante');
         }
 
+        $normalizedInventoryList = normalizeInventoryList($row['inv'] ?? null);
+        $inventoryJson = $normalizedInventoryList === []
+            ? null
+            : json_encode($normalizedInventoryList, JSON_UNESCAPED_UNICODE);
+        if ($inventoryJson === false) {
+            jsonError('inv non valido');
+        }
+
         $normalizedRow = [
             'apparecchiatura' => asNullableString($row['apparecchiatura'] ?? null),
             'tipologia' => asNullableString($row['tipologia'] ?? null),
@@ -348,7 +397,7 @@ try {
             'qta' => asNullableString($row['qta'] ?? null),
             'nuovo' => asNullableString($row['nuovo'] ?? null),
             'trasferimento' => asNullableString($row['trasferimento'] ?? null),
-            'inv' => asNullableString($row['inv'] ?? null),
+            'inv' => $inventoryJson,
             'note' => asNullableString($row['note'] ?? null),
         ];
 

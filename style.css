@@ -475,7 +475,7 @@ body::-webkit-scrollbar-corner,
 
 .table-editor-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 8px;
 }
 
@@ -497,14 +497,7 @@ body::-webkit-scrollbar-corner,
   background: #ffffff;
 }
 
-.table-editor-field input:focus,
-.table-editor-field select:focus {
-  outline: 2px solid #93c5fd;
-  outline-offset: 1px;
-  border-color: #3b82f6;
-}
-
-.table-editor-tipologia-select {
+.table-editor-field select {
   min-height: 34px;
   appearance: none;
   background-image: linear-gradient(45deg, transparent 50%, #475569 50%), linear-gradient(135deg, #475569 50%, transparent 50%);
@@ -512,6 +505,41 @@ body::-webkit-scrollbar-corner,
   background-size: 5px 5px, 5px 5px;
   background-repeat: no-repeat;
   padding-right: 28px;
+}
+
+.table-editor-field input:focus,
+.table-editor-field select:focus {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+  border-color: #3b82f6;
+}
+
+.table-editor-field .ts-wrapper {
+  font-size: 13px;
+}
+
+.table-editor-field .ts-control {
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
+  padding: 7px 9px;
+  min-height: 34px;
+  background: #ffffff;
+  box-shadow: none;
+}
+
+.table-editor-field .ts-wrapper.focus .ts-control {
+  outline: 2px solid #93c5fd;
+  outline-offset: 1px;
+  border-color: #3b82f6;
+}
+
+.table-editor-field .ts-control > input {
+  font-size: 13px;
+}
+
+.table-editor-field .ts-dropdown {
+  border: 1px solid #93c5fd;
+  border-radius: 6px;
 }
 
 .table-editor-actions {
@@ -604,6 +632,15 @@ body::-webkit-scrollbar-corner,
   padding: 7px 9px;
   font-size: 13px;
   background: #ffffff;
+}
+
+select.table-inline-input {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, #475569 50%), linear-gradient(135deg, #475569 50%, transparent 50%);
+  background-position: calc(100% - 14px) calc(50% - 2px), calc(100% - 9px) calc(50% - 2px);
+  background-size: 5px 5px, 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 28px;
 }
 
 .table-inline-input:focus {

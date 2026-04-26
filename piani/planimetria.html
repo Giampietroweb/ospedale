@@ -15,6 +15,7 @@
   <meta name="360" content="noindex, nofollow">
   <meta name="sogou" content="noindex, nofollow">
   <meta name="sogou" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css">
 </head>
 <body>
   <div class="toolbar">
@@ -49,7 +50,7 @@
         </div>
       </div>
       <details class="modal-header-secondary">
-        <summary class="modal-header-secondary-toggle">Altri attributi stanza</summary>
+        <summary class="modal-header-secondary-toggle">Attributi stanza</summary>
         <div class="modal-header-fields modal-header-fields-secondary">
         <div class="modal-field">
           <span class="modal-field-label">Codice (Nome)</span>
@@ -123,7 +124,7 @@
         </div>
       </details>
       <div class="modal-sections" role="tablist" aria-label="Sezioni dati stanza">
-        <button id="sectionApparecchiatura" class="modal-section-button is-active" type="button" role="tab" aria-selected="true">Apparecchiatura</button>
+        <button id="sectionApparecchiatura" class="modal-section-button is-active" type="button" role="tab" aria-selected="true">Apparecchiature</button>
         <button id="sectionImpiantistica" class="modal-section-button" type="button" role="tab" aria-selected="false">Dotazioni impiantistiche</button>
         <button id="sectionAltreDotazioni" class="modal-section-button" type="button" role="tab" aria-selected="false">Altre dotazioni</button>
       </div>
@@ -176,8 +177,8 @@
               </select>
             </label>
             <label class="table-editor-field">
-              <span>inv</span>
-              <input id="appInvInput" type="text">
+              <span>Inventari</span>
+              <input id="appInvInput" type="text" placeholder="INV001, INV002">
             </label>
             <label class="table-editor-field">
               <span>Note</span>
@@ -200,7 +201,7 @@
               <th>Qta</th>
               <th>Nuovo</th>
               <th>Trasferimento</th>
-              <th>inv</th>
+              <th>inventario</th>
               <th>Note</th>
               <th>Azioni</th>
             </tr>
@@ -239,6 +240,7 @@
     </div>
   </div>
 
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
   <script src="../script.js"></script>
 </body>
 </html>

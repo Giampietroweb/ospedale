@@ -29,7 +29,7 @@ CREATE TABLE IF NOT EXISTS room_apparecchiature (
   qta VARCHAR(50) NULL,
   nuovo VARCHAR(20) NULL,
   trasferimento VARCHAR(20) NULL,
-  inv VARCHAR(100) NULL,
+  inv TEXT NULL,
   note TEXT NULL,
   sort_order INT UNSIGNED NOT NULL DEFAULT 0,
   created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,

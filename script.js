@@ -56,6 +56,7 @@ const appNoteInput = document.getElementById('appNoteInput');
 const appAddButton = document.getElementById('appAddButton');
 const appSaveButton = document.getElementById('appSaveButton');
 const appCancelButton = document.getElementById('appCancelButton');
+let appTipologiaTomSelect = null;
 
 const minZoom = 0.1;
 const maxZoom = 50;
@@ -127,6 +128,7 @@ BISTURI AD ULTRASUONI
 BOBINA PER TRM
 BRACCIO ROBOTIZZATO PER CHIRURGIA
 BRACCIO ROBOTIZZATO PER VIDEOENDOSCOPIO
+BRONCOASPIRATORE
 BRONCOSCOPIO
 CALIBRATORE PER FONOMETRO
 CALIBRO OSSEO
@@ -244,6 +246,7 @@ FLUORANGIOGRAFO
 FLUORIMETRO
 FLUSSIMETRO ARIA 15 l/min
 FLUSSIMETRO ARIA 30 l/min
+FLUSSIMETRO OSSIGENO 15 l/min
 FLUSSIMETRO OSSIGENO 30 l/min
 FOTOTERAPIA PEDIATRICA, APPARECCHIO PER
 FRIGOEMOTECA
@@ -735,6 +738,12 @@ const impiantisticaRows = [
     note: ''
   },
   {
+    tipologia: 'Presa Vuoto',
+    qtaPresenti: '',
+    qtaDaImplementare: '',
+    note: ''
+  },
+  {
     tipologia: 'Presa CO2',
     qtaPresenti: '',
     qtaDaImplementare: '',
@@ -1092,6 +1101,80 @@ function normalizeApparecchiaturaTipologiaValue(value) {
   return legacyToCurrentTipologiaMap[normalizedValue] || '';
 }
 
+function normalizeInventarioCode(value) {
+  return String(value || '').trim().toUpperCase();
+}
+
+function parseInventarioRawValue(rawValue) {
+  if (Array.isArray(rawValue)) {
+    return rawValue.map((value) => String(value || ''));
+  }
+
+  const stringValue = String(rawValue || '').trim();
+  if (stringValue === '' || stringValue === '-' || stringValue.toLowerCase() === 'null') {
+    return [];
+  }
+
+  if (stringValue.startsWith('[') && stringValue.endsWith(']')) {
+    try {
+      const parsed = JSON.parse(stringValue);
+      if (Array.isArray(parsed)) {
+        return parsed.map((value) => String(value || ''));
+      }
+    } catch (error) {
+      console.warn('[InventarioParser] JSON non valido, fallback CSV', { error });
+    }
+  }
+
+  return stringValue.split(',').map((value) => String(value || ''));
+}
+
+function normalizeInventarioList(rawValue) {
+  const normalizedCodes = parseInventarioRawValue(rawValue)
+    .map((value) => normalizeInventarioCode(value))
+    .filter((value) => value !== '');
+
+  return Array.from(new Set(normalizedCodes));
+}
+
+function serializeInventarioList(rawValue) {
+  return normalizeInventarioList(rawValue).join(', ');
+}
+
+function initializeApparecchiaturaTomSelect() {
+  if (!appTipologiaInput || typeof window.TomSelect !== 'function') {
+    return;
+  }
+
+  appTipologiaTomSelect = new window.TomSelect(appTipologiaInput, {
+    create: false,
+    allowEmptyOption: true,
+    maxOptions: 500,
+    searchField: ['text', 'value'],
+    sortField: [
+      {
+        field: 'text',
+        direction: 'asc'
+      }
+    ],
+    placeholder: 'Cerca apparecchiatura...'
+  });
+}
+
+function setApparecchiaturaValue(value) {
+  const normalizedValue = String(value || '').trim();
+  if (appTipologiaTomSelect) {
+    appTipologiaTomSelect.setValue(normalizedValue, true);
+    return;
+  }
+
+  appTipologiaInput.value = normalizedValue;
+}
+
+function clearApparecchiaturaValue() {
+  setApparecchiaturaValue('');
+}
+
 function populateApparecchiaturaSelectOptions() {
   if (!appTipologiaInput) {
     return;
@@ -1106,18 +1189,35 @@ function populateApparecchiaturaSelectOptions() {
     )
   );
 
+  const currentValue = String(appTipologiaInput.value || '').trim();
   appTipologiaInput.innerHTML = '<option value="" selected></option>';
+
+  if (appTipologiaTomSelect) {
+    appTipologiaTomSelect.clear(true);
+    appTipologiaTomSelect.clearOptions();
+    appTipologiaTomSelect.addOption({ value: '', text: '' });
+    optionValues.forEach((optionValue) => {
+      appTipologiaTomSelect.addOption({ value: optionValue, text: optionValue });
+    });
+    appTipologiaTomSelect.refreshOptions(false);
+    setApparecchiaturaValue(currentValue);
+    return;
+  }
+
   optionValues.forEach((optionValue) => {
     const optionElement = document.createElement('option');
     optionElement.value = optionValue;
     optionElement.textContent = optionValue;
     appTipologiaInput.appendChild(optionElement);
   });
+
+  setApparecchiaturaValue(currentValue);
 }
 
 function normalizeApparecchiaturaRow(row) {
   const safeRow = row && typeof row === 'object' ? row : {};
   const apparecchiaturaValue = String(safeRow.apparecchiatura || safeRow.tipologia || '-').trim() || '-';
+  const serializedInventory = serializeInventarioList(safeRow.inv);
 
   return {
     apparecchiatura: apparecchiaturaValue,
@@ -1127,7 +1227,7 @@ function normalizeApparecchiaturaRow(row) {
     qta: String(safeRow.qta || '0').trim() || '0',
     nuovo: String(safeRow.nuovo || '-').trim() || '-',
     trasferimento: String(safeRow.trasferimento || '-').trim() || '-',
-    inv: String(safeRow.inv || '-').trim() || '-',
+    inv: serializedInventory || '-',
     note: String(safeRow.note || '-').trim() || '-'
   };
 }
@@ -1139,6 +1239,7 @@ function setApparecchiaturaEditMode(isEditing) {
 }
 
 function getApparecchiaturaFormData() {
+  const normalizedInventory = serializeInventarioList(appInvInput.value);
   return {
     apparecchiatura: appTipologiaInput.value.trim(),
     tipologia: normalizeApparecchiaturaTipologiaValue(appInstallazioneTipologiaInput.value),
@@ -1147,13 +1248,13 @@ function getApparecchiaturaFormData() {
     qta: appQtaInput.value.trim(),
     nuovo: appNuovoInput.value.trim(),
     trasferimento: appTrasferimentoInput.value.trim(),
-    inv: appInvInput.value.trim(),
+    inv: normalizedInventory,
     note: appNoteInput.value.trim()
   };
 }
 
 function resetApparecchiaturaForm() {
-  appTipologiaInput.value = '';
+  clearApparecchiaturaValue();
   appInstallazioneTipologiaInput.value = '';
   appProduttoreInput.value = '';
   appModelloInput.value = '';
@@ -1201,14 +1302,14 @@ function renderApparecchiaturaTable() {
       const normalizedSelectedRow = normalizeApparecchiaturaRow(selectedRow);
       apparecchiaturaRows[rowIndex] = normalizedSelectedRow;
 
-      appTipologiaInput.value = normalizedSelectedRow.apparecchiatura;
+      setApparecchiaturaValue(normalizedSelectedRow.apparecchiatura);
       appInstallazioneTipologiaInput.value = normalizedSelectedRow.tipologia;
       appProduttoreInput.value = normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore;
       appModelloInput.value = normalizedSelectedRow.modello === '-' ? '' : normalizedSelectedRow.modello;
       appQtaInput.value = normalizedSelectedRow.qta;
       appNuovoInput.value = normalizedSelectedRow.nuovo;
       appTrasferimentoInput.value = normalizedSelectedRow.trasferimento;
-      appInvInput.value = normalizedSelectedRow.inv;
+      appInvInput.value = normalizedSelectedRow.inv === '-' ? '' : normalizedSelectedRow.inv;
       appNoteInput.value = normalizedSelectedRow.note;
       editingApparecchiaturaIndex = rowIndex;
       setApparecchiaturaEditMode(true);
@@ -1266,7 +1367,7 @@ async function saveApparecchiaturaRow(rowIndex) {
       qta: normalizeInputValue(row.qta),
       nuovo: normalizeInputValue(row.nuovo),
       trasferimento: normalizeInputValue(row.trasferimento),
-      inv: normalizeInputValue(row.inv),
+      inv: normalizeInventarioList(row.inv),
       note: normalizeInputValue(row.note)
     }
   });
@@ -1656,7 +1757,7 @@ function openModal(textValue) {
   roomCodeValue.textContent = roomCode;
   roomCodeNameValue.textContent = '-';
   roomOccupazioneValue.textContent = '-';
-  roomDepartmentValue.textContent = 'cardiologia';
+  roomDepartmentValue.textContent = '-';
   roomSurfaceValue.textContent = '-';
   roomHemifloorValue.textContent = '-';
   roomAccreditationValue.textContent = '-';
@@ -1931,4 +2032,5 @@ if (isFloorMapReady) {
 renderApparecchiaturaTable();
 renderImpiantisticaTable();
 renderAltreDotazioniTable();
+initializeApparecchiaturaTomSelect();
 populateApparecchiaturaSelectOptions();

@@ -19,6 +19,41 @@ function errorResponse(string $message, int $statusCode = 400): void
     exit;
 }
 
+function normalizeInventoryCode(mixed $value): string
+{
+    return strtoupper(trim((string)($value ?? '')));
+}
+
+function normalizeInventoryListForResponse(mixed $value): array
+{
+    if (is_array($value)) {
+        $rawValues = $value;
+    } else {
+        $stringValue = trim((string)($value ?? ''));
+        if ($stringValue === '' || $stringValue === '-' || strtolower($stringValue) === 'null') {
+            return [];
+        }
+
+        $decoded = json_decode($stringValue, true);
+        if (is_array($decoded)) {
+            $rawValues = $decoded;
+        } else {
+            $rawValues = preg_split('/\s*,\s*/', $stringValue) ?: [];
+        }
+    }
+
+    $normalizedValues = [];
+    foreach ($rawValues as $rawItem) {
+        $normalizedCode = normalizeInventoryCode($rawItem);
+        if ($normalizedCode === '') {
+            continue;
+        }
+        $normalizedValues[] = $normalizedCode;
+    }
+
+    return array_values(array_unique($normalizedValues));
+}
+
 $blocco = trim((string)($_GET['blocco'] ?? ''));
 $piano = trim((string)($_GET['piano'] ?? ''));
 $roomCode = trim((string)($_GET['roomCode'] ?? ''));
@@ -84,6 +119,15 @@ try {
     );
     $apparecchiatureStatement->execute([':room_id' => $roomId]);
     $apparecchiature = $apparecchiatureStatement->fetchAll();
+    if (is_array($apparecchiature)) {
+        foreach ($apparecchiature as &$apparecchiaturaRow) {
+            if (!is_array($apparecchiaturaRow)) {
+                continue;
+            }
+            $apparecchiaturaRow['inv'] = normalizeInventoryListForResponse($apparecchiaturaRow['inv'] ?? null);
+        }
+        unset($apparecchiaturaRow);
+    }
 
     $impiantisticaStatement = $pdo->prepare(
         'SELECT
