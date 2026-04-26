@@ -84,7 +84,7 @@ const mapLoadMinMs = 2000;
 let mapLoadMinMet = false;
 let mapLoadResourceMet = false;
 let mapLoadMinTimeoutId = null;
-const apparecchiaturaTipologiaOptions = ['', 'Carrellato', 'Parete', 'Pensile', 'Soffitto'];
+const apparecchiaturaTipologiaOptions = ['', 'Carrellato', 'Parete', 'Pensile', 'Soffitto', 'Barra'];
 const apparecchiaturaCatalogText = `
 ABLATORE PER ARTERIECTOMIA
 ABLAZIONE CARDIACA A RADIOFREQUENZA, APPARECCHIO PER
@@ -1617,7 +1617,8 @@ function normalizeApparecchiaturaTipologiaValue(value) {
     'su pensile': 'Pensile',
     pensile: 'Pensile',
     'a soffitto': 'Soffitto',
-    soffitto: 'Soffitto'
+    soffitto: 'Soffitto',
+    barra: 'Barra'
   };
 
   return legacyToCurrentTipologiaMap[normalizedValue] || '';
