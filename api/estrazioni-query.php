@@ -2,43 +2,10 @@
 
 declare(strict_types=1);
 
+require_once __DIR__ . '/utils.php';
+
 const ESTRAZIONI_VALID_BLOCCHI = ['nord', 'sud', 'piastra', 'sotterraneo'];
 const ESTRAZIONI_VALID_TIPI = ['apparecchiature', 'impiantistica', 'altre_dotazioni'];
-
-function estrazioniNormalizeInventoryCode(mixed $value): string
-{
-    return strtoupper(trim((string)($value ?? '')));
-}
-
-function estrazioniNormalizeInventoryListForResponse(mixed $value): array
-{
-    if (is_array($value)) {
-        $rawValues = $value;
-    } else {
-        $stringValue = trim((string)($value ?? ''));
-        if ($stringValue === '' || $stringValue === '-' || strtolower($stringValue) === 'null') {
-            return [];
-        }
-
-        $decoded = json_decode($stringValue, true);
-        if (is_array($decoded)) {
-            $rawValues = $decoded;
-        } else {
-            $rawValues = preg_split('/\s*,\s*/', $stringValue) ?: [];
-        }
-    }
-
-    $normalizedValues = [];
-    foreach ($rawValues as $rawItem) {
-        $normalizedCode = estrazioniNormalizeInventoryCode($rawItem);
-        if ($normalizedCode === '') {
-            continue;
-        }
-        $normalizedValues[] = $normalizedCode;
-    }
-
-    return array_values(array_unique($normalizedValues));
-}
 
 /**
  * Condizioni WHERE su alias `r` (rooms) condivise da tutte le estrazioni.
@@ -246,7 +213,7 @@ function fetchEstrazioniApparecchiatureRows(PDO $pdo, array $filters): array
         if (!is_array($row)) {
             continue;
         }
-        $row['inv'] = estrazioniNormalizeInventoryListForResponse($row['inv'] ?? null);
+        $row['inv'] = normalizeInventoryListForResponse($row['inv'] ?? null);
     }
     unset($row);
 

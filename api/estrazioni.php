@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/database.php';
+require_once __DIR__ . '/utils.php';
 require_once __DIR__ . '/estrazioni-query.php';
 
 header('Content-Type: application/json; charset=utf-8');
@@ -10,13 +11,6 @@ header('Content-Type: application/json; charset=utf-8');
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode(['ok' => false, 'error' => 'Metodo non consentito'], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-function errorResponse(string $message, int $statusCode = 400): void
-{
-    http_response_code($statusCode);
-    echo json_encode(['ok' => false, 'error' => $message], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -34,7 +28,7 @@ function readTipoParam(): string
 {
     $tipo = trim((string)($_GET['tipo'] ?? 'apparecchiature'));
     if (!in_array($tipo, ESTRAZIONI_VALID_TIPI, true)) {
-        errorResponse('tipo non valido');
+        apiErrorResponse('tipo non valido');
     }
 
     return $tipo;
@@ -43,14 +37,14 @@ function readTipoParam(): string
 function assertValidBlocco(string $blocco): void
 {
     if (!in_array($blocco, ESTRAZIONI_VALID_BLOCCHI, true)) {
-        errorResponse('blocco non valido');
+        apiErrorResponse('blocco non valido');
     }
 }
 
 function assertValidPiano(string $piano): void
 {
     if ($piano === '' || !preg_match('/^-?\d+$/', $piano)) {
-        errorResponse('piano non valido');
+        apiErrorResponse('piano non valido');
     }
 }
 
@@ -219,7 +213,7 @@ function handleSearch(PDO $pdo): void
     try {
         $filters = parseEstrazioniFiltersFromGet($_GET);
     } catch (InvalidArgumentException $invalidArgument) {
-        errorResponse($invalidArgument->getMessage());
+        apiErrorResponse($invalidArgument->getMessage());
     }
 
     $rows = fetchEstrazioniRows($pdo, $filters);
@@ -246,7 +240,7 @@ try {
         return;
     }
 
-    errorResponse('action non valido (options|search)');
+    apiErrorResponse('action non valido (options|search)');
 } catch (Throwable $throwable) {
-    errorResponse('Errore: ' . $throwable->getMessage(), 500);
+    apiErrorResponse('Errore: ' . $throwable->getMessage(), 500);
 }

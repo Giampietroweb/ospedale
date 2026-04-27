@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require __DIR__ . '/database.php';
+require_once __DIR__ . '/utils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -12,60 +13,18 @@ if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     exit;
 }
 
-function errorResponse(string $message, int $statusCode = 400): void
-{
-    http_response_code($statusCode);
-    echo json_encode(['ok' => false, 'error' => $message], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-function normalizeInventoryCode(mixed $value): string
-{
-    return strtoupper(trim((string)($value ?? '')));
-}
-
-function normalizeInventoryListForResponse(mixed $value): array
-{
-    if (is_array($value)) {
-        $rawValues = $value;
-    } else {
-        $stringValue = trim((string)($value ?? ''));
-        if ($stringValue === '' || $stringValue === '-' || strtolower($stringValue) === 'null') {
-            return [];
-        }
-
-        $decoded = json_decode($stringValue, true);
-        if (is_array($decoded)) {
-            $rawValues = $decoded;
-        } else {
-            $rawValues = preg_split('/\s*,\s*/', $stringValue) ?: [];
-        }
-    }
-
-    $normalizedValues = [];
-    foreach ($rawValues as $rawItem) {
-        $normalizedCode = normalizeInventoryCode($rawItem);
-        if ($normalizedCode === '') {
-            continue;
-        }
-        $normalizedValues[] = $normalizedCode;
-    }
-
-    return array_values(array_unique($normalizedValues));
-}
-
 $blocco = trim((string)($_GET['blocco'] ?? ''));
 $piano = trim((string)($_GET['piano'] ?? ''));
 $roomCode = trim((string)($_GET['roomCode'] ?? ''));
 
 if (!in_array($blocco, ['nord', 'sud', 'piastra', 'sotterraneo'], true)) {
-    errorResponse('blocco non valido');
+    apiErrorResponse('blocco non valido');
 }
 if ($piano === '' || !preg_match('/^-?\d+$/', $piano)) {
-    errorResponse('piano non valido');
+    apiErrorResponse('piano non valido');
 }
 if ($roomCode === '') {
-    errorResponse('roomCode obbligatorio');
+    apiErrorResponse('roomCode obbligatorio');
 }
 
 try {
@@ -180,5 +139,5 @@ try {
 
     echo json_encode($response, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $throwable) {
-    errorResponse('Errore caricamento: ' . $throwable->getMessage(), 500);
+    apiErrorResponse('Errore caricamento: ' . $throwable->getMessage(), 500);
 }

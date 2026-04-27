@@ -3,19 +3,13 @@
 declare(strict_types=1);
 
 require __DIR__ . '/database.php';
+require_once __DIR__ . '/utils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
     http_response_code(405);
     echo json_encode(['ok' => false, 'error' => 'Metodo non consentito'], JSON_UNESCAPED_UNICODE);
-    exit;
-}
-
-function errorResponse(string $message, int $statusCode = 400): void
-{
-    http_response_code($statusCode);
-    echo json_encode(['ok' => false, 'error' => $message], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -29,11 +23,11 @@ $blocco = trim((string)($_GET['blocco'] ?? ''));
 $piano = trim((string)($_GET['piano'] ?? ''));
 
 if (!in_array($blocco, ['nord', 'sud', 'piastra', 'sotterraneo'], true)) {
-    errorResponse('blocco non valido');
+    apiErrorResponse('blocco non valido');
 }
 
 if ($piano === '' || !preg_match('/^-?\d+$/', $piano)) {
-    errorResponse('piano non valido');
+    apiErrorResponse('piano non valido');
 }
 
 try {
@@ -109,5 +103,5 @@ try {
         'centralizedMonitorRooms' => array_values(array_unique($centralizedMonitorRoomCodes)),
     ], JSON_UNESCAPED_UNICODE);
 } catch (Throwable $throwable) {
-    errorResponse('Errore caricamento: ' . $throwable->getMessage(), 500);
+    apiErrorResponse('Errore caricamento: ' . $throwable->getMessage(), 500);
 }

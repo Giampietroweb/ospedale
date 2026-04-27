@@ -3,19 +3,13 @@
 declare(strict_types=1);
 
 require __DIR__ . '/database.php';
+require_once __DIR__ . '/utils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
     echo json_encode(['ok' => false, 'error' => 'Metodo non consentito']);
-    exit;
-}
-
-function jsonError(string $message, int $statusCode = 400): void
-{
-    http_response_code($statusCode);
-    echo json_encode(['ok' => false, 'error' => $message], JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -53,11 +47,6 @@ function isTruthyValue(mixed $value): bool
         return false;
     }
     return true;
-}
-
-function normalizeInventoryCode(mixed $value): string
-{
-    return strtoupper(trim((string)($value ?? '')));
 }
 
 function normalizeInventoryList(mixed $value): array
@@ -224,12 +213,12 @@ $autoFieldMap = [
 $rawBody = file_get_contents('php://input');
 $payload = json_decode($rawBody ?: '', true);
 if (!is_array($payload)) {
-    jsonError('Payload JSON non valido');
+    apiErrorResponse('Payload JSON non valido');
 }
 
 $roomRef = is_array($payload['roomRef'] ?? null) ? $payload['roomRef'] : null;
 if (!$roomRef) {
-    jsonError('roomRef mancante');
+    apiErrorResponse('roomRef mancante');
 }
 
 $blocco = trim((string)($roomRef['blocco'] ?? ''));
@@ -237,18 +226,18 @@ $piano = trim((string)($roomRef['piano'] ?? ''));
 $roomCode = trim((string)($roomRef['roomCode'] ?? ''));
 
 if (!in_array($blocco, ['nord', 'sud', 'piastra', 'sotterraneo'], true)) {
-    jsonError('blocco non valido');
+    apiErrorResponse('blocco non valido');
 }
 if ($piano === '' || !preg_match('/^-?\d+$/', $piano)) {
-    jsonError('piano non valido');
+    apiErrorResponse('piano non valido');
 }
 if ($roomCode === '') {
-    jsonError('roomCode obbligatorio');
+    apiErrorResponse('roomCode obbligatorio');
 }
 
 $action = trim((string)($payload['action'] ?? ''));
 if (!in_array($action, ['saveField', 'saveApparecchiaturaRow', 'saveImpiantisticaRow', 'saveAltreDotazioniRow'], true)) {
-    jsonError('action non valida');
+    apiErrorResponse('action non valida');
 }
 $autoAttributes = is_array($payload['autoAttributes'] ?? null) ? $payload['autoAttributes'] : [];
 
@@ -262,7 +251,7 @@ try {
     if ($action === 'saveField') {
         $fieldName = trim((string)($payload['fieldName'] ?? ''));
         if (!array_key_exists($fieldName, $allowedFieldMap)) {
-            jsonError('fieldName non valido');
+            apiErrorResponse('fieldName non valido');
         }
 
         $fieldValue = $payload['value'] ?? null;
@@ -288,12 +277,12 @@ try {
     if ($action === 'saveImpiantisticaRow') {
         $row = is_array($payload['row'] ?? null) ? $payload['row'] : null;
         if (!$row) {
-            jsonError('row mancante');
+            apiErrorResponse('row mancante');
         }
 
         $tipologia = trim((string)($row['tipologia'] ?? ''));
         if ($tipologia === '') {
-            jsonError('tipologia impiantistica obbligatoria');
+            apiErrorResponse('tipologia impiantistica obbligatoria');
         }
 
         $qtaPresenti = asNullableInt($row['qtaPresenti'] ?? null);
@@ -332,12 +321,12 @@ try {
     if ($action === 'saveAltreDotazioniRow') {
         $row = is_array($payload['row'] ?? null) ? $payload['row'] : null;
         if (!$row) {
-            jsonError('row mancante');
+            apiErrorResponse('row mancante');
         }
 
         $altraDotazione = trim((string)($row['altraDotazione'] ?? ''));
         if ($altraDotazione === '') {
-            jsonError('altraDotazione obbligatoria');
+            apiErrorResponse('altraDotazione obbligatoria');
         }
 
         $presente = asNullableString($row['presente'] ?? null);
@@ -378,7 +367,7 @@ try {
     if ($action === 'saveApparecchiaturaRow') {
         $row = is_array($payload['row'] ?? null) ? $payload['row'] : null;
         if (!$row) {
-            jsonError('row mancante');
+            apiErrorResponse('row mancante');
         }
 
         $normalizedInventoryList = normalizeInventoryList($row['inv'] ?? null);
@@ -386,7 +375,7 @@ try {
             ? null
             : json_encode($normalizedInventoryList, JSON_UNESCAPED_UNICODE);
         if ($inventoryJson === false) {
-            jsonError('inv non valido');
+            apiErrorResponse('inv non valido');
         }
 
         $normalizedRow = [
@@ -456,5 +445,5 @@ try {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
     }
-    jsonError('Errore salvataggio: ' . $throwable->getMessage(), 500);
+    apiErrorResponse('Errore salvataggio: ' . $throwable->getMessage(), 500);
 }
