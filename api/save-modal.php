@@ -268,7 +268,13 @@ try {
             $boundValue = $fieldName === 'postiLetto'
                 ? asNullableInt($fieldValue)
                 : asNullableString($fieldValue);
-            $updateStatement->bindValue(':value', $boundValue, $boundValue === null ? PDO::PARAM_NULL : PDO::PARAM_STR);
+            $pdoType = PDO::PARAM_STR;
+            if ($boundValue === null) {
+                $pdoType = PDO::PARAM_NULL;
+            } elseif ($fieldName === 'postiLetto') {
+                $pdoType = PDO::PARAM_INT;
+            }
+            $updateStatement->bindValue(':value', $boundValue, $pdoType);
             $updateStatement->bindValue(':room_id', $roomId, PDO::PARAM_INT);
             $updateStatement->execute();
         }
