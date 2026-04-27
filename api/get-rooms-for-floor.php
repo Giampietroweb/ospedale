@@ -64,9 +64,49 @@ try {
         $roomCodes[] = $normalizedRoomCode;
     }
 
+    $centralizedMonitorStatement = $pdo->prepare(
+        'SELECT DISTINCT r.room_code
+         FROM rooms r
+         INNER JOIN room_apparecchiature ra ON ra.room_id = r.id
+         WHERE r.blocco = :blocco
+           AND r.piano = :piano
+           AND REPLACE(
+                 REPLACE(
+                   REPLACE(
+                     REPLACE(UPPER(COALESCE(ra.apparecchiatura, "")), " ", ""),
+                     "-",
+                     ""
+                   ),
+                   "_",
+                   ""
+                 ),
+                 ".",
+                 ""
+               ) = :monitor_label'
+    );
+    $centralizedMonitorStatement->execute([
+        ':blocco' => $blocco,
+        ':piano' => $piano,
+        ':monitor_label' => 'MONITORCENTRALIZZATO',
+    ]);
+
+    $centralizedRows = $centralizedMonitorStatement->fetchAll();
+    $centralizedMonitorRoomCodes = [];
+    foreach ($centralizedRows as $centralizedRow) {
+        if (!is_array($centralizedRow)) {
+            continue;
+        }
+        $normalizedRoomCode = normalizeRoomCode($centralizedRow['room_code'] ?? '');
+        if ($normalizedRoomCode === '') {
+            continue;
+        }
+        $centralizedMonitorRoomCodes[] = $normalizedRoomCode;
+    }
+
     echo json_encode([
         'ok' => true,
         'rooms' => array_values(array_unique($roomCodes)),
+        'centralizedMonitorRooms' => array_values(array_unique($centralizedMonitorRoomCodes)),
     ], JSON_UNESCAPED_UNICODE);
 } catch (Throwable $throwable) {
     errorResponse('Errore caricamento: ' . $throwable->getMessage(), 500);

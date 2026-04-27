@@ -463,7 +463,9 @@ VENTILATORE POLMONARE TRASPORTABILE D EMERGENZA
 VIDEOLARINGOSCOPIO
 `;
 let occurrencesMap = null;
+let normalizedOccurrencesMap = null;
 let roomsInDatabaseSet = null;
+let centralizedMonitorRoomsSet = null;
 
 function resetMapLoadSequence() {
   console.log('[MapLoader] resetMapLoadSequence');
@@ -684,6 +686,7 @@ async function loadOccurrencesData(floorName) {
     }
 
     occurrencesMap = new Map();
+    normalizedOccurrencesMap = new Map();
     records.forEach((record) => {
       if (!record || typeof record !== 'object') {
         return;
@@ -695,17 +698,28 @@ async function loadOccurrencesData(floorName) {
       }
 
       occurrencesMap.set(roomCode, record);
+      normalizedOccurrencesMap.set(normalizeRoomCode(roomCode), record);
     });
     console.log('[Occorrenze] Caricate occorrenze', { count: occurrencesMap.size, floorName });
   } catch (error) {
     console.error('[Occorrenze] Errore caricamento JSON:', error);
     occurrencesMap = null;
+    normalizedOccurrencesMap = null;
   }
+}
+
+function isCentralizedMonitorRoom(normalizedRoomCode) {
+  return Boolean(
+    normalizedRoomCode
+    && centralizedMonitorRoomsSet instanceof Set
+    && centralizedMonitorRoomsSet.has(normalizedRoomCode)
+  );
 }
 
 async function loadRoomsInDbSet(floorContext) {
   if (!floorContext || !floorContext.blocco || !floorContext.piano) {
     roomsInDatabaseSet = null;
+    centralizedMonitorRoomsSet = null;
     return null;
   }
 
@@ -729,14 +743,22 @@ async function loadRoomsInDbSet(floorContext) {
         .map((roomCode) => normalizeRoomCode(roomCode))
         .filter((roomCode) => roomCode !== '')
     );
+    centralizedMonitorRoomsSet = new Set(
+      (Array.isArray(payload.centralizedMonitorRooms) ? payload.centralizedMonitorRooms : [])
+        .map((roomCode) => normalizeRoomCode(roomCode))
+        .filter((roomCode) => roomCode !== '')
+    );
     console.log('[RoomsDbHighlight] Stanze DB caricate', {
       floorContext,
-      totalRooms: roomsInDatabaseSet.size
+      totalRooms: roomsInDatabaseSet.size,
+      centralizedMonitorRooms: centralizedMonitorRoomsSet.size,
+      centralizedMonitorPreview: Array.from(centralizedMonitorRoomsSet).slice(0, 10)
     });
     return roomsInDatabaseSet;
   } catch (error) {
     console.warn('[RoomsDbHighlight] Impossibile caricare stanze DB:', error);
     roomsInDatabaseSet = null;
+    centralizedMonitorRoomsSet = null;
     return null;
   }
 }
@@ -2635,8 +2657,14 @@ function ensureSvgHighlightClassStyle(svgDocument) {
   styleElement.textContent = `
     .room-present-in-db,
     .room-present-in-db tspan {
-      fill:rgb(0, 0, 251) !important;
+      fill: #2400f8 !important;
       font-weight: 700;
+    }
+
+    .room-centralized-monitor,
+    .room-centralized-monitor tspan {
+      fill:rgb(178, 128, 2) !important;
+      font-weight: 800;
     }
   `;
 
@@ -2647,28 +2675,36 @@ function ensureSvgHighlightClassStyle(svgDocument) {
 function bindOccurrencesClick(svgDocument, roomCodesSet) {
   ensureSvgHighlightClassStyle(svgDocument);
   const textNodes = svgDocument.querySelectorAll('text');
+  let textNodeCount = 0;
   let clickableCount = 0;
   let highlightedCount = 0;
 
   textNodes.forEach((textNode) => {
-    if (!isClickableOccurrence(textNode)) {
-      return;
-    }
-    clickableCount += 1;
+    textNodeCount += 1;
+    const rawTextValue = textNode.textContent ? textNode.textContent.trim() : '';
+    const normalizedRoomCode = normalizeRoomCode(getRoomCodeWithoutAsterisks(rawTextValue));
 
-    textNode.style.cursor = 'pointer';
-    const normalizedRoomCode = normalizeRoomCode(getRoomCodeWithoutAsterisks(textNode.textContent.trim()));
     if (roomCodesSet instanceof Set && roomCodesSet.has(normalizedRoomCode)) {
-      textNode.classList.add('room-present-in-db');
+      if (isCentralizedMonitorRoom(normalizedRoomCode)) {
+        textNode.classList.add('room-centralized-monitor');
+      } else {
+        textNode.classList.add('room-present-in-db');
+      }
       highlightedCount += 1;
     }
-    textNode.addEventListener('click', () => {
-      const textValue = textNode.textContent.trim();
-      openModal(textValue);
-    });
+
+    if (isClickableOccurrence(textNode)) {
+      clickableCount += 1;
+      textNode.style.cursor = 'pointer';
+      textNode.addEventListener('click', () => {
+        const textValue = textNode.textContent.trim();
+        openModal(textValue);
+      });
+    }
   });
 
   console.log('[RoomsDbHighlight] Esito evidenziazione', {
+    textNodeCount,
     clickableCount,
     highlightedCount,
     roomCodesAvailable: roomCodesSet instanceof Set ? roomCodesSet.size : 0
