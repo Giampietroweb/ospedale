@@ -463,6 +463,7 @@ VENTILATORE POLMONARE TRASPORTABILE D EMERGENZA
 VIDEOLARINGOSCOPIO
 `;
 let occurrencesMap = null;
+let roomsInDatabaseSet = null;
 
 function resetMapLoadSequence() {
   console.log('[MapLoader] resetMapLoadSequence');
@@ -576,6 +577,13 @@ function parseFloorContext(floorName) {
 
   const piano = blocco === 'sotterraneo' ? String(-Math.abs(rawLevel)) : String(rawLevel);
   return { blocco, piano };
+}
+
+function normalizeRoomCode(roomCode) {
+  return String(roomCode || '')
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, '');
 }
 
 function normalizeDisplayValue(value, fallback = '-') {
@@ -692,6 +700,44 @@ async function loadOccurrencesData(floorName) {
   } catch (error) {
     console.error('[Occorrenze] Errore caricamento JSON:', error);
     occurrencesMap = null;
+  }
+}
+
+async function loadRoomsInDbSet(floorContext) {
+  if (!floorContext || !floorContext.blocco || !floorContext.piano) {
+    roomsInDatabaseSet = null;
+    return null;
+  }
+
+  try {
+    const query = new URLSearchParams({
+      blocco: floorContext.blocco,
+      piano: floorContext.piano
+    });
+    const response = await fetch(`../api/get-rooms-for-floor.php?${query.toString()}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const payload = await response.json();
+    if (!payload?.ok || !Array.isArray(payload.rooms)) {
+      throw new Error(payload?.error || 'Formato payload non valido');
+    }
+
+    roomsInDatabaseSet = new Set(
+      payload.rooms
+        .map((roomCode) => normalizeRoomCode(roomCode))
+        .filter((roomCode) => roomCode !== '')
+    );
+    console.log('[RoomsDbHighlight] Stanze DB caricate', {
+      floorContext,
+      totalRooms: roomsInDatabaseSet.size
+    });
+    return roomsInDatabaseSet;
+  } catch (error) {
+    console.warn('[RoomsDbHighlight] Impossibile caricare stanze DB:', error);
+    roomsInDatabaseSet = null;
+    return null;
   }
 }
 
@@ -2575,19 +2621,57 @@ function isClickableOccurrence(textNode) {
   return /^\*.+\*$/.test(rawText);
 }
 
-function bindOccurrencesClick(svgDocument) {
+function ensureSvgHighlightClassStyle(svgDocument) {
+  if (!svgDocument || !svgDocument.documentElement) {
+    return;
+  }
+
+  if (svgDocument.getElementById('room-present-in-db-style')) {
+    return;
+  }
+
+  const styleElement = svgDocument.createElementNS('http://www.w3.org/2000/svg', 'style');
+  styleElement.setAttribute('id', 'room-present-in-db-style');
+  styleElement.textContent = `
+    .room-present-in-db,
+    .room-present-in-db tspan {
+      fill:rgb(0, 0, 251) !important;
+      font-weight: 700;
+    }
+  `;
+
+  const svgRoot = svgDocument.documentElement;
+  svgRoot.insertBefore(styleElement, svgRoot.firstChild);
+}
+
+function bindOccurrencesClick(svgDocument, roomCodesSet) {
+  ensureSvgHighlightClassStyle(svgDocument);
   const textNodes = svgDocument.querySelectorAll('text');
+  let clickableCount = 0;
+  let highlightedCount = 0;
 
   textNodes.forEach((textNode) => {
     if (!isClickableOccurrence(textNode)) {
       return;
     }
+    clickableCount += 1;
 
     textNode.style.cursor = 'pointer';
+    const normalizedRoomCode = normalizeRoomCode(getRoomCodeWithoutAsterisks(textNode.textContent.trim()));
+    if (roomCodesSet instanceof Set && roomCodesSet.has(normalizedRoomCode)) {
+      textNode.classList.add('room-present-in-db');
+      highlightedCount += 1;
+    }
     textNode.addEventListener('click', () => {
       const textValue = textNode.textContent.trim();
       openModal(textValue);
     });
+  });
+
+  console.log('[RoomsDbHighlight] Esito evidenziazione', {
+    clickableCount,
+    highlightedCount,
+    roomCodesAvailable: roomCodesSet instanceof Set ? roomCodesSet.size : 0
   });
 }
 
@@ -2635,7 +2719,7 @@ function applyFallbackMapSize() {
   centerMapInViewport();
 }
 
-function initializeMapDimensions() {
+function initializeMapDimensions(roomCodesSet = null) {
   console.log('[MapLoader] initializeMapDimensions start');
   const svgDocument = mapObject.contentDocument;
   if (!svgDocument || !svgDocument.documentElement) {
@@ -2657,7 +2741,7 @@ function initializeMapDimensions() {
     baseImageHeight = mapObject.clientHeight || 1000;
   }
 
-  bindOccurrencesClick(svgDocument);
+  bindOccurrencesClick(svgDocument, roomCodesSet);
   setCenteredMapErrorMessage('');
   updateZoomDisplay();
   centerMapInViewport();
@@ -2766,18 +2850,21 @@ const isFloorMapReady = validateFloorFromQueryString();
 console.log('[MapLoader] isFloorMapReady', { isFloorMapReady, requestedFloorName });
 
 if (isFloorMapReady) {
+  const floorContext = parseFloorContext(requestedFloorName);
+  const roomsInDbSetPromise = loadRoomsInDbSet(floorContext);
   loadOccurrencesData(requestedFloorName);
   startMapLoadSequence();
 
   let mapInitDone = false;
-  function runMapInitOnce() {
+  async function runMapInitOnce() {
     console.log('[MapLoader] runMapInitOnce called', { mapInitDone });
     if (mapInitDone) {
       return;
     }
     mapInitDone = true;
     try {
-      initializeMapDimensions();
+      const roomCodesSet = await roomsInDbSetPromise;
+      initializeMapDimensions(roomCodesSet);
     } catch (error) {
       console.error('Errore inizializzazione mappa:', error);
       setCenteredMapErrorMessage('Errore durante l\'inizializzazione della planimetria.');

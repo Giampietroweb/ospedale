@@ -1,0 +1,73 @@
+<?php
+
+declare(strict_types=1);
+
+require __DIR__ . '/database.php';
+
+header('Content-Type: application/json; charset=utf-8');
+
+if ($_SERVER['REQUEST_METHOD'] !== 'GET') {
+    http_response_code(405);
+    echo json_encode(['ok' => false, 'error' => 'Metodo non consentito'], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+function errorResponse(string $message, int $statusCode = 400): void
+{
+    http_response_code($statusCode);
+    echo json_encode(['ok' => false, 'error' => $message], JSON_UNESCAPED_UNICODE);
+    exit;
+}
+
+function normalizeRoomCode(mixed $value): string
+{
+    $normalizedValue = strtoupper(trim((string)($value ?? '')));
+    return preg_replace('/[^A-Z0-9]/', '', $normalizedValue) ?? '';
+}
+
+$blocco = trim((string)($_GET['blocco'] ?? ''));
+$piano = trim((string)($_GET['piano'] ?? ''));
+
+if (!in_array($blocco, ['nord', 'sud', 'piastra', 'sotterraneo'], true)) {
+    errorResponse('blocco non valido');
+}
+
+if ($piano === '' || !preg_match('/^-?\d+$/', $piano)) {
+    errorResponse('piano non valido');
+}
+
+try {
+    $pdo = getDatabaseConnection();
+    $statement = $pdo->prepare(
+        'SELECT room_code
+         FROM rooms
+         WHERE blocco = :blocco AND piano = :piano'
+    );
+    $statement->execute([
+        ':blocco' => $blocco,
+        ':piano' => $piano,
+    ]);
+
+    $rows = $statement->fetchAll();
+    $roomCodes = [];
+
+    foreach ($rows as $row) {
+        if (!is_array($row)) {
+            continue;
+        }
+
+        $normalizedRoomCode = normalizeRoomCode($row['room_code'] ?? '');
+        if ($normalizedRoomCode === '') {
+            continue;
+        }
+
+        $roomCodes[] = $normalizedRoomCode;
+    }
+
+    echo json_encode([
+        'ok' => true,
+        'rooms' => array_values(array_unique($roomCodes)),
+    ], JSON_UNESCAPED_UNICODE);
+} catch (Throwable $throwable) {
+    errorResponse('Errore caricamento: ' . $throwable->getMessage(), 500);
+}
