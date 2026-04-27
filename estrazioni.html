@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pagina estrazioni</title>
+  <link rel="stylesheet" href="./style.css?v=20260427-2">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css">
+</head>
+<body class="estrazioni-page">
+  <div class="toolbar">
+    <a href="index.html" class="home-cta-link-toolbar">Torna alla home</a>
+  </div>
+
+  <main class="estrazioni-main">
+    <header class="estrazioni-header">
+      <h1 class="estrazioni-title">Pagina estrazioni</h1>
+      <p class="estrazioni-intro">Filtra per blocco, piano, reparto, ID stanza e apparecchiatura, poi avvia la ricerca.</p>
+    </header>
+
+    <section class="estrazioni-filters" aria-label="Filtri di ricerca">
+      <div class="estrazioni-filter-grid">
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="filterBlocco">Blocco</label>
+          <select id="filterBlocco" name="blocco" autocomplete="off">
+            <option value=""></option>
+          </select>
+        </div>
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="filterPiano">Piano</label>
+          <select id="filterPiano" name="piano" autocomplete="off">
+            <option value=""></option>
+          </select>
+        </div>
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="filterReparto">Reparto</label>
+          <select id="filterReparto" name="reparto" autocomplete="off">
+            <option value=""></option>
+          </select>
+        </div>
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="filterStanza">ID Stanza</label>
+          <select id="filterStanza" name="room_code" autocomplete="off">
+            <option value=""></option>
+          </select>
+        </div>
+        <div class="estrazioni-field estrazioni-field-span">
+          <label class="estrazioni-label" for="filterApparecchiatura">Apparecchiatura</label>
+          <select id="filterApparecchiatura" name="apparecchiatura" autocomplete="off">
+            <option value=""></option>
+          </select>
+        </div>
+      </div>
+      <div class="estrazioni-actions">
+        <button id="estrazioniSearchBtn" type="button" class="estrazioni-search-btn">Ricerca</button>
+        <button id="estrazioniExportBtn" type="button" class="estrazioni-export-btn">Esporta Excel</button>
+      </div>
+      <p id="estrazioniError" class="estrazioni-error" role="alert" hidden></p>
+    </section>
+
+    <section class="estrazioni-results" aria-label="Risultati">
+      <div class="estrazioni-results-scroll">
+        <table class="estrazioni-table">
+          <thead>
+            <tr>
+              <th>Blocco</th>
+              <th>Piano</th>
+              <th>Reparto</th>
+              <th>ID Stanza</th>
+              <th>Apparecchiatura</th>
+              <th>Tipologia</th>
+              <th>Produttore</th>
+              <th>Modello</th>
+              <th>Q.tà</th>
+              <th>Nuovo</th>
+              <th>Trasferimento</th>
+              <th>Inv.</th>
+              <th>Note</th>
+            </tr>
+          </thead>
+          <tbody id="estrazioniTableBody"></tbody>
+        </table>
+      </div>
+      <p id="estrazioniEmpty" class="estrazioni-empty" hidden>Nessun risultato per i filtri selezionati.</p>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+  <script src="./estrazioni.js?v=20260427-5"></script>
+</body>
+</html>

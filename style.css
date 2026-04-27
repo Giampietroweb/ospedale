@@ -175,7 +175,7 @@ body::-webkit-scrollbar-corner,
 
 .map-wrapper {
   width: max-content;
-}
+} 
 
 .map-image {
   display: block;
@@ -805,4 +805,250 @@ body.page-structure {
   padding: 1rem 0;
   color: #475569;
   font-size: 0.875rem;
+}
+
+/* Pagina estrazioni */
+.estrazioni-page {
+  margin: 0;
+  min-height: 100vh;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.estrazioni-page .toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  backdrop-filter: blur(4px);
+  background: rgb(255 255 255 / 88%);
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.estrazioni-main {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.15rem 1.25rem 2.5rem;
+}
+
+.estrazioni-header {
+  margin-bottom: 1.5rem;
+}
+
+.estrazioni-title {
+  margin: 0 0 0.35rem;
+  font-size: 1.75rem;
+  font-weight: 800;
+  color: #0f172a;
+}
+
+.estrazioni-intro {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.95rem;
+}
+
+.estrazioni-filters {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.25rem 1.25rem 1rem;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+  margin-bottom: 1.5rem;
+}
+
+.estrazioni-filter-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem 1.25rem;
+  align-items: end;
+}
+
+.estrazioni-field-span {
+  grid-column: 1 / -1;
+}
+
+@media (min-width: 900px) {
+  .estrazioni-field-span {
+    grid-column: span 2;
+  }
+}
+
+.estrazioni-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #475569;
+  margin-bottom: 0.35rem;
+}
+
+.estrazioni-field .ts-wrapper {
+  min-width: 0;
+}
+
+.estrazioni-field .ts-control,
+.estrazioni-field .ts-control input {
+  font-size: 0.95rem;
+}
+
+.estrazioni-field .ts-control {
+  min-height: 2.6rem;
+  border-radius: 0.5rem;
+  border-color: #cbd5e1;
+  padding: 0.35rem 0.6rem;
+  box-shadow: none;
+}
+
+.estrazioni-field .ts-wrapper.focus .ts-control,
+.estrazioni-search-btn:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
+}
+
+.estrazioni-field .ts-wrapper.disabled .ts-control {
+  background: #f8fafc;
+  color: #94a3b8;
+}
+
+.estrazioni-actions {
+  margin-top: 1.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  align-items: center;
+}
+
+.estrazioni-search-btn {
+  min-height: 2.6rem;
+  padding: 0.55rem 1.35rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #fff;
+  background: #0284c7;
+  border: none;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.estrazioni-search-btn:hover:not(:disabled) {
+  background: #0369a1;
+}
+
+.estrazioni-search-btn:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+.estrazioni-export-btn {
+  min-height: 2.6rem;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #0c4a6e;
+  background: #fff;
+  border: 2px solid #0284c7;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.estrazioni-export-btn:hover {
+  background: #e0f2fe;
+}
+
+.estrazioni-export-btn:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
+}
+
+.estrazioni-error {
+  margin: 0.75rem 0 0;
+  color: #b91c1c;
+  font-size: 0.9rem;
+}
+
+.estrazioni-results-scroll {
+  overflow-x: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
+}
+
+.estrazioni-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.estrazioni-table th,
+.estrazioni-table td {
+  padding: 0.5rem 0.65rem;
+  text-align: left;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: top;
+  white-space: nowrap;
+}
+
+.estrazioni-table th {
+  background: #f1f5f9;
+  font-weight: 700;
+  color: #334155;
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.estrazioni-table tbody tr:nth-child(even) {
+  background: #fcfdff;
+}
+
+.estrazioni-table tbody tr:hover {
+  background: #f0f9ff;
+}
+
+.estrazioni-table td:nth-child(5),
+.estrazioni-table th:nth-child(5) {
+  white-space: normal;
+  min-width: 10rem;
+}
+
+.estrazioni-table td:last-child,
+.estrazioni-table th:last-child {
+  white-space: normal;
+  min-width: 8rem;
+}
+
+.estrazioni-empty {
+  margin: 0.75rem 0 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 700px) {
+  .estrazioni-main {
+    padding: 0.85rem 0.8rem 2rem;
+  }
+
+  .estrazioni-filters {
+    padding: 1rem 0.8rem 0.85rem;
+  }
+
+  .estrazioni-filter-grid {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+  }
+
+  .estrazioni-field-span {
+    grid-column: auto;
+  }
+
+  .estrazioni-search-btn,
+  .estrazioni-export-btn {
+    width: 100%;
+  }
+
+  .estrazioni-table th,
+  .estrazioni-table td {
+    font-size: 0.82rem;
+    padding: 0.45rem 0.55rem;
+  }
 }

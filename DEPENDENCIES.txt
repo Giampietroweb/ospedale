@@ -1,0 +1,5 @@
+Export Excel (api/estrazioni-export.php) con server PHP 8.2.30:
+1) dalla root progetto cancellare eventuali lock/vendor incompatibili:
+   rm -rf vendor composer.lock
+2) installare dipendenze compatibili:
+   composer update
