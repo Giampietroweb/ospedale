@@ -1,5 +1,5 @@
 /**
- * Pagina estrazioni: filtri a cascata e ricerca apparecchiature.
+ * Pagina estrazioni: filtri a cascata e ricerca per tipo (apparecchiature, impiantistica, altre dotazioni).
  */
 
 const API_URL = 'api/estrazioni.php';
@@ -11,6 +11,50 @@ const BLOCCO_LABELS = {
   sud: 'Blocco Sud',
   piastra: 'Piastra Centrale',
   sotterraneo: 'Interrato',
+};
+
+const TIPO_DETTAGLIO_LABEL = {
+  apparecchiature: 'Apparecchiatura',
+  impiantistica: 'Tipologia impiantistica',
+  altre_dotazioni: 'Altra dotazione',
+};
+
+const TABLE_HEADERS = {
+  apparecchiature: [
+    'Blocco',
+    'Piano',
+    'Reparto',
+    'ID Stanza',
+    'Apparecchiatura',
+    'Tipologia',
+    'Produttore',
+    'Modello',
+    'Q.tà',
+    'Nuovo',
+    'Trasferimento',
+    'Inv.',
+    'Note',
+  ],
+  impiantistica: [
+    'Blocco',
+    'Piano',
+    'Reparto',
+    'ID Stanza',
+    'Tipologia impiantistica',
+    'Q.tà presenti',
+    'Q.tà da implementare',
+    'Note',
+  ],
+  altre_dotazioni: [
+    'Blocco',
+    'Piano',
+    'Reparto',
+    'ID Stanza',
+    'Altra dotazione',
+    'Presente',
+    'Da implementare',
+    'Note',
+  ],
 };
 
 function labelBlocco(value) {
@@ -29,6 +73,27 @@ function labelPiano(piano) {
     return `Piano ${n}`;
   }
   return `Piano ${piano}`;
+}
+
+function getSelectedTipo() {
+  const checked = document.querySelector('input[name="estrazioniTipo"]:checked');
+  return checked && checked.value ? checked.value : 'apparecchiature';
+}
+
+function updateDettaglioLabel() {
+  const labelEl = document.getElementById('estrazioniDettaglioLabel');
+  const legacyLabel = document.querySelector('label[for=\"filterApparecchiatura\"]');
+  if (!labelEl && !legacyLabel) {
+    return;
+  }
+  const tipo = getSelectedTipo();
+  const labelText = TIPO_DETTAGLIO_LABEL[tipo] || 'Dettaglio';
+  if (labelEl) {
+    labelEl.textContent = labelText;
+  }
+  if (legacyLabel) {
+    legacyLabel.textContent = labelText;
+  }
 }
 
 function tomSelectBaseOptions() {
@@ -120,13 +185,30 @@ function appendTextCell(row, text) {
   row.appendChild(cell);
 }
 
+function renderTableHead(tipo) {
+  const thead = document.getElementById('estrazioniTableHead');
+  if (!thead) {
+    return;
+  }
+  const headers = TABLE_HEADERS[tipo] || TABLE_HEADERS.apparecchiature;
+  const tr = document.createElement('tr');
+  headers.forEach((text) => {
+    const th = document.createElement('th');
+    th.textContent = text;
+    tr.appendChild(th);
+  });
+  thead.replaceChildren(tr);
+}
+
 function renderResults(rows) {
   const tbody = document.getElementById('estrazioniTableBody');
   const emptyEl = document.getElementById('estrazioniEmpty');
+  const tipo = getSelectedTipo();
   if (!tbody) {
     return;
   }
   tbody.replaceChildren();
+  renderTableHead(tipo);
 
   if (!rows || rows.length === 0) {
     if (emptyEl) {
@@ -136,6 +218,45 @@ function renderResults(rows) {
   }
   if (emptyEl) {
     emptyEl.hidden = true;
+  }
+
+  if (tipo === 'impiantistica') {
+    rows.forEach((row) => {
+      const tr = document.createElement('tr');
+      const tipologia =
+        row.tipologiaImpianto ?? row.tipologiaimpianto ?? row.TipologiaImpianto ?? '';
+      const qtaPr = row.qtaPresenti ?? row.qtapresenti ?? row.QtaPresenti;
+      const qtaDi = row.qtaDaImplementare ?? row.qtadaimplementare ?? row.QtaDaImplementare;
+      appendTextCell(tr, labelBlocco(row.blocco));
+      appendTextCell(tr, labelPiano(row.piano));
+      appendTextCell(tr, row.reparto ?? '');
+      appendTextCell(tr, row.roomCode ?? row.roomcode ?? '');
+      appendTextCell(tr, tipologia);
+      appendTextCell(tr, qtaPr != null && qtaPr !== '' ? String(qtaPr) : '');
+      appendTextCell(tr, qtaDi != null && qtaDi !== '' ? String(qtaDi) : '');
+      appendTextCell(tr, row.note ?? '');
+      tbody.appendChild(tr);
+    });
+    return;
+  }
+
+  if (tipo === 'altre_dotazioni') {
+    rows.forEach((row) => {
+      const tr = document.createElement('tr');
+      const altra =
+        row.altraDotazione ?? row.altadotazione ?? row.AltraDotazione ?? '';
+      const daImp = row.daImplementare ?? row.daimplementare ?? row.DaImplementare ?? '';
+      appendTextCell(tr, labelBlocco(row.blocco));
+      appendTextCell(tr, labelPiano(row.piano));
+      appendTextCell(tr, row.reparto ?? '');
+      appendTextCell(tr, row.roomCode ?? row.roomcode ?? '');
+      appendTextCell(tr, altra);
+      appendTextCell(tr, row.presente ?? '');
+      appendTextCell(tr, daImp);
+      appendTextCell(tr, row.note ?? '');
+      tbody.appendChild(tr);
+    });
+    return;
   }
 
   rows.forEach((row) => {
@@ -165,22 +286,33 @@ const filterBloccoEl = document.getElementById('filterBlocco');
 const filterPianoEl = document.getElementById('filterPiano');
 const filterRepartoEl = document.getElementById('filterReparto');
 const filterStanzaEl = document.getElementById('filterStanza');
-const filterApparecchiaturaEl = document.getElementById('filterApparecchiatura');
+const filterDettaglioEl =
+  document.getElementById('filterDettaglio') || document.getElementById('filterApparecchiatura');
 
 const TomSelect = getTomSelectConstructor();
 let tsBlocco = null;
 let tsPiano = null;
 let tsReparto = null;
 let tsStanza = null;
-let tsApparecchiatura = null;
+let tsDettaglio = null;
+
+function applyDettaglioChoicesFromPayload(payload) {
+  const choices = Array.isArray(payload.dettaglioChoices)
+    ? payload.dettaglioChoices
+    : Array.isArray(payload.apparecchiature)
+      ? payload.apparecchiature
+      : [];
+  fillTomSelectOptions(tsDettaglio, choices, (v) => v);
+}
 
 async function loadRootOptions() {
-  const payload = await fetchJson(`${API_URL}?action=options`);
+  const tipo = getSelectedTipo();
+  const payload = await fetchJson(`${API_URL}?action=options&tipo=${encodeURIComponent(tipo)}`);
   fillTomSelectOptions(tsBlocco, payload.blocchi || [], labelBlocco);
   fillTomSelectOptions(tsPiano, payload.piani || [], labelPiano);
   updateRepartoOptions(payload.reparti || [], Boolean(payload.hasEmptyReparto));
   fillTomSelectOptions(tsStanza, payload.stanze || [], (v) => v);
-  fillTomSelectOptions(tsApparecchiatura, payload.apparecchiature || [], (v) => v);
+  applyDettaglioChoicesFromPayload(payload);
 }
 
 function updateRepartoOptions(reparti, hasEmptyReparto) {
@@ -209,7 +341,11 @@ function updateRepartoOptions(reparti, hasEmptyReparto) {
 }
 
 async function loadOptionsForContext(blocco, piano) {
-  const params = new URLSearchParams({ action: 'options' });
+  const tipo = getSelectedTipo();
+  const params = new URLSearchParams({
+    action: 'options',
+    tipo,
+  });
   if (blocco) {
     params.set('blocco', blocco);
   }
@@ -227,6 +363,7 @@ async function loadOptionsForContext(blocco, piano) {
   if (Array.isArray(payload.stanze)) {
     fillTomSelectOptions(tsStanza, payload.stanze, (v) => v);
   }
+  applyDettaglioChoicesFromPayload(payload);
 }
 
 async function onBloccoChanged() {
@@ -253,13 +390,48 @@ async function onPianoChanged() {
   }
 }
 
+async function onTipoChanged() {
+  updateDettaglioLabel();
+  try {
+    setErrorMessage('');
+    await loadRootOptions();
+    const tbody = document.getElementById('estrazioniTableBody');
+    if (tbody) {
+      tbody.replaceChildren();
+    }
+    renderTableHead(getSelectedTipo());
+    const emptyEl = document.getElementById('estrazioniEmpty');
+    if (emptyEl) {
+      emptyEl.hidden = true;
+    }
+  } catch (error) {
+    console.error('[Estrazioni] tipo changed', error);
+    setErrorMessage(error.message || 'Errore aggiornamento opzioni');
+  }
+}
+
+function wireTipoListeners() {
+  const tipoInputs = document.querySelectorAll('input[name=\"estrazioniTipo\"]');
+  if (!tipoInputs.length) {
+    return;
+  }
+  tipoInputs.forEach((input) => {
+    input.addEventListener('change', () => {
+      onTipoChanged();
+    });
+  });
+}
+
 function buildEstrazioniFilterParams() {
   const params = new URLSearchParams();
+  const tipo = getSelectedTipo();
+  params.set('tipo', tipo);
+
   const blocco = tsBlocco ? tsBlocco.getValue() : '';
   const piano = tsPiano ? tsPiano.getValue() : '';
   const reparto = tsReparto ? tsReparto.getValue() : '';
   const stanza = tsStanza ? tsStanza.getValue() : '';
-  const apparecchiatura = tsApparecchiatura ? tsApparecchiatura.getValue() : '';
+  const dettaglio = tsDettaglio ? tsDettaglio.getValue() : '';
 
   if (blocco) {
     params.set('blocco', blocco);
@@ -277,8 +449,8 @@ function buildEstrazioniFilterParams() {
   if (stanza) {
     params.set('room_code', stanza);
   }
-  if (apparecchiatura) {
-    params.set('apparecchiatura', apparecchiatura);
+  if (dettaglio) {
+    params.set('dettaglio', dettaglio);
   }
 
   return params;
@@ -320,6 +492,10 @@ function initTomSelects() {
     setErrorMessage('TomSelect non disponibile: controlla la connessione al CDN.');
     return false;
   }
+  if (!filterBloccoEl || !filterPianoEl || !filterRepartoEl || !filterStanzaEl || !filterDettaglioEl) {
+    setErrorMessage('Markup filtri non allineato: ricarica la pagina senza cache (Cmd+Shift+R).');
+    return false;
+  }
 
   tsBlocco = new TS(filterBloccoEl, {
     ...tomSelectBaseOptions(),
@@ -337,7 +513,7 @@ function initTomSelects() {
 
   tsReparto = new TS(filterRepartoEl, tomSelectBaseOptions());
   tsStanza = new TS(filterStanzaEl, tomSelectBaseOptions());
-  tsApparecchiatura = new TS(filterApparecchiaturaEl, {
+  tsDettaglio = new TS(filterDettaglioEl, {
     ...tomSelectBaseOptions(),
     sortField: { field: 'text', direction: 'asc' },
   });
@@ -357,6 +533,9 @@ document.getElementById('estrazioniExportBtn')?.addEventListener('click', () => 
 if (!initTomSelects()) {
   // stop
 } else {
+  updateDettaglioLabel();
+  renderTableHead(getSelectedTipo());
+  wireTipoListeners();
   loadRootOptions().catch((error) => {
     console.error('[Estrazioni] opzioni iniziali', error);
     setErrorMessage(error.message || 'Errore caricamento filtri');

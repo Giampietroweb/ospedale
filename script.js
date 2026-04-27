@@ -1844,12 +1844,24 @@ function getApparecchiaturaFormData() {
   };
 }
 
+function parsePositiveQtaOrNull(rawValue) {
+  const normalizedValue = String(rawValue ?? '').trim();
+  if (normalizedValue === '') {
+    return null;
+  }
+  const numericValue = Number(normalizedValue);
+  if (!Number.isFinite(numericValue) || numericValue <= 0) {
+    return null;
+  }
+  return String(Math.trunc(numericValue));
+}
+
 function resetApparecchiaturaForm() {
   clearApparecchiaturaValue();
   appInstallazioneTipologiaInput.value = '';
   appProduttoreInput.value = '';
   appModelloInput.value = '';
-  appQtaInput.value = '';
+  appQtaInput.value = '1';
   appNuovoInput.value = '';
   appTrasferimentoInput.value = '';
   appInvInput.value = '';
@@ -2787,12 +2799,17 @@ function initializeMapDimensions(roomCodesSet = null) {
 
 async function handleAddApparecchiatura() {
   const rawRow = getApparecchiaturaFormData();
+  const qtaValue = parsePositiveQtaOrNull(rawRow.qta);
+  if (qtaValue === null) {
+    window.alert('Qta deve essere maggiore di 0.');
+    return;
+  }
   const newRow = normalizeApparecchiaturaRow({
     apparecchiatura: rawRow.apparecchiatura || '-',
     tipologia: rawRow.tipologia,
     produttore: rawRow.produttore || '-',
     modello: rawRow.modello || '-',
-    qta: rawRow.qta || '0',
+    qta: qtaValue,
     nuovo: rawRow.nuovo || '-',
     trasferimento: rawRow.trasferimento || '-',
     inv: rawRow.inv || '-',
@@ -2829,11 +2846,16 @@ async function handleSaveApparecchiatura() {
     return;
   }
 
-  const updatedRow = normalizeApparecchiaturaRow(getApparecchiaturaFormData());
-  if (!updatedRow.apparecchiatura || !updatedRow.qta) {
-    window.alert('Compila almeno Apparecchiatura e QTA per Apparecchiatura.');
+  const rawUpdatedRow = getApparecchiaturaFormData();
+  const qtaValue = parsePositiveQtaOrNull(rawUpdatedRow.qta);
+  if (qtaValue === null) {
+    window.alert('Qta deve essere maggiore di 0.');
     return;
   }
+  const updatedRow = normalizeApparecchiaturaRow({
+    ...rawUpdatedRow,
+    qta: qtaValue
+  });
 
   const rowIndex = editingApparecchiaturaIndex;
   apparecchiaturaRows[rowIndex] = updatedRow;

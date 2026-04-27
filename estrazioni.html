@@ -16,10 +16,29 @@
   <main class="estrazioni-main">
     <header class="estrazioni-header">
       <h1 class="estrazioni-title">Pagina estrazioni</h1>
-      <p class="estrazioni-intro">Filtra per blocco, piano, reparto, ID stanza e apparecchiatura, poi avvia la ricerca.</p>
+      <p class="estrazioni-intro">
+        Scegli il tipo di estrazione, filtra per blocco, piano, reparto e ID stanza, opzionalmente per il dettaglio (apparecchiatura, tipologia impiantistica o altra dotazione), poi avvia la ricerca.
+      </p>
     </header>
 
     <section class="estrazioni-filters" aria-label="Filtri di ricerca">
+      <fieldset class="estrazioni-tipo-fieldset">
+        <legend class="estrazioni-tipo-legend">Tipo estrazione</legend>
+        <div class="estrazioni-tipo-options">
+          <label class="estrazioni-tipo-label">
+            <input type="radio" name="estrazioniTipo" value="apparecchiature" checked />
+            Apparecchiature
+          </label>
+          <label class="estrazioni-tipo-label">
+            <input type="radio" name="estrazioniTipo" value="impiantistica" />
+            Dotazioni impiantistiche
+          </label>
+          <label class="estrazioni-tipo-label">
+            <input type="radio" name="estrazioniTipo" value="altre_dotazioni" />
+            Altre dotazioni
+          </label>
+        </div>
+      </fieldset>
       <div class="estrazioni-filter-grid">
         <div class="estrazioni-field">
           <label class="estrazioni-label" for="filterBlocco">Blocco</label>
@@ -46,8 +65,8 @@
           </select>
         </div>
         <div class="estrazioni-field estrazioni-field-span">
-          <label class="estrazioni-label" for="filterApparecchiatura">Apparecchiatura</label>
-          <select id="filterApparecchiatura" name="apparecchiatura" autocomplete="off">
+          <label class="estrazioni-label" id="estrazioniDettaglioLabel" for="filterDettaglio">Apparecchiatura</label>
+          <select id="filterDettaglio" name="dettaglio" autocomplete="off">
             <option value=""></option>
           </select>
         </div>
@@ -62,23 +81,7 @@
     <section class="estrazioni-results" aria-label="Risultati">
       <div class="estrazioni-results-scroll">
         <table class="estrazioni-table">
-          <thead>
-            <tr>
-              <th>Blocco</th>
-              <th>Piano</th>
-              <th>Reparto</th>
-              <th>ID Stanza</th>
-              <th>Apparecchiatura</th>
-              <th>Tipologia</th>
-              <th>Produttore</th>
-              <th>Modello</th>
-              <th>Q.tà</th>
-              <th>Nuovo</th>
-              <th>Trasferimento</th>
-              <th>Inv.</th>
-              <th>Note</th>
-            </tr>
-          </thead>
+          <thead id="estrazioniTableHead"></thead>
           <tbody id="estrazioniTableBody"></tbody>
         </table>
       </div>
@@ -87,6 +90,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-  <script src="./estrazioni.js?v=20260427-5"></script>
+  <script src="./estrazioni.js?v=20260427-7"></script>
 </body>
 </html>

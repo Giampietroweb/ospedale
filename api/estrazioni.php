@@ -30,6 +30,16 @@ function readPianoParam(): string
     return trim((string)($_GET['piano'] ?? ''));
 }
 
+function readTipoParam(): string
+{
+    $tipo = trim((string)($_GET['tipo'] ?? 'apparecchiature'));
+    if (!in_array($tipo, ESTRAZIONI_VALID_TIPI, true)) {
+        errorResponse('tipo non valido');
+    }
+
+    return $tipo;
+}
+
 function assertValidBlocco(string $blocco): void
 {
     if (!in_array($blocco, ESTRAZIONI_VALID_BLOCCHI, true)) {
@@ -115,6 +125,7 @@ function fetchRepartiAndStanze(PDO $pdo, string $whereSql = '', array $params = 
 
 function handleOptions(PDO $pdo): void
 {
+    $tipo = readTipoParam();
     $blocco = readBloccoParam();
     $piano = readPianoParam();
 
@@ -128,23 +139,18 @@ function handleOptions(PDO $pdo): void
             'SELECT DISTINCT piano FROM rooms ORDER BY CAST(piano AS SIGNED) ASC, piano ASC'
         );
         $roomFilters = fetchRepartiAndStanze($pdo);
-        $apparecchiature = fetchDistinctStrings(
-            $pdo,
-            'SELECT DISTINCT ra.apparecchiatura
-             FROM room_apparecchiature ra
-             INNER JOIN rooms r ON r.id = ra.room_id
-             WHERE ra.apparecchiatura IS NOT NULL AND TRIM(ra.apparecchiatura) <> \'\'
-             ORDER BY ra.apparecchiatura ASC'
-        );
+        $dettaglioChoices = fetchEstrazioniDettaglioChoices($pdo, $tipo, '', '');
 
         echo json_encode([
             'ok' => true,
+            'tipo' => $tipo,
             'blocchi' => $blocchi,
             'piani' => $piani,
             'reparti' => $roomFilters['reparti'],
             'hasEmptyReparto' => $roomFilters['hasEmptyReparto'],
             'stanze' => $roomFilters['stanze'],
-            'apparecchiature' => $apparecchiature,
+            'dettaglioChoices' => $dettaglioChoices,
+            'apparecchiature' => $tipo === 'apparecchiature' ? $dettaglioChoices : [],
         ], JSON_UNESCAPED_UNICODE);
         return;
     }
@@ -168,12 +174,17 @@ function handleOptions(PDO $pdo): void
             [':blocco' => $blocco]
         );
 
+        $dettaglioChoices = fetchEstrazioniDettaglioChoices($pdo, $tipo, $blocco, '');
+
         echo json_encode([
             'ok' => true,
+            'tipo' => $tipo,
             'piani' => $piani,
             'reparti' => $roomFilters['reparti'],
             'hasEmptyReparto' => $roomFilters['hasEmptyReparto'],
             'stanze' => $roomFilters['stanze'],
+            'dettaglioChoices' => $dettaglioChoices,
+            'apparecchiature' => $tipo === 'apparecchiature' ? $dettaglioChoices : [],
         ], JSON_UNESCAPED_UNICODE);
         return;
     }
@@ -190,12 +201,16 @@ function handleOptions(PDO $pdo): void
     }
     $whereSql = implode(' AND ', $whereParts);
     $roomFilters = fetchRepartiAndStanze($pdo, $whereSql, $params);
+    $dettaglioChoices = fetchEstrazioniDettaglioChoices($pdo, $tipo, $blocco, $piano);
 
     echo json_encode([
         'ok' => true,
+        'tipo' => $tipo,
         'reparti' => $roomFilters['reparti'],
         'hasEmptyReparto' => $roomFilters['hasEmptyReparto'],
         'stanze' => $roomFilters['stanze'],
+        'dettaglioChoices' => $dettaglioChoices,
+        'apparecchiature' => $tipo === 'apparecchiature' ? $dettaglioChoices : [],
     ], JSON_UNESCAPED_UNICODE);
 }
 
@@ -211,6 +226,7 @@ function handleSearch(PDO $pdo): void
 
     echo json_encode([
         'ok' => true,
+        'tipo' => $filters['tipo'],
         'rows' => $rows,
     ], JSON_UNESCAPED_UNICODE);
 }

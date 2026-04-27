@@ -45,25 +45,16 @@ try {
     exit;
 }
 
-$headerRow = [
-    'Blocco',
-    'Piano',
-    'Reparto',
-    'ID Stanza',
-    'Apparecchiatura',
-    'Tipologia',
-    'Produttore',
-    'Modello',
-    'Q.tà',
-    'Nuovo',
-    'Trasferimento',
-    'Inv.',
-    'Note',
-];
+$tipo = $filters['tipo'];
+$headerRow = estrazioniExportHeadersForTipo($tipo);
 
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
-$sheet->setTitle('Estrazioni');
+$sheet->setTitle(match ($tipo) {
+    'impiantistica' => 'Impiantistica',
+    'altre_dotazioni' => 'Altre dotazioni',
+    default => 'Apparecchiature',
+});
 $sheet->fromArray($headerRow, null, 'A1');
 
 $rowIndex = 2;
@@ -71,16 +62,21 @@ foreach ($rows as $row) {
     if (!is_array($row)) {
         continue;
     }
-    $sheet->fromArray(estrazioniRowToSpreadsheetLine($row), null, 'A' . $rowIndex);
+    $sheet->fromArray(estrazioniExportRowToLine($tipo, $row), null, 'A' . $rowIndex);
     $rowIndex++;
 }
 
 $sheet->freezePane('A2');
-foreach (range('A', 'M') as $columnId) {
+foreach (estrazioniExportColumnLettersForTipo($tipo) as $columnId) {
     $sheet->getColumnDimension($columnId)->setAutoSize(true);
 }
 
-$filename = 'estrazioni-' . date('Ymd-His') . '.xlsx';
+$tipoSlug = match ($tipo) {
+    'impiantistica' => 'impiantistica',
+    'altre_dotazioni' => 'altre-dotazioni',
+    default => 'apparecchiature',
+};
+$filename = 'estrazioni-' . $tipoSlug . '-' . date('Ymd-His') . '.xlsx';
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
