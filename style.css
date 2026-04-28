@@ -20,6 +20,7 @@ body {
 .toolbar {
   display: flex;
   align-items: center;
+  flex-wrap: wrap;
   gap: 10px;
   padding: 10px 12px;
   background: #ffffff;
@@ -45,7 +46,7 @@ body {
   transition: background-color 0.2s ease, transform 0.1s ease, box-shadow 0.2s ease;
 }
 
-.home-cta-link:hover {
+.home-cta-link-toolbar:hover {
   background: #1e40af;
   box-shadow: 0 4px 12px rgba(30, 64, 175, 0.45);
   transform: translateY(-1px);
@@ -146,8 +147,8 @@ button:hover {
 
 body::-webkit-scrollbar,
 .viewer::-webkit-scrollbar {
-  width: 37px;
-  height: 37px;
+  width: 14px;
+  height: 14px;
 }
 
 body::-webkit-scrollbar-track,
@@ -200,7 +201,7 @@ body::-webkit-scrollbar-corner,
 
 .modal {
   position: relative;
-  width: 90vw;
+  width: min(1120px, 96vw);
   height: min(100%, 100%);
   max-height: 90vh;
   overflow-y: auto;
@@ -440,6 +441,7 @@ body::-webkit-scrollbar-corner,
 
 .modal-sections {
   display: flex;
+  flex-wrap: wrap;
   gap: 8px;
   margin-top: 14px;
 }
@@ -641,6 +643,12 @@ body::-webkit-scrollbar-corner,
   margin-top: 10px;
 }
 
+.modal-table {
+  display: block;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .modal-table th,
 .modal-table td {
   text-align: left;
@@ -757,6 +765,10 @@ body.page-structure {
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
   height: auto;
   display: block;
+}
+
+.page-structure .toolbar {
+  justify-content: center;
 }
 
 .page-structure .piano-link {
@@ -1055,6 +1067,27 @@ body.page-structure {
   padding: 0.25rem 0.45rem;
 }
 
+.estrazioni-page-size-buttons {
+  display: none;
+  gap: 0.45rem;
+}
+
+.estrazioni-page-size-option {
+  min-height: 2rem;
+  padding: 0.35rem 0.7rem;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: #0c4a6e;
+  background: #ffffff;
+  border: 1px solid #0284c7;
+  border-radius: 0.45rem;
+}
+
+.estrazioni-page-size-option.is-active {
+  background: #0284c7;
+  color: #ffffff;
+}
+
 .estrazioni-pagination-controls {
   display: inline-flex;
   align-items: center;
@@ -1146,6 +1179,97 @@ body.page-structure {
 }
 
 @media (max-width: 700px) {
+  .estrazioni-page {
+    overflow-x: hidden;
+  }
+
+  .estrazioni-main,
+  .estrazioni-results,
+  .estrazioni-results-scroll {
+    max-width: 100%;
+    min-width: 0;
+  }
+
+  .toolbar {
+    gap: 8px;
+    padding: 8px;
+  }
+
+  .home-cta-link-toolbar,
+  .toolbar button {
+    flex: 1 1 calc(50% - 8px);
+    min-height: 40px;
+  }
+
+  .zoom-label {
+    flex: 1 1 100%;
+    text-align: center;
+    min-width: 0;
+  }
+
+  .viewer {
+    padding: 8px;
+  }
+
+  .modal-overlay {
+    padding: 8px;
+  }
+
+  .modal {
+    width: 100%;
+    max-height: 96vh;
+    padding: 16px 14px 12px;
+  }
+
+  .modal-title {
+    font-size: 1.2rem;
+  }
+
+  .modal-field {
+    flex-basis: 100%;
+  }
+
+  .modal-field-main {
+    flex-wrap: wrap;
+  }
+
+  .modal-field-input,
+  .modal-edit-button {
+    width: 100%;
+  }
+
+  .modal-section-button {
+    width: 100%;
+  }
+
+  .table-editor {
+    padding: 10px;
+  }
+
+  .table-editor-title {
+    font-size: 1rem;
+    margin-bottom: 12px;
+  }
+
+  .table-editor-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .table-editor-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .table-editor-button {
+    width: 100%;
+  }
+
+  .modal-table th,
+  .modal-table td {
+    padding: 8px 9px;
+    font-size: 13px;
+  }
+
   .estrazioni-main {
     padding: 0.85rem 0.8rem 2rem;
   }
@@ -1175,6 +1299,75 @@ body.page-structure {
     padding: 0.45rem 0.55rem;
   }
 
+  .estrazioni-results-scroll {
+    border: none;
+    box-shadow: none;
+    background: transparent;
+    overflow-x: visible;
+  }
+
+  .estrazioni-table {
+    display: block;
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .estrazioni-table thead {
+    display: none;
+  }
+
+  .estrazioni-table tbody {
+    display: block;
+  }
+
+  .estrazioni-table tbody tr {
+    display: block;
+    margin-bottom: 0.75rem;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.65rem;
+    background: #ffffff;
+    overflow: hidden;
+  }
+
+  .estrazioni-table tbody tr:nth-child(even),
+  .estrazioni-table tbody tr:hover {
+    background: #ffffff;
+  }
+
+  .estrazioni-table td {
+    display: grid;
+    grid-template-columns: minmax(115px, 42%) 1fr;
+    gap: 0.6rem;
+    align-items: start;
+    width: 100%;
+    min-width: 0;
+    white-space: normal !important;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 0.5rem 0.7rem;
+  }
+
+  .estrazioni-table td:nth-child(5),
+  .estrazioni-table th:nth-child(5),
+  .estrazioni-table td:last-child,
+  .estrazioni-table th:last-child {
+    min-width: 0;
+  }
+
+  .estrazioni-table td::before {
+    content: attr(data-label);
+    font-weight: 700;
+    color: #334155;
+    font-size: 0.78rem;
+    line-height: 1.2;
+  }
+
+  .estrazioni-table td:last-child {
+    border-bottom: none;
+  }
+
   .estrazioni-pagination {
     flex-direction: column;
     align-items: stretch;
@@ -1182,11 +1375,59 @@ body.page-structure {
 
   .estrazioni-pagination-page-size,
   .estrazioni-pagination-controls {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    flex-wrap: wrap;
     justify-content: space-between;
   }
 
   .estrazioni-pagination-info {
     min-width: 0;
     flex: 1;
+    text-align: center;
+  }
+
+  .estrazioni-pagination-controls .estrazioni-page-btn {
+    flex: 0 0 auto;
+  }
+
+  .estrazioni-pagination-page-size select {
+    display: none;
+  }
+
+  .estrazioni-page-size-buttons {
+    display: inline-flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .estrazioni-page-size-option {
+    font-size: 0.9rem;
+  }
+
+  .estrazioni-page-size-option:focus-visible {
+    outline: 2px solid #0284c7;
+    outline-offset: 2px;
+  }
+}
+
+@media (max-width: 420px) {
+  .home-cta-link-toolbar,
+  .toolbar button {
+    flex-basis: 100%;
+  }
+
+  .page-structure .piano-link {
+    height: 3.1rem;
+    font-size: 0.95rem;
+  }
+
+  .page-structure .label-edificio {
+    padding: 0.75rem 0;
+  }
+
+  .estrazioni-title {
+    font-size: 1.35rem;
   }
 }

@@ -179,9 +179,12 @@ function formatInvForCell(inv) {
   return String(inv);
 }
 
-function appendTextCell(row, text) {
+function appendTextCell(row, text, label) {
   const cell = document.createElement('td');
   cell.textContent = text ?? '';
+  if (label) {
+    cell.setAttribute('data-label', label);
+  }
   row.appendChild(cell);
 }
 
@@ -204,6 +207,7 @@ function renderResults(rows) {
   const tbody = document.getElementById('estrazioniTableBody');
   const emptyEl = document.getElementById('estrazioniEmpty');
   const tipo = getSelectedTipo();
+  const headers = TABLE_HEADERS[tipo] || TABLE_HEADERS.apparecchiature;
   const safeRows = Array.isArray(rows) ? rows : [];
   const totalPages = getTotalPages(safeRows.length);
   if (currentPage > totalPages) {
@@ -238,14 +242,14 @@ function renderResults(rows) {
         row.tipologiaImpianto ?? row.tipologiaimpianto ?? row.TipologiaImpianto ?? '';
       const qtaPr = row.qtaPresenti ?? row.qtapresenti ?? row.QtaPresenti;
       const qtaDi = row.qtaDaImplementare ?? row.qtadaimplementare ?? row.QtaDaImplementare;
-      appendTextCell(tr, labelBlocco(row.blocco));
-      appendTextCell(tr, labelPiano(row.piano));
-      appendTextCell(tr, row.reparto ?? '');
-      appendTextCell(tr, row.roomCode ?? row.roomcode ?? '');
-      appendTextCell(tr, tipologia);
-      appendTextCell(tr, qtaPr != null && qtaPr !== '' ? String(qtaPr) : '');
-      appendTextCell(tr, qtaDi != null && qtaDi !== '' ? String(qtaDi) : '');
-      appendTextCell(tr, row.note ?? '');
+      appendTextCell(tr, labelBlocco(row.blocco), headers[0]);
+      appendTextCell(tr, labelPiano(row.piano), headers[1]);
+      appendTextCell(tr, row.reparto ?? '', headers[2]);
+      appendTextCell(tr, row.roomCode ?? row.roomcode ?? '', headers[3]);
+      appendTextCell(tr, tipologia, headers[4]);
+      appendTextCell(tr, qtaPr != null && qtaPr !== '' ? String(qtaPr) : '', headers[5]);
+      appendTextCell(tr, qtaDi != null && qtaDi !== '' ? String(qtaDi) : '', headers[6]);
+      appendTextCell(tr, row.note ?? '', headers[7]);
       tbody.appendChild(tr);
     });
     return;
@@ -257,14 +261,14 @@ function renderResults(rows) {
       const altra =
         row.altraDotazione ?? row.altadotazione ?? row.AltraDotazione ?? '';
       const daImp = row.daImplementare ?? row.daimplementare ?? row.DaImplementare ?? '';
-      appendTextCell(tr, labelBlocco(row.blocco));
-      appendTextCell(tr, labelPiano(row.piano));
-      appendTextCell(tr, row.reparto ?? '');
-      appendTextCell(tr, row.roomCode ?? row.roomcode ?? '');
-      appendTextCell(tr, altra);
-      appendTextCell(tr, row.presente ?? '');
-      appendTextCell(tr, daImp);
-      appendTextCell(tr, row.note ?? '');
+      appendTextCell(tr, labelBlocco(row.blocco), headers[0]);
+      appendTextCell(tr, labelPiano(row.piano), headers[1]);
+      appendTextCell(tr, row.reparto ?? '', headers[2]);
+      appendTextCell(tr, row.roomCode ?? row.roomcode ?? '', headers[3]);
+      appendTextCell(tr, altra, headers[4]);
+      appendTextCell(tr, row.presente ?? '', headers[5]);
+      appendTextCell(tr, daImp, headers[6]);
+      appendTextCell(tr, row.note ?? '', headers[7]);
       tbody.appendChild(tr);
     });
     return;
@@ -272,19 +276,19 @@ function renderResults(rows) {
 
   visibleRows.forEach((row) => {
     const tr = document.createElement('tr');
-    appendTextCell(tr, labelBlocco(row.blocco));
-    appendTextCell(tr, labelPiano(row.piano));
-    appendTextCell(tr, row.reparto ?? '');
-    appendTextCell(tr, row.roomCode ?? '');
-    appendTextCell(tr, row.apparecchiatura ?? '');
-    appendTextCell(tr, row.tipologia ?? '');
-    appendTextCell(tr, row.produttore ?? '');
-    appendTextCell(tr, row.modello ?? '');
-    appendTextCell(tr, row.qta ?? '');
-    appendTextCell(tr, row.nuovo ?? '');
-    appendTextCell(tr, row.trasferimento ?? '');
-    appendTextCell(tr, formatInvForCell(row.inv));
-    appendTextCell(tr, row.note ?? '');
+    appendTextCell(tr, labelBlocco(row.blocco), headers[0]);
+    appendTextCell(tr, labelPiano(row.piano), headers[1]);
+    appendTextCell(tr, row.reparto ?? '', headers[2]);
+    appendTextCell(tr, row.roomCode ?? '', headers[3]);
+    appendTextCell(tr, row.apparecchiatura ?? '', headers[4]);
+    appendTextCell(tr, row.tipologia ?? '', headers[5]);
+    appendTextCell(tr, row.produttore ?? '', headers[6]);
+    appendTextCell(tr, row.modello ?? '', headers[7]);
+    appendTextCell(tr, row.qta ?? '', headers[8]);
+    appendTextCell(tr, row.nuovo ?? '', headers[9]);
+    appendTextCell(tr, row.trasferimento ?? '', headers[10]);
+    appendTextCell(tr, formatInvForCell(row.inv), headers[11]);
+    appendTextCell(tr, row.note ?? '', headers[12]);
     tbody.appendChild(tr);
   });
 }
@@ -309,6 +313,41 @@ let tsDettaglio = null;
 let currentRows = [];
 let currentPage = 1;
 let pageSize = 20;
+
+function updatePageSizeButtonsUi(value) {
+  const selectedValue = String(value ?? '20');
+  const pageSizeButtons = document.querySelectorAll('[data-page-size-value]');
+  pageSizeButtons.forEach((button) => {
+    if (!(button instanceof HTMLButtonElement)) {
+      return;
+    }
+    const isActive = button.dataset.pageSizeValue === selectedValue;
+    button.classList.toggle('is-active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+}
+
+function bindPageSizeButtons() {
+  const pageSizeSelect = document.getElementById('estrazioniPageSize');
+  const pageSizeButtons = document.querySelectorAll('[data-page-size-value]');
+  if (!pageSizeButtons.length || !(pageSizeSelect instanceof HTMLSelectElement)) {
+    return;
+  }
+
+  pageSizeButtons.forEach((button) => {
+    if (!(button instanceof HTMLButtonElement)) {
+      return;
+    }
+    button.addEventListener('click', () => {
+      const nextValue = button.dataset.pageSizeValue || '20';
+      if (!Array.from(pageSizeSelect.options).some((option) => option.value === nextValue)) {
+        return;
+      }
+      pageSizeSelect.value = nextValue;
+      pageSizeSelect.dispatchEvent(new Event('change', { bubbles: true }));
+    });
+  });
+}
 
 function getPaginationElements() {
   return {
@@ -679,6 +718,7 @@ document.getElementById('estrazioniPageSize')?.addEventListener('change', (event
     return;
   }
   pageSize = target.value === 'all' ? 'all' : Number(target.value) || 20;
+  updatePageSizeButtonsUi(target.value);
   currentPage = 1;
   renderResults(currentRows);
 });
@@ -690,6 +730,8 @@ if (!initTomSelects()) {
   renderTableHead(getSelectedTipo());
   updatePaginationUi(0);
   wireTipoListeners();
+  bindPageSizeButtons();
+  updatePageSizeButtonsUi(String(pageSize));
   loadRootOptions().catch((error) => {
     console.error('[Estrazioni] opzioni iniziali', error);
     setErrorMessage(error.message || 'Errore caricamento filtri');
