@@ -217,3 +217,88 @@ Obiettivi:
 - controlla che non restino etichette P6 spezzate su più nodi consecutivi
 - riporta un breve riepilogo numerico delle occorrenze trovate/modificate
 ```
+///////////////////////////////////////////////////////////////////////////////
+
+Lavora sul file SVG indicato e applica SOLO la logica delle referenze P6>>>>>>>cambia con numero piano, come fatto su `planimetrie/nord-6.svg`.
+OBIETTIVO
+1) Normalizzare tutte le referenze che iniziano con P6.
+2) Evidenziarle con stile ad alta leggibilità.
+3) Aggregare i codici P6 spezzati in più nodi `<text>`.
+4) Portare i `<text>` P6 finali in fondo al file SVG, così vengono renderizzati sopra.
+5) Ridurre lo spazio bianco sopra/sotto lavorando solo sul `viewBox`.
+VINCOLI CRITICI
+- NON copiare un vecchio SVG dentro quello nuovo.
+- NON serializzare o riscrivere l’intero SVG.
+- NON cambiare encoding, newline, spaziatura globale o ordine attributi non necessari.
+- NON toccare `<path>`, geometrie, immagini embeddate, layer/gruppi, colori non-P6 o testi non-P6.
+- Per la fase P6, modifica solo nodi `<text>` che compongono referenze P6.
+- Per la fase viewBox, modifica solo l’attributo `viewBox` del tag `<svg>`.
+LOGICA P6
+- Riconosci tutte le varianti P6 numeriche e alfanumeriche:
+  - `P6-191-060`
+  - `P6-991-003`
+  - `P6-E91-001`
+  - `P6-C9M-113`
+  - `P6-191-025b`
+- Nel file i codici possono essere spezzati così:
+  - `P6`
+  - `-`
+  - `191`
+  - `191`
+  - `-`
+  - `060`
+- Aggrega ogni sequenza in un unico `<text>`:
+  - `*P6-191-060*`
+- Se nella stessa etichetta c’è un token duplicato, mantienilo una sola volta.
+- Non aggiungere nuove occorrenze logiche: lavora solo sui P6 già presenti nel nuovo file.
+- Dopo l’aggregazione non devono rimanere P6 spezzati su più `<text>`.
+- Non creare mai casi incompleti come `*P6*`.
+STILE DA APPLICARE AI SOLI P6
+Usa questo stile sul `<text>` finale aggregato:
+- `fill="#ff2a00"`
+- `font-weight="700"`
+- `stroke="#ffffff"`
+- `stroke-width="0.35"`
+- `paint-order="stroke fill"`
+- `font-size="1.4119788"`
+Preserva gli attributi di posizione del primo nodo P6 originale, per esempio:
+- `x`
+- `y`
+- `font-family`
+- `text-anchor`
+Z-ORDER SVG
+- Rimuovi i frammenti originali usati per comporre il codice P6.
+- Inserisci i `<text>` P6 aggregati e stilizzati subito prima di `</svg>`.
+- Non riordinare altri blocchi.
+VIEWBOX
+Dopo la fase P6:
+1) Calcola il bounding box reale del contenuto SVG.
+2) Riduci lo spazio bianco sopra/sotto e, se utile, anche ai lati.
+3) Applica un margine di sicurezza, ad esempio `20` unità.
+4) Modifica solo il valore di `viewBox`.
+5) Non modificare `width`, `height`, geometrie, path o testi.
+METODO DI LAVORO
+Prima di modificare:
+- mostra il conteggio dei nodi `<text>` con P6;
+- mostra quanti sono già nel formato `*P6...*`;
+- mostra quanti casi incompleti `*P6*` esistono.
+Poi:
+- esegui patch minimali e mirate;
+- evita rewrite totale del file;
+- se usi uno script, deve fare sostituzioni puntuali sul testo esistente.
+Dopo:
+- mostra `git diff --stat`;
+- verifica che:
+  - tutte le etichette P6 siano aggregate;
+  - tutti i P6 siano stilizzati;
+  - non esistano casi `*P6*`;
+  - non restino P6 spezzati;
+  - il `viewBox` sia l’unico attributo globale modificato.
+REPORT FINALE OBBLIGATORIO
+Riporta:
+- numero etichette P6 trovate;
+- numero etichette aggregate;
+- numero duplicati rimossi;
+- numero casi `*P6*` incompleti, deve essere `0`;
+- nuovo valore del `viewBox`;
+- conferma esplicita: “Nessuna modifica fuori da referenze/stile P6 e viewBox”.

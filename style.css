@@ -812,6 +812,15 @@ body::-webkit-scrollbar-corner,
   -webkit-overflow-scrolling: touch;
 }
 
+@media (min-width: 701px) {
+  #contentImpiantistica .modal-table,
+  #contentAltreDotazioni .modal-table {
+    display: table;
+    width: 100%;
+    table-layout: fixed;
+  }
+}
+
 .modal-table th,
 .modal-table td {
   text-align: left;
