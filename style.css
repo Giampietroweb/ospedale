@@ -973,6 +973,27 @@ body.page-structure {
   cursor: not-allowed;
 }
 
+.estrazioni-reset-btn {
+  min-height: 2.6rem;
+  padding: 0.55rem 1.2rem;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #334155;
+  background: #f8fafc;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.5rem;
+  cursor: pointer;
+}
+
+.estrazioni-reset-btn:hover {
+  background: #f1f5f9;
+}
+
+.estrazioni-reset-btn:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
+}
+
 .estrazioni-export-btn {
   min-height: 2.6rem;
   padding: 0.55rem 1.2rem;
@@ -1077,6 +1098,7 @@ body.page-structure {
   }
 
   .estrazioni-search-btn,
+  .estrazioni-reset-btn,
   .estrazioni-export-btn {
     width: 100%;
   }

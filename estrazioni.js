@@ -467,6 +467,26 @@ function buildExportUrl() {
   return `${EXPORT_URL}?${params.toString()}`;
 }
 
+function clearAllTomSelectFilters() {
+  [tsBlocco, tsPiano, tsReparto, tsStanza, tsDettaglio].forEach((tomSelectInstance) => {
+    if (tomSelectInstance) {
+      tomSelectInstance.clear(true);
+    }
+  });
+}
+
+function clearResultsTable() {
+  const tbody = document.getElementById('estrazioniTableBody');
+  if (tbody) {
+    tbody.replaceChildren();
+  }
+  renderTableHead(getSelectedTipo());
+  const emptyEl = document.getElementById('estrazioniEmpty');
+  if (emptyEl) {
+    emptyEl.hidden = true;
+  }
+}
+
 async function runSearch() {
   setErrorMessage('');
   const emptyEl = document.getElementById('estrazioniEmpty');
@@ -481,6 +501,34 @@ async function runSearch() {
     console.error('[Estrazioni] ricerca', error);
     setErrorMessage(error.message || 'Errore durante la ricerca');
     renderResults([]);
+  } finally {
+    setLoading(false);
+  }
+}
+
+async function resetFilters() {
+  const defaultTipo = 'apparecchiature';
+  const radioToSelect = document.querySelector(
+    `input[name="estrazioniTipo"][value="${defaultTipo}"]`
+  );
+  const shouldSwitchTipo = getSelectedTipo() !== defaultTipo;
+
+  if (radioToSelect) {
+    radioToSelect.checked = true;
+  }
+
+  setErrorMessage('');
+  setLoading(true);
+  try {
+    if (shouldSwitchTipo) {
+      updateDettaglioLabel();
+    }
+    clearAllTomSelectFilters();
+    await loadRootOptions();
+    clearResultsTable();
+  } catch (error) {
+    console.error('[Estrazioni] reset filtri', error);
+    setErrorMessage(error.message || 'Errore durante il reset dei filtri');
   } finally {
     setLoading(false);
   }
@@ -528,6 +576,10 @@ document.getElementById('estrazioniSearchBtn')?.addEventListener('click', () => 
 document.getElementById('estrazioniExportBtn')?.addEventListener('click', () => {
   setErrorMessage('');
   window.location.assign(buildExportUrl());
+});
+
+document.getElementById('estrazioniResetBtn')?.addEventListener('click', () => {
+  resetFilters();
 });
 
 if (!initTomSelects()) {
