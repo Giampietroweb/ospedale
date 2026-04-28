@@ -1894,19 +1894,31 @@ function renderApparecchiaturaTable() {
       <td>${escapeHtml(normalizedRow.trasferimento)}</td>
       <td>${escapeHtml(normalizedRow.inv)}</td>
       <td>${escapeHtml(normalizedRow.note)}</td>
-      <td>
-        <button type="button" class="row-edit-button" data-app-edit="${index}">Modifica</button>
-        <button
-          type="button"
-          class="row-delete-button"
-          data-app-delete="${index}"
-          aria-label="Elimina apparecchiatura"
-          title="Elimina apparecchiatura"
-        >
-          <svg class="row-delete-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm-2 6h2v9H7V9zm4 0h2v9h-2V9zm4 0h2v9h-2V9z"></path>
-          </svg>
-        </button>
+      <td class="row-actions-cell">
+        <div class="row-actions">
+          <button
+            type="button"
+            class="row-edit-button row-edit-button-icon"
+            data-app-edit="${index}"
+            aria-label="Modifica apparecchiatura"
+            title="Modifica apparecchiatura"
+          >
+            <svg class="row-edit-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M22.2 19.8l-6.6-6.6a6 6 0 0 1-7.5-7.5l3.1 3.1 2.3-.8.8-2.3-3.1-3.1a6 6 0 0 1 7.5 7.5l6.6 6.6a1.6 1.6 0 1 1-2.3 2.3l-.8.8zM4.8 20.6a1.8 1.8 0 1 1 2.5-2.5 1.8 1.8 0 0 1-2.5 2.5z"></path>
+            </svg>
+          </button>
+          <button
+            type="button"
+            class="row-delete-button"
+            data-app-delete="${index}"
+            aria-label="Elimina apparecchiatura"
+            title="Elimina apparecchiatura"
+          >
+            <svg class="row-delete-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path d="M9 3h6l1 2h4v2H4V5h4l1-2zm-2 6h2v9H7V9zm4 0h2v9h-2V9zm4 0h2v9h-2V9z"></path>
+            </svg>
+          </button>
+        </div>
       </td>
     </tr>
   `;

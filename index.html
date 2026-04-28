@@ -23,54 +23,101 @@
     </div>
 
     <div class="max-w-6xl mx-auto">
-        <header class="text-center mb-8 sm:mb-10">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-800 tracking-tight">Ospedale</h1>
+        <header class="text-center mb-10 sm:mb-12">
+            <p class="label-edificio mb-1">Mappa interattiva</p>
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900 tracking-tight">Ospedale</h1>
+            <p class="mt-2 text-slate-500 text-sm sm:text-base">Seleziona un piano per consultarne la planimetria</p>
         </header>
 
         <!-- Sezione Elevata: Torri e Piastra -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 items-end">
-            
+
             <!-- Torre Sud -->
             <section>
-                <div class="flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x-2 border-t-2 border-sky-300">
-                    <a href="piani/planimetria.html?piano=sud-0" class="piano-link piastra-piano">Piano 0</a>
-                    <a href="piani/planimetria.html?piano=sud-1" class="piano-link piastra-piano">Piano 1</a>
-                    <a href="piani/planimetria.html?piano=sud-2" class="piano-link piastra-piano">Piano 2</a>
-                    <a href="piani/planimetria.html?piano=sud-3" class="piano-link piastra-piano">Piano 3</a>
-                    <a href="piani/planimetria.html?piano=sud-4" class="piano-link piastra-piano">Piano 4</a>
-                    <a href="piani/planimetria.html?piano=sud-5" class="piano-link piastra-piano">Piano 5</a>
-                    <a href="piani/planimetria.html?piano=sud-6" class="piano-link piastra-piano">Piano 6</a>
-                    <div class="h-12 bg-sky-500 text-white flex items-center justify-center font-bold text-xs uppercase tracking-widest">
-                        Torre Sud
-                    </div>
+                <div class="edificio-stack flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x border-t border-slate-200">
+                    <a href="piani/planimetria.html?piano=sud-0" class="piano-link piastra-piano">
+                        <span>Piano 0</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=sud-1" class="piano-link piastra-piano">
+                        <span>Piano 1</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=sud-2" class="piano-link piastra-piano">
+                        <span>Piano 2</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=sud-3" class="piano-link piastra-piano">
+                        <span>Piano 3</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=sud-4" class="piano-link piastra-piano">
+                        <span>Piano 4</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=sud-5" class="piano-link piastra-piano">
+                        <span>Piano 5</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=sud-6" class="piano-link piastra-piano">
+                        <span>Piano 6</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <div class="edificio-header">Torre Sud</div>
                 </div>
             </section>
 
             <!-- Piastra Centrale -->
             <section>
-                <div class="flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x-2 border-t-2 border-sky-300">
-                    <a href="piani/planimetria.html?piano=piastra-0" class="piano-link piastra-piano">Piano 0</a>
-                    <a href="piani/planimetria.html?piano=piastra-1" class="piano-link piastra-piano">Piano 1</a>
-                    <a href="piani/planimetria.html?piano=piastra-2" class="piano-link piastra-piano">Piano 2</a>
-                    <div class="h-12 bg-sky-500 text-white flex items-center justify-center font-bold text-xs uppercase tracking-widest">
-                        Piastra Centrale
-                    </div>
+                <div class="edificio-stack flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x border-t border-slate-200">
+                    <a href="piani/planimetria.html?piano=piastra-0" class="piano-link piastra-piano">
+                        <span>Piano 0</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=piastra-1" class="piano-link piastra-piano">
+                        <span>Piano 1</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=piastra-2" class="piano-link piastra-piano">
+                        <span>Piano 2</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <div class="edificio-header">Piastra Centrale</div>
                 </div>
             </section>
 
             <!-- Torre Nord -->
             <section>
-                <div class="flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x-2 border-t-2 border-sky-300">
-                    <a href="piani/planimetria.html?piano=nord-0" class="piano-link piastra-piano">Piano 0</a>
-                    <a href="piani/planimetria.html?piano=nord-1" class="piano-link piastra-piano">Piano 1</a>
-                    <a href="piani/planimetria.html?piano=nord-2" class="piano-link piastra-piano">Piano 2</a>
-                    <a href="piani/planimetria.html?piano=nord-3" class="piano-link piastra-piano">Piano 3</a>
-                    <a href="piani/planimetria.html?piano=nord-4" class="piano-link piastra-piano">Piano 4</a>
-                    <a href="piani/planimetria.html?piano=nord-5" class="piano-link piastra-piano">Piano 5</a>
-                    <a href="piani/planimetria.html?piano=nord-6" class="piano-link piastra-piano">Piano 6</a>
-                    <div class="h-12 bg-sky-500 text-white flex items-center justify-center font-bold text-xs uppercase tracking-widest">
-                        Torre Nord
-                    </div>
+                <div class="edificio-stack flex flex-col-reverse rounded-t-xl overflow-hidden shadow-md border-x border-t border-slate-200">
+                    <a href="piani/planimetria.html?piano=nord-0" class="piano-link piastra-piano">
+                        <span>Piano 0</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=nord-1" class="piano-link piastra-piano">
+                        <span>Piano 1</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=nord-2" class="piano-link piastra-piano">
+                        <span>Piano 2</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=nord-3" class="piano-link piastra-piano">
+                        <span>Piano 3</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=nord-4" class="piano-link piastra-piano">
+                        <span>Piano 4</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=nord-5" class="piano-link piastra-piano">
+                        <span>Piano 5</span>
+                        <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
+                    </a>
+                    <a href="piani/planimetria.html?piano=nord-6" class="piano-link piastra-piano">
+                        <span>Piano 6</span>
+                        <span class="piano-planimetria-flag" aria-label="Planimetria presente" title="Planimetria presente">Planimetria presente</span>
+                    </a>
+                    <div class="edificio-header">Torre Nord</div>
                 </div>
             </section>
 
@@ -78,19 +125,21 @@
 
         <!-- Fondamenta / Interrati -->
         <div class="mt-8">
-            <h2 class="label-edificio text-slate-400">Livelli Interrati</h2>
-            <div class="flex flex-col rounded-b-xl overflow-hidden shadow-xl border-x-2 border-b-2 border-slate-700">
+            <h2 class="label-edificio">Livelli Interrati</h2>
+            <div class="flex flex-col rounded-b-xl overflow-hidden shadow-md border-x border-b border-slate-700">
                 <a href="piani/planimetria.html?piano=sotterraneo-1" class="piano-link interrato-piano">
-                    <span class="mr-3 text-lg font-bold">Piano -1</span>
+                    <span class="mr-3 text-base">Piano -1</span>
+                    <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
                 </a>
                 <a href="piani/planimetria.html?piano=sotterraneo-2" class="piano-link interrato-piano border-t border-slate-600">
-                    <span class="mr-3 text-lg font-bold">Piano -2</span>
+                    <span class="mr-3 text-base">Piano -2</span>
+                    <span class="piano-planimetria-flag is-unavailable" aria-label="Nessuna planimetria caricata" title="Nessuna planimetria caricata">Nessuna planimetria caricata</span>
                 </a>
             </div>
         </div>
 
-        <footer class="mt-16 text-center text-slate-400 text-sm">
-            &copy; 2026 - Mappa Informativa Ospedaliera
+        <footer class="mt-16 text-center text-slate-400 text-xs tracking-wide">
+            &copy; 2026 — Mappa Informativa Ospedaliera
         </footer>
     </div>
 
