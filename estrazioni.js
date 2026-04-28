@@ -204,24 +204,35 @@ function renderResults(rows) {
   const tbody = document.getElementById('estrazioniTableBody');
   const emptyEl = document.getElementById('estrazioniEmpty');
   const tipo = getSelectedTipo();
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const totalPages = getTotalPages(safeRows.length);
+  if (currentPage > totalPages) {
+    currentPage = totalPages;
+  }
+  if (currentPage < 1) {
+    currentPage = 1;
+  }
+  const visibleRows = getVisibleRows(safeRows);
   if (!tbody) {
     return;
   }
   tbody.replaceChildren();
   renderTableHead(tipo);
 
-  if (!rows || rows.length === 0) {
+  if (!safeRows.length) {
     if (emptyEl) {
       emptyEl.hidden = false;
     }
+    updatePaginationUi(0);
     return;
   }
   if (emptyEl) {
     emptyEl.hidden = true;
   }
+  updatePaginationUi(safeRows.length);
 
   if (tipo === 'impiantistica') {
-    rows.forEach((row) => {
+    visibleRows.forEach((row) => {
       const tr = document.createElement('tr');
       const tipologia =
         row.tipologiaImpianto ?? row.tipologiaimpianto ?? row.TipologiaImpianto ?? '';
@@ -241,7 +252,7 @@ function renderResults(rows) {
   }
 
   if (tipo === 'altre_dotazioni') {
-    rows.forEach((row) => {
+    visibleRows.forEach((row) => {
       const tr = document.createElement('tr');
       const altra =
         row.altraDotazione ?? row.altadotazione ?? row.AltraDotazione ?? '';
@@ -259,7 +270,7 @@ function renderResults(rows) {
     return;
   }
 
-  rows.forEach((row) => {
+  visibleRows.forEach((row) => {
     const tr = document.createElement('tr');
     appendTextCell(tr, labelBlocco(row.blocco));
     appendTextCell(tr, labelPiano(row.piano));
@@ -295,6 +306,70 @@ let tsPiano = null;
 let tsReparto = null;
 let tsStanza = null;
 let tsDettaglio = null;
+let currentRows = [];
+let currentPage = 1;
+let pageSize = 20;
+
+function getPaginationElements() {
+  return {
+    container: document.getElementById('estrazioniPagination'),
+    pageSizeSelect: document.getElementById('estrazioniPageSize'),
+    prevButton: document.getElementById('estrazioniPrevPageBtn'),
+    nextButton: document.getElementById('estrazioniNextPageBtn'),
+    info: document.getElementById('estrazioniPaginationInfo'),
+  };
+}
+
+function getCurrentPageSize() {
+  if (pageSize === 'all') {
+    return 'all';
+  }
+  const numericPageSize = Number(pageSize);
+  return Number.isFinite(numericPageSize) && numericPageSize > 0 ? numericPageSize : 20;
+}
+
+function getTotalPages(totalRows) {
+  if (totalRows <= 0) {
+    return 1;
+  }
+  const size = getCurrentPageSize();
+  if (size === 'all') {
+    return 1;
+  }
+  return Math.max(1, Math.ceil(totalRows / size));
+}
+
+function getVisibleRows(rows) {
+  const size = getCurrentPageSize();
+  if (size === 'all') {
+    return rows;
+  }
+  const safeRows = Array.isArray(rows) ? rows : [];
+  const startIndex = (currentPage - 1) * size;
+  const endIndex = startIndex + size;
+  return safeRows.slice(startIndex, endIndex);
+}
+
+function updatePaginationUi(totalRows) {
+  const { container, prevButton, nextButton, info } = getPaginationElements();
+  if (!container || !prevButton || !nextButton || !info) {
+    return;
+  }
+
+  if (!totalRows || totalRows <= 0) {
+    container.hidden = true;
+    info.textContent = '';
+    prevButton.disabled = true;
+    nextButton.disabled = true;
+    return;
+  }
+
+  const totalPages = getTotalPages(totalRows);
+  container.hidden = false;
+  prevButton.disabled = currentPage <= 1;
+  nextButton.disabled = currentPage >= totalPages;
+  info.textContent = `Pagina ${currentPage} di ${totalPages} (${totalRows} risultati)`;
+}
 
 function applyDettaglioChoicesFromPayload(payload) {
   const choices = Array.isArray(payload.dettaglioChoices)
@@ -395,15 +470,7 @@ async function onTipoChanged() {
   try {
     setErrorMessage('');
     await loadRootOptions();
-    const tbody = document.getElementById('estrazioniTableBody');
-    if (tbody) {
-      tbody.replaceChildren();
-    }
-    renderTableHead(getSelectedTipo());
-    const emptyEl = document.getElementById('estrazioniEmpty');
-    if (emptyEl) {
-      emptyEl.hidden = true;
-    }
+    clearResultsTable();
   } catch (error) {
     console.error('[Estrazioni] tipo changed', error);
     setErrorMessage(error.message || 'Errore aggiornamento opzioni');
@@ -480,11 +547,14 @@ function clearResultsTable() {
   if (tbody) {
     tbody.replaceChildren();
   }
+  currentRows = [];
+  currentPage = 1;
   renderTableHead(getSelectedTipo());
   const emptyEl = document.getElementById('estrazioniEmpty');
   if (emptyEl) {
     emptyEl.hidden = true;
   }
+  updatePaginationUi(0);
 }
 
 async function runSearch() {
@@ -496,10 +566,14 @@ async function runSearch() {
   setLoading(true);
   try {
     const payload = await fetchJson(buildSearchUrl());
-    renderResults(payload.rows || []);
+    currentRows = Array.isArray(payload.rows) ? payload.rows : [];
+    currentPage = 1;
+    renderResults(currentRows);
   } catch (error) {
     console.error('[Estrazioni] ricerca', error);
     setErrorMessage(error.message || 'Errore durante la ricerca');
+    currentRows = [];
+    currentPage = 1;
     renderResults([]);
   } finally {
     setLoading(false);
@@ -582,11 +656,39 @@ document.getElementById('estrazioniResetBtn')?.addEventListener('click', () => {
   resetFilters();
 });
 
+document.getElementById('estrazioniPrevPageBtn')?.addEventListener('click', () => {
+  if (currentPage <= 1) {
+    return;
+  }
+  currentPage -= 1;
+  renderResults(currentRows);
+});
+
+document.getElementById('estrazioniNextPageBtn')?.addEventListener('click', () => {
+  const totalPages = getTotalPages(currentRows.length);
+  if (currentPage >= totalPages) {
+    return;
+  }
+  currentPage += 1;
+  renderResults(currentRows);
+});
+
+document.getElementById('estrazioniPageSize')?.addEventListener('change', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLSelectElement)) {
+    return;
+  }
+  pageSize = target.value === 'all' ? 'all' : Number(target.value) || 20;
+  currentPage = 1;
+  renderResults(currentRows);
+});
+
 if (!initTomSelects()) {
   // stop
 } else {
   updateDettaglioLabel();
   renderTableHead(getSelectedTipo());
+  updatePaginationUi(0);
   wireTipoListeners();
   loadRootOptions().catch((error) => {
     console.error('[Estrazioni] opzioni iniziali', error);

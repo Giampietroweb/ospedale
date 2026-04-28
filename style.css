@@ -1029,6 +1029,72 @@ body.page-structure {
   box-shadow: 0 1px 2px rgb(15 23 42 / 6%);
 }
 
+.estrazioni-pagination {
+  margin-top: 0.75rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.7rem;
+}
+
+.estrazioni-pagination-page-size {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: #334155;
+  font-size: 0.9rem;
+}
+
+.estrazioni-pagination-page-size select {
+  min-height: 2rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.45rem;
+  background: #fff;
+  color: #1e293b;
+  padding: 0.25rem 0.45rem;
+}
+
+.estrazioni-pagination-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.estrazioni-pagination-info {
+  color: #475569;
+  font-size: 0.9rem;
+  min-width: 11rem;
+  text-align: center;
+}
+
+.estrazioni-page-btn {
+  min-height: 2rem;
+  padding: 0.35rem 0.85rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  color: #0c4a6e;
+  background: #fff;
+  border: 1px solid #0284c7;
+  border-radius: 0.45rem;
+  cursor: pointer;
+}
+
+.estrazioni-page-btn:hover:not(:disabled) {
+  background: #e0f2fe;
+}
+
+.estrazioni-page-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.estrazioni-page-btn:focus-visible,
+.estrazioni-pagination-page-size select:focus-visible {
+  outline: 2px solid #0284c7;
+  outline-offset: 2px;
+}
+
 .estrazioni-table {
   width: 100%;
   border-collapse: collapse;
@@ -1107,5 +1173,20 @@ body.page-structure {
   .estrazioni-table td {
     font-size: 0.82rem;
     padding: 0.45rem 0.55rem;
+  }
+
+  .estrazioni-pagination {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .estrazioni-pagination-page-size,
+  .estrazioni-pagination-controls {
+    justify-content: space-between;
+  }
+
+  .estrazioni-pagination-info {
+    min-width: 0;
+    flex: 1;
   }
 }

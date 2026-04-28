@@ -86,6 +86,21 @@
           <tbody id="estrazioniTableBody"></tbody>
         </table>
       </div>
+      <div class="estrazioni-pagination" id="estrazioniPagination" hidden>
+        <div class="estrazioni-pagination-page-size">
+          <label for="estrazioniPageSize">Risultati per pagina</label>
+          <select id="estrazioniPageSize" name="pageSize">
+            <option value="20" selected>20</option>
+            <option value="50">50</option>
+            <option value="all">Tutti</option>
+          </select>
+        </div>
+        <div class="estrazioni-pagination-controls">
+          <button id="estrazioniPrevPageBtn" type="button" class="estrazioni-page-btn">Precedente</button>
+          <span id="estrazioniPaginationInfo" class="estrazioni-pagination-info" aria-live="polite"></span>
+          <button id="estrazioniNextPageBtn" type="button" class="estrazioni-page-btn">Successiva</button>
+        </div>
+      </div>
       <p id="estrazioniEmpty" class="estrazioni-empty" hidden>Nessun risultato per i filtri selezionati.</p>
     </section>
   </main>
