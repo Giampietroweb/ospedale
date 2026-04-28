@@ -1739,6 +1739,8 @@ function initializeApparecchiaturaTomSelect() {
 
   appTipologiaTomSelect = new window.TomSelect(appTipologiaInput, {
     create: false,
+    maxItems: 1,
+    closeAfterSelect: true,
     allowEmptyOption: true,
     maxOptions: 500,
     searchField: ['text', 'value'],
@@ -1748,7 +1750,11 @@ function initializeApparecchiaturaTomSelect() {
         direction: 'asc'
       }
     ],
-    placeholder: 'Cerca apparecchiatura...'
+    placeholder: 'Cerca apparecchiatura...',
+    onItemAdd() {
+      this.close();
+      this.blur();
+    }
   });
 }
 
