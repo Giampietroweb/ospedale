@@ -819,6 +819,12 @@ body::-webkit-scrollbar-corner,
     width: 100%;
     table-layout: fixed;
   }
+
+  #contentApparecchiatura .modal-table {
+    display: table;
+    width: 100%;
+    table-layout: auto;
+  }
 }
 
 .modal-table th,
