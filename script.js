@@ -58,6 +58,16 @@ const appSaveButton = document.getElementById('appSaveButton');
 const appCancelButton = document.getElementById('appCancelButton');
 const apparecchiaturaEditor = document.getElementById('apparecchiaturaEditor');
 let appTipologiaTomSelect = null;
+const catalogOptions = {
+  apparecchiature: [],
+  ancoraggiApparecchiature: [],
+  produttori: [],
+  impiantistica: [],
+  altreDotazioni: [],
+  emipiani: [],
+  reparti: [],
+  accreditamentiLocale: []
+};
 
 const minZoom = 0.1;
 const maxZoom = 50;
@@ -462,6 +472,41 @@ VENTILATORE POLMONARE PER USO OSPEDALIERO
 VENTILATORE POLMONARE TRASPORTABILE D EMERGENZA
 VIDEOLARINGOSCOPIO
 `;
+
+function parseStaticApparecchiatureCatalog() {
+  return apparecchiaturaCatalogText
+    .split('\n')
+    .map((item) => item.trim())
+    .filter((item) => item !== '');
+}
+
+function uniqueNonEmptyValues(values) {
+  const out = [];
+  const seen = new Set();
+  (Array.isArray(values) ? values : []).forEach((value) => {
+    const normalizedValue = String(value || '').trim();
+    const comparableValue = normalizedValue.toLocaleLowerCase('it-IT');
+    if (normalizedValue === '' || seen.has(comparableValue)) {
+      return;
+    }
+    seen.add(comparableValue);
+    out.push(normalizedValue);
+  });
+  return out;
+}
+
+function getCatalogFallbackOptions() {
+  return {
+    apparecchiature: parseStaticApparecchiatureCatalog(),
+    ancoraggiApparecchiature: apparecchiaturaTipologiaOptions.filter((value) => value !== ''),
+    produttori: ['Philips', 'Getinge', 'Flowmeter', 'Siemens'],
+    impiantistica: impiantisticaRows.map((row) => row.tipologia),
+    altreDotazioni: altreDotazioniRows.map((row) => row.altraDotazione),
+    emipiani: ['Ovest', 'Est'],
+    reparti: ['Cardiologia'],
+    accreditamentiLocale: ['Degenza 2 PL a uso singolo', 'Studio medici']
+  };
+}
 let occurrencesMap = null;
 let normalizedOccurrencesMap = null;
 let roomsInDatabaseSet = null;
@@ -1559,7 +1604,11 @@ function startEditingField(fieldName) {
     stopEditingField(activeFieldBeingEdited, false);
   }
 
-  fieldConfig.inputElement.value = fieldConfig.valueElement.textContent.trim();
+  const currentFieldValue = fieldConfig.valueElement.textContent.trim();
+  if (fieldConfig.inputElement instanceof HTMLSelectElement) {
+    ensureSelectOption(fieldConfig.inputElement, currentFieldValue);
+  }
+  fieldConfig.inputElement.value = currentFieldValue;
   roomFieldEditBaselines.set(fieldName, normalizeComparableInlineValue(fieldConfig.valueElement.textContent));
   setRoomFieldStatus(fieldName, INLINE_STATUS.neutral);
   fieldConfig.valueElement.hidden = true;
@@ -1732,6 +1781,154 @@ function serializeInventarioList(rawValue) {
   return normalizeInventarioList(rawValue).join(', ');
 }
 
+function ensureSelectOption(selectElement, value) {
+  if (!selectElement) {
+    return;
+  }
+  const normalizedValue = String(value || '').trim();
+  if (normalizedValue === '') {
+    return;
+  }
+  const hasOption = Array.from(selectElement.options).some((optionElement) => optionElement.value === normalizedValue);
+  if (hasOption) {
+    return;
+  }
+  const optionElement = document.createElement('option');
+  optionElement.value = normalizedValue;
+  optionElement.textContent = normalizedValue;
+  selectElement.appendChild(optionElement);
+}
+
+function populateSelectOptions(selectElement, values, currentValue = '') {
+  if (!selectElement) {
+    return;
+  }
+  const normalizedCurrentValue = String(currentValue || selectElement.value || '').trim();
+  selectElement.innerHTML = '<option value=""></option>';
+  uniqueNonEmptyValues(values).forEach((optionValue) => {
+    const optionElement = document.createElement('option');
+    optionElement.value = optionValue;
+    optionElement.textContent = optionValue;
+    selectElement.appendChild(optionElement);
+  });
+  ensureSelectOption(selectElement, normalizedCurrentValue);
+  selectElement.value = normalizedCurrentValue;
+}
+
+function hasImpiantisticaRowValue(row) {
+  return Boolean(
+    row
+    && (String(row.qtaPresenti || '').trim() !== ''
+      || String(row.qtaDaImplementare || '').trim() !== ''
+      || String(row.note || '').trim() !== '')
+  );
+}
+
+function hasAltreDotazioniRowValue(row) {
+  return Boolean(
+    row
+    && (String(row.presente || '').trim() !== ''
+      || String(row.daImplementare || '').trim() !== ''
+      || String(row.note || '').trim() !== '')
+  );
+}
+
+function applyCatalogRowsToFixedTables(nextImpiantisticaLabels, nextAltreDotazioniLabels) {
+  const impiantisticaByLabel = new Map(impiantisticaRows.map((row) => [row.tipologia, row]));
+  const historicalImpiantisticaLabels = impiantisticaRows
+    .filter(hasImpiantisticaRowValue)
+    .map((row) => row.tipologia);
+  impiantisticaRows.length = 0;
+  uniqueNonEmptyValues([...nextImpiantisticaLabels, ...historicalImpiantisticaLabels]).forEach((tipologia) => {
+    const existingRow = impiantisticaByLabel.get(tipologia);
+    impiantisticaRows.push(existingRow || {
+      tipologia,
+      qtaPresenti: '',
+      qtaDaImplementare: '',
+      note: ''
+    });
+  });
+
+  const altreDotazioniByLabel = new Map(altreDotazioniRows.map((row) => [row.altraDotazione, row]));
+  const historicalAltreDotazioniLabels = altreDotazioniRows
+    .filter(hasAltreDotazioniRowValue)
+    .map((row) => row.altraDotazione);
+  altreDotazioniRows.length = 0;
+  uniqueNonEmptyValues([...nextAltreDotazioniLabels, ...historicalAltreDotazioniLabels]).forEach((altraDotazione) => {
+    const existingRow = altreDotazioniByLabel.get(altraDotazione);
+    altreDotazioniRows.push(existingRow || {
+      altraDotazione,
+      presente: '',
+      daImplementare: '',
+      note: ''
+    });
+  });
+}
+
+function applyCatalogOptionsToModal() {
+  populateApparecchiaturaSelectOptions();
+  populateSelectOptions(appInstallazioneTipologiaInput, catalogOptions.ancoraggiApparecchiature);
+  populateSelectOptions(appProduttoreInput, catalogOptions.produttori);
+  populateSelectOptions(roomHemifloorInput, catalogOptions.emipiani, roomHemifloorValue.textContent);
+  populateSelectOptions(roomDepartmentInput, catalogOptions.reparti, roomDepartmentValue.textContent);
+  populateSelectOptions(roomAccreditationInput, catalogOptions.accreditamentiLocale, roomAccreditationValue.textContent);
+  applyCatalogRowsToFixedTables(catalogOptions.impiantistica, catalogOptions.altreDotazioni);
+  renderImpiantisticaTable();
+  renderAltreDotazioniTable();
+}
+
+async function fetchCatalogLabels(type, fallbackValues) {
+  try {
+    const response = await fetch(`../api/catalogs.php?action=list&type=${encodeURIComponent(type)}&activeOnly=1`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const payload = await response.json();
+    if (!payload?.ok || !Array.isArray(payload.rows)) {
+      throw new Error(payload?.error || 'Payload catalogo non valido');
+    }
+    return uniqueNonEmptyValues(payload.rows.map((row) => row.label));
+  } catch (error) {
+    console.warn(`[Cataloghi] fallback statico per ${type}`, error);
+    return uniqueNonEmptyValues(fallbackValues);
+  }
+}
+
+async function loadCatalogOptions() {
+  const fallbackOptions = getCatalogFallbackOptions();
+  const [
+    apparecchiature,
+    ancoraggiApparecchiature,
+    produttori,
+    impiantistica,
+    altreDotazioni,
+    emipiani,
+    reparti,
+    accreditamentiLocale
+  ] = await Promise.all([
+    fetchCatalogLabels('apparecchiature', fallbackOptions.apparecchiature),
+    fetchCatalogLabels('ancoraggi_apparecchiature', fallbackOptions.ancoraggiApparecchiature),
+    fetchCatalogLabels('produttore', fallbackOptions.produttori),
+    fetchCatalogLabels('impiantistica', fallbackOptions.impiantistica),
+    fetchCatalogLabels('altre_dotazioni', fallbackOptions.altreDotazioni),
+    fetchCatalogLabels('emipiani', fallbackOptions.emipiani),
+    fetchCatalogLabels('reparto', fallbackOptions.reparti),
+    fetchCatalogLabels('accreditamento_locale', fallbackOptions.accreditamentiLocale)
+  ]);
+
+  Object.assign(catalogOptions, {
+    apparecchiature,
+    ancoraggiApparecchiature,
+    produttori,
+    impiantistica,
+    altreDotazioni,
+    emipiani,
+    reparti,
+    accreditamentiLocale
+  });
+  applyCatalogOptionsToModal();
+}
+
 function initializeApparecchiaturaTomSelect() {
   if (!appTipologiaInput || typeof window.TomSelect !== 'function') {
     return;
@@ -1777,13 +1974,10 @@ function populateApparecchiaturaSelectOptions() {
     return;
   }
 
-  const optionValues = Array.from(
-    new Set(
-      apparecchiaturaCatalogText
-        .split('\n')
-        .map((item) => item.trim())
-        .filter((item) => item !== '')
-    )
+  const optionValues = uniqueNonEmptyValues(
+    catalogOptions.apparecchiature.length > 0
+      ? catalogOptions.apparecchiature
+      : parseStaticApparecchiatureCatalog()
   );
 
   const currentValue = String(appTipologiaInput.value || '').trim();
@@ -1796,6 +1990,9 @@ function populateApparecchiaturaSelectOptions() {
     optionValues.forEach((optionValue) => {
       appTipologiaTomSelect.addOption({ value: optionValue, text: optionValue });
     });
+    if (currentValue !== '' && !optionValues.includes(currentValue)) {
+      appTipologiaTomSelect.addOption({ value: currentValue, text: currentValue });
+    }
     appTipologiaTomSelect.refreshOptions(false);
     setApparecchiaturaValue(currentValue);
     return;
@@ -1940,7 +2137,9 @@ function renderApparecchiaturaTable() {
       apparecchiaturaRows[rowIndex] = normalizedSelectedRow;
 
       setApparecchiaturaValue(normalizedSelectedRow.apparecchiatura);
+      ensureSelectOption(appInstallazioneTipologiaInput, normalizedSelectedRow.tipologia);
       appInstallazioneTipologiaInput.value = normalizedSelectedRow.tipologia;
+      ensureSelectOption(appProduttoreInput, normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore);
       appProduttoreInput.value = normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore;
       appModelloInput.value = normalizedSelectedRow.modello === '-' ? '' : normalizedSelectedRow.modello;
       appQtaInput.value = normalizedSelectedRow.qta;
@@ -2104,7 +2303,9 @@ async function handleDeleteApparecchiatura(rowIndex) {
     if (editingApparecchiaturaIndex !== null && apparecchiaturaRows[editingApparecchiaturaIndex]) {
       const restoredRow = normalizeApparecchiaturaRow(apparecchiaturaRows[editingApparecchiaturaIndex]);
       setApparecchiaturaValue(restoredRow.apparecchiatura);
+      ensureSelectOption(appInstallazioneTipologiaInput, restoredRow.tipologia);
       appInstallazioneTipologiaInput.value = restoredRow.tipologia;
+      ensureSelectOption(appProduttoreInput, restoredRow.produttore === '-' ? '' : restoredRow.produttore);
       appProduttoreInput.value = restoredRow.produttore === '-' ? '' : restoredRow.produttore;
       appModelloInput.value = restoredRow.modello === '-' ? '' : restoredRow.modello;
       appQtaInput.value = restoredRow.qta;
@@ -2492,7 +2693,19 @@ function applyTableRowsFromPayload(payload) {
     if (!row || typeof row !== 'object') {
       return;
     }
-    impiantisticaByTipologia.set(String(row.tipologia || '').trim(), row);
+    const tipologia = String(row.tipologia || '').trim();
+    if (tipologia === '') {
+      return;
+    }
+    impiantisticaByTipologia.set(tipologia, row);
+    if (!impiantisticaRows.some((catalogRow) => catalogRow.tipologia === tipologia)) {
+      impiantisticaRows.push({
+        tipologia,
+        qtaPresenti: '',
+        qtaDaImplementare: '',
+        note: ''
+      });
+    }
   });
   impiantisticaRows.forEach((row) => {
     const sourceRow = impiantisticaByTipologia.get(row.tipologia);
@@ -2514,7 +2727,19 @@ function applyTableRowsFromPayload(payload) {
     if (!row || typeof row !== 'object') {
       return;
     }
-    altreDotazioniByName.set(String(row.altraDotazione || '').trim(), row);
+    const altraDotazione = String(row.altraDotazione || '').trim();
+    if (altraDotazione === '') {
+      return;
+    }
+    altreDotazioniByName.set(altraDotazione, row);
+    if (!altreDotazioniRows.some((catalogRow) => catalogRow.altraDotazione === altraDotazione)) {
+      altreDotazioniRows.push({
+        altraDotazione,
+        presente: '',
+        daImplementare: '',
+        note: ''
+      });
+    }
   });
   altreDotazioniRows.forEach((row) => {
     const sourceRow = altreDotazioniByName.get(row.altraDotazione);
@@ -2983,6 +3208,9 @@ renderImpiantisticaTable();
 renderAltreDotazioniTable();
 initializeApparecchiaturaTomSelect();
 populateApparecchiaturaSelectOptions();
+loadCatalogOptions().catch((error) => {
+  console.warn('[Cataloghi] impossibile caricare cataloghi DB, uso fallback statico', error);
+});
 ensureApparecchiaturaStatusBadgeElement();
 applyApparecchiaturaFieldStatusClasses();
 [appTipologiaInput, appInstallazioneTipologiaInput, appProduttoreInput, appModelloInput, appQtaInput, appNuovoInput, appTrasferimentoInput, appInvInput, appNoteInput]

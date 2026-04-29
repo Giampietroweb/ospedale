@@ -21,6 +21,7 @@
   <div class="toolbar">
     <a href="../index.html" class="home-cta-link-toolbar">Torna alla home</a>
     <a href="../estrazioni.html" class="home-cta-link-toolbar">Pagina estrazioni</a>
+    <a href="../cataloghi.html" class="home-cta-link-toolbar">Backoffice cataloghi</a>
     <button id="zoomOut" type="button">Zoom -</button>
     <button id="zoomIn" type="button">Zoom +</button>
     <button id="zoomReset" type="button">Reset 100%</button>
@@ -94,7 +95,9 @@
           <span class="modal-field-label">Reparto</span>
           <div class="modal-field-main">
             <span id="roomDepartmentValue" class="modal-field-value"></span>
-            <input id="roomDepartmentInput" class="modal-field-input" type="text" hidden>
+            <select id="roomDepartmentInput" class="modal-field-input" hidden>
+              <option value=""></option>
+            </select>
             <button id="editRoomDepartmentButton" class="modal-edit-button" type="button">Modifica</button>
           </div>
         </div>
@@ -102,7 +105,9 @@
           <span class="modal-field-label">Accreditamento Locale</span>
           <div class="modal-field-main">
             <span id="roomAccreditationValue" class="modal-field-value">-</span>
-            <input id="roomAccreditationInput" class="modal-field-input" type="text" hidden>
+            <select id="roomAccreditationInput" class="modal-field-input" hidden>
+              <option value=""></option>
+            </select>
             <button id="editRoomAccreditationButton" class="modal-edit-button" type="button">Modifica</button>
           </div>
         </div>
@@ -152,7 +157,9 @@
             </label>
             <label class="table-editor-field">
               <span>Produttore</span>
-              <input id="appProduttoreInput" type="text">
+              <select id="appProduttoreInput">
+                <option value="" selected></option>
+              </select>
             </label>
             <label class="table-editor-field">
               <span>Modello</span>
@@ -243,6 +250,6 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-  <script src="../script.js?v=20260428-2"></script>
+  <script src="../script.js?v=20260429-cataloghi"></script>
 </body>
 </html>

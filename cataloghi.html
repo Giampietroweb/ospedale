@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Backoffice cataloghi</title>
+  <link rel="stylesheet" href="./style.css">
+</head>
+<body class="estrazioni-page cataloghi-page">
+  <div class="toolbar">
+    <a href="index.html" class="home-cta-link-toolbar">Torna alla home</a>
+    <a href="estrazioni.html" class="home-cta-link-toolbar">Pagina estrazioni</a>
+  </div>
+  <main class="estrazioni-main">
+    <header class="estrazioni-header">
+      <h1 class="estrazioni-title">Backoffice cataloghi</h1>
+      <p class="estrazioni-intro">
+        Gestisci le voci dei cataloghi usati nella pagina estrazioni: scegli il catalogo, aggiorna i campi e salva con upsert.
+      </p>
+    </header>
+
+    <section class="estrazioni-filters" aria-label="Gestione cataloghi">
+      <div class="estrazioni-filter-grid">
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="catalogType">Catalogo</label>
+          <select id="catalogType">
+            <option value="apparecchiature">Apparecchiature</option>
+            <option value="impiantistica">Impiantistica</option>
+            <option value="altre_dotazioni">Altre dotazioni</option>
+            <option value="ancoraggi_apparecchiature">Ancoraggi apparecchiature</option>
+            <option value="emipiani">Emipiani</option>
+            <option value="produttore">Produttore</option>
+            <option value="reparto">Reparto</option>
+            <option value="accreditamento_locale">Accreditamento locale</option>
+          </select>
+        </div>
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="catalogLabel">Nuova label</label>
+          <input id="catalogLabel" type="text" placeholder="Inserisci la label">
+        </div>
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="catalogCode">Code (opzionale)</label>
+          <input id="catalogCode" type="text" placeholder="Inserisci il codice">
+        </div>
+        <div class="estrazioni-field">
+          <label class="estrazioni-label" for="catalogSortOrder">Sort order</label>
+          <input id="catalogSortOrder" type="number" min="0" step="1" placeholder="0">
+        </div>
+      </div>
+      <div class="estrazioni-actions">
+        <button id="catalogAddBtn" type="button" class="estrazioni-search-btn">Upsert</button>
+      </div>
+      <p id="catalogError" class="estrazioni-error" hidden></p>
+    </section>
+
+    <section class="estrazioni-results" aria-label="Voci catalogo">
+      <div class="estrazioni-results-scroll">
+        <table class="estrazioni-table">
+          <thead><tr><th>ID</th><th>Code</th><th>Label</th><th>Sort</th><th>Attivo</th><th>Azioni</th></tr></thead>
+          <tbody id="catalogTableBody"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="./cataloghi.js"></script>
+</body>
+</html>

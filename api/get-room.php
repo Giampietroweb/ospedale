@@ -63,7 +63,7 @@ try {
 
     $apparecchiatureStatement = $pdo->prepare(
         'SELECT
-            apparecchiatura,
+            COALESCE(ca.label, ra.apparecchiatura) AS apparecchiatura,
             tipologia,
             produttore,
             modello,
@@ -72,9 +72,10 @@ try {
             trasferimento,
             inv,
             note
-         FROM room_apparecchiature
-         WHERE room_id = :room_id
-         ORDER BY sort_order ASC, id ASC'
+         FROM room_apparecchiature ra
+         LEFT JOIN catalog_apparecchiature ca ON ca.id = ra.catalog_apparecchiatura_id
+         WHERE ra.room_id = :room_id
+         ORDER BY ra.sort_order ASC, ra.id ASC'
     );
     $apparecchiatureStatement->execute([':room_id' => $roomId]);
     $apparecchiature = $apparecchiatureStatement->fetchAll();
@@ -90,26 +91,28 @@ try {
 
     $impiantisticaStatement = $pdo->prepare(
         'SELECT
-            tipologia,
-            qta_presenti AS qtaPresenti,
-            qta_da_implementare AS qtaDaImplementare,
-            note
-         FROM room_impiantistica
-         WHERE room_id = :room_id
-         ORDER BY sort_order ASC, id ASC'
+            COALESCE(ci.label, ri.tipologia) AS tipologia,
+            ri.qta_presenti AS qtaPresenti,
+            ri.qta_da_implementare AS qtaDaImplementare,
+            ri.note
+         FROM room_impiantistica ri
+         LEFT JOIN catalog_impiantistica ci ON ci.id = ri.catalog_impiantistica_id
+         WHERE ri.room_id = :room_id
+         ORDER BY ri.sort_order ASC, ri.id ASC'
     );
     $impiantisticaStatement->execute([':room_id' => $roomId]);
     $impiantistica = $impiantisticaStatement->fetchAll();
 
     $altreDotazioniStatement = $pdo->prepare(
         'SELECT
-            altra_dotazione AS altraDotazione,
-            presente,
-            da_implementare AS daImplementare,
-            note
-         FROM room_altre_dotazioni
-         WHERE room_id = :room_id
-         ORDER BY sort_order ASC, id ASC'
+            COALESCE(cad.label, rad.altra_dotazione) AS altraDotazione,
+            rad.presente,
+            rad.da_implementare AS daImplementare,
+            rad.note
+         FROM room_altre_dotazioni rad
+         LEFT JOIN catalog_altre_dotazioni cad ON cad.id = rad.catalog_altra_dotazione_id
+         WHERE rad.room_id = :room_id
+         ORDER BY rad.sort_order ASC, rad.id ASC'
     );
     $altreDotazioniStatement->execute([':room_id' => $roomId]);
     $altreDotazioni = $altreDotazioniStatement->fetchAll();

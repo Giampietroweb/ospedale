@@ -126,6 +126,100 @@ function fetchEstrazioniDettaglioChoices(PDO $pdo, string $tipo, string $blocco,
     [$roomWhere, $params] = estrazioniBuildRoomWhereAndParams($filters);
 
     if ($tipo === 'apparecchiature') {
+        $sql = "SELECT v
+            FROM (
+              SELECT ca.label AS v, ca.sort_order AS sort_order
+              FROM catalog_apparecchiature ca
+              WHERE ca.is_active = 1
+              UNION
+              SELECT COALESCE(ca.label, ra.apparecchiatura) AS v, 999999 AS sort_order
+              FROM room_apparecchiature ra
+              LEFT JOIN catalog_apparecchiature ca ON ca.id = ra.catalog_apparecchiatura_id
+              INNER JOIN rooms r ON r.id = ra.room_id
+              WHERE ({$roomWhere})
+                AND COALESCE(ca.label, ra.apparecchiatura) IS NOT NULL
+                AND TRIM(COALESCE(ca.label, ra.apparecchiatura)) <> ''
+            ) choices
+            GROUP BY v
+            ORDER BY MIN(sort_order) ASC, v ASC";
+    } elseif ($tipo === 'impiantistica') {
+        $sql = "SELECT v
+            FROM (
+              SELECT ci.label AS v, ci.sort_order AS sort_order
+              FROM catalog_impiantistica ci
+              WHERE ci.is_active = 1
+              UNION
+              SELECT COALESCE(ci.label, ri.tipologia) AS v, 999999 AS sort_order
+              FROM room_impiantistica ri
+              LEFT JOIN catalog_impiantistica ci ON ci.id = ri.catalog_impiantistica_id
+              INNER JOIN rooms r ON r.id = ri.room_id
+              WHERE ({$roomWhere})
+                AND COALESCE(ci.label, ri.tipologia) IS NOT NULL
+                AND TRIM(COALESCE(ci.label, ri.tipologia)) <> ''
+            ) choices
+            GROUP BY v
+            ORDER BY MIN(sort_order) ASC, v ASC";
+    } else {
+        $sql = "SELECT v
+            FROM (
+              SELECT cad.label AS v, cad.sort_order AS sort_order
+              FROM catalog_altre_dotazioni cad
+              WHERE cad.is_active = 1
+              UNION
+              SELECT COALESCE(cad.label, rad.altra_dotazione) AS v, 999999 AS sort_order
+              FROM room_altre_dotazioni rad
+              LEFT JOIN catalog_altre_dotazioni cad ON cad.id = rad.catalog_altra_dotazione_id
+              INNER JOIN rooms r ON r.id = rad.room_id
+              WHERE ({$roomWhere})
+                AND COALESCE(cad.label, rad.altra_dotazione) IS NOT NULL
+                AND TRIM(COALESCE(cad.label, rad.altra_dotazione)) <> ''
+            ) choices
+            GROUP BY v
+            ORDER BY MIN(sort_order) ASC, v ASC";
+    }
+
+    try {
+        $statement = $pdo->prepare($sql);
+        $statement->execute($params);
+        $rows = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
+    } catch (Throwable) {
+        return fetchEstrazioniDettaglioChoicesLegacy($pdo, $tipo, $blocco, $piano);
+    }
+    if (!is_array($rows)) {
+        return [];
+    }
+
+    $out = [];
+    foreach ($rows as $cell) {
+        if ($cell === null) {
+            continue;
+        }
+        $s = trim((string)$cell);
+        if ($s !== '') {
+            $out[] = $s;
+        }
+    }
+
+    return array_values(array_unique($out));
+}
+
+function fetchEstrazioniDettaglioChoicesLegacy(PDO $pdo, string $tipo, string $blocco, string $piano): array
+{
+    if (!in_array($tipo, ESTRAZIONI_VALID_TIPI, true)) {
+        return [];
+    }
+
+    $filters = [
+        'blocco' => $blocco,
+        'piano' => $piano,
+        'reparto_filter' => false,
+        'reparto_empty' => false,
+        'reparto' => '',
+        'room_code' => '',
+    ];
+    [$roomWhere, $params] = estrazioniBuildRoomWhereAndParams($filters);
+
+    if ($tipo === 'apparecchiature') {
         $sql = "SELECT DISTINCT ra.apparecchiatura AS v
             FROM room_apparecchiature ra
             INNER JOIN rooms r ON r.id = ra.room_id
@@ -151,22 +245,7 @@ function fetchEstrazioniDettaglioChoices(PDO $pdo, string $tipo, string $blocco,
     $statement = $pdo->prepare($sql);
     $statement->execute($params);
     $rows = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
-    if (!is_array($rows)) {
-        return [];
-    }
-
-    $out = [];
-    foreach ($rows as $cell) {
-        if ($cell === null) {
-            continue;
-        }
-        $s = trim((string)$cell);
-        if ($s !== '') {
-            $out[] = $s;
-        }
-    }
-
-    return array_values(array_unique($out));
+    return is_array($rows) ? array_values(array_unique(array_map('strval', $rows))) : [];
 }
 
 /**
@@ -178,7 +257,7 @@ function fetchEstrazioniApparecchiatureRows(PDO $pdo, array $filters): array
     [$roomWhere, $params] = estrazioniBuildRoomWhereAndParams($filters);
 
     if ($filters['dettaglio'] !== '') {
-        $roomWhere .= ' AND ra.apparecchiatura = :dettaglio';
+        $roomWhere .= ' AND COALESCE(ca.label, ra.apparecchiatura) = :dettaglio';
         $params[':dettaglio'] = $filters['dettaglio'];
     }
 
@@ -187,7 +266,7 @@ function fetchEstrazioniApparecchiatureRows(PDO $pdo, array $filters): array
             r.piano AS piano,
             r.reparto AS reparto,
             r.room_code AS roomCode,
-            ra.apparecchiatura AS apparecchiatura,
+            COALESCE(ca.label, ra.apparecchiatura) AS apparecchiatura,
             ra.tipologia AS tipologia,
             ra.produttore AS produttore,
             ra.modello AS modello,
@@ -197,6 +276,7 @@ function fetchEstrazioniApparecchiatureRows(PDO $pdo, array $filters): array
             ra.inv AS inv,
             ra.note AS note
         FROM room_apparecchiature ra
+        LEFT JOIN catalog_apparecchiature ca ON ca.id = ra.catalog_apparecchiatura_id
         INNER JOIN rooms r ON r.id = ra.room_id
         WHERE {$roomWhere}
         ORDER BY r.blocco ASC, CAST(r.piano AS SIGNED) ASC, r.room_code ASC, ra.sort_order ASC, ra.id ASC";
@@ -230,7 +310,7 @@ function fetchEstrazioniImpiantisticaRows(PDO $pdo, array $filters): array
     [$roomWhere, $params] = estrazioniBuildRoomWhereAndParams($filters);
 
     if ($filters['dettaglio'] !== '') {
-        $roomWhere .= ' AND ri.tipologia = :dettaglio';
+        $roomWhere .= ' AND COALESCE(ci.label, ri.tipologia) = :dettaglio';
         $params[':dettaglio'] = $filters['dettaglio'];
     }
 
@@ -239,11 +319,12 @@ function fetchEstrazioniImpiantisticaRows(PDO $pdo, array $filters): array
             r.piano AS piano,
             r.reparto AS reparto,
             r.room_code AS roomCode,
-            ri.tipologia AS tipologiaImpianto,
+            COALESCE(ci.label, ri.tipologia) AS tipologiaImpianto,
             ri.qta_presenti AS qtaPresenti,
             ri.qta_da_implementare AS qtaDaImplementare,
             ri.note AS note
         FROM room_impiantistica ri
+        LEFT JOIN catalog_impiantistica ci ON ci.id = ri.catalog_impiantistica_id
         INNER JOIN rooms r ON r.id = ri.room_id
         WHERE {$roomWhere}
         ORDER BY r.blocco ASC, CAST(r.piano AS SIGNED) ASC, r.room_code ASC, ri.sort_order ASC, ri.id ASC";
@@ -264,7 +345,7 @@ function fetchEstrazioniAltreDotazioniRows(PDO $pdo, array $filters): array
     [$roomWhere, $params] = estrazioniBuildRoomWhereAndParams($filters);
 
     if ($filters['dettaglio'] !== '') {
-        $roomWhere .= ' AND rad.altra_dotazione = :dettaglio';
+        $roomWhere .= ' AND COALESCE(cad.label, rad.altra_dotazione) = :dettaglio';
         $params[':dettaglio'] = $filters['dettaglio'];
     }
 
@@ -273,11 +354,12 @@ function fetchEstrazioniAltreDotazioniRows(PDO $pdo, array $filters): array
             r.piano AS piano,
             r.reparto AS reparto,
             r.room_code AS roomCode,
-            rad.altra_dotazione AS altraDotazione,
+            COALESCE(cad.label, rad.altra_dotazione) AS altraDotazione,
             rad.presente AS presente,
             rad.da_implementare AS daImplementare,
             rad.note AS note
         FROM room_altre_dotazioni rad
+        LEFT JOIN catalog_altre_dotazioni cad ON cad.id = rad.catalog_altra_dotazione_id
         INNER JOIN rooms r ON r.id = rad.room_id
         WHERE {$roomWhere}
         ORDER BY r.blocco ASC, CAST(r.piano AS SIGNED) ASC, r.room_code ASC, rad.sort_order ASC, rad.id ASC";

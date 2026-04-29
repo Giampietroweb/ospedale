@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 require __DIR__ . '/database.php';
 require_once __DIR__ . '/utils.php';
+require_once __DIR__ . '/catalog-utils.php';
 
 header('Content-Type: application/json; charset=utf-8');
 
@@ -290,6 +291,7 @@ try {
         if ($tipologia === '') {
             apiErrorResponse('tipologia impiantistica obbligatoria');
         }
+        $catalogImpiantisticaId = resolveCatalogIdByLabel($pdo, 'catalog_impiantistica', $tipologia);
 
         $qtaPresenti = asNullableInt($row['qtaPresenti'] ?? null);
         $qtaDaImplementare = asNullableInt($row['qtaDaImplementare'] ?? null);
@@ -301,19 +303,36 @@ try {
         } else {
             $roomId = ensureRoomExists($pdo, $blocco, $piano, $roomCode);
             syncAutoAttributesIfEmpty($pdo, $roomId, $autoAttributes, $autoFieldMap);
-            $deleteStatement = $pdo->prepare('DELETE FROM room_impiantistica WHERE room_id = :room_id AND tipologia = :tipologia');
-            $deleteStatement->execute([
-                ':room_id' => $roomId,
-                ':tipologia' => $tipologia,
-            ]);
+            if ($catalogImpiantisticaId !== null) {
+                $deleteStatement = $pdo->prepare(
+                    'DELETE FROM room_impiantistica
+                     WHERE room_id = :room_id
+                       AND (catalog_impiantistica_id = :catalog_id OR tipologia = :tipologia)'
+                );
+                $deleteStatement->execute([
+                    ':room_id' => $roomId,
+                    ':catalog_id' => $catalogImpiantisticaId,
+                    ':tipologia' => $tipologia,
+                ]);
+            } else {
+                $deleteStatement = $pdo->prepare('DELETE FROM room_impiantistica WHERE room_id = :room_id AND tipologia = :tipologia');
+                $deleteStatement->execute([
+                    ':room_id' => $roomId,
+                    ':tipologia' => $tipologia,
+                ]);
+            }
 
             if (!($qtaPresenti === null && $qtaDaImplementare === null && $note === null)) {
                 $insertStatement = $pdo->prepare(
-                    'INSERT INTO room_impiantistica (room_id, tipologia, qta_presenti, qta_da_implementare, note, sort_order)
-                     VALUES (:room_id, :tipologia, :qta_presenti, :qta_da_implementare, :note, :sort_order)'
+                    'INSERT INTO room_impiantistica (
+                        room_id, catalog_impiantistica_id, tipologia, qta_presenti, qta_da_implementare, note, sort_order
+                     ) VALUES (
+                        :room_id, :catalog_impiantistica_id, :tipologia, :qta_presenti, :qta_da_implementare, :note, :sort_order
+                     )'
                 );
                 $insertStatement->execute([
                     ':room_id' => $roomId,
+                    ':catalog_impiantistica_id' => $catalogImpiantisticaId,
                     ':tipologia' => $tipologia,
                     ':qta_presenti' => $qtaPresenti,
                     ':qta_da_implementare' => $qtaDaImplementare,
@@ -334,6 +353,7 @@ try {
         if ($altraDotazione === '') {
             apiErrorResponse('altraDotazione obbligatoria');
         }
+        $catalogAltraDotazioneId = resolveCatalogIdByLabel($pdo, 'catalog_altre_dotazioni', $altraDotazione);
 
         $presente = asNullableString($row['presente'] ?? null);
         $daImplementare = asNullableString($row['daImplementare'] ?? null);
@@ -345,21 +365,38 @@ try {
         } else {
             $roomId = ensureRoomExists($pdo, $blocco, $piano, $roomCode);
             syncAutoAttributesIfEmpty($pdo, $roomId, $autoAttributes, $autoFieldMap);
-            $deleteStatement = $pdo->prepare(
-                'DELETE FROM room_altre_dotazioni WHERE room_id = :room_id AND altra_dotazione = :altra_dotazione'
-            );
-            $deleteStatement->execute([
-                ':room_id' => $roomId,
-                ':altra_dotazione' => $altraDotazione,
-            ]);
+            if ($catalogAltraDotazioneId !== null) {
+                $deleteStatement = $pdo->prepare(
+                    'DELETE FROM room_altre_dotazioni
+                     WHERE room_id = :room_id
+                       AND (catalog_altra_dotazione_id = :catalog_id OR altra_dotazione = :altra_dotazione)'
+                );
+                $deleteStatement->execute([
+                    ':room_id' => $roomId,
+                    ':catalog_id' => $catalogAltraDotazioneId,
+                    ':altra_dotazione' => $altraDotazione,
+                ]);
+            } else {
+                $deleteStatement = $pdo->prepare(
+                    'DELETE FROM room_altre_dotazioni WHERE room_id = :room_id AND altra_dotazione = :altra_dotazione'
+                );
+                $deleteStatement->execute([
+                    ':room_id' => $roomId,
+                    ':altra_dotazione' => $altraDotazione,
+                ]);
+            }
 
             if (!($presente === null && $daImplementare === null && $note === null)) {
                 $insertStatement = $pdo->prepare(
-                    'INSERT INTO room_altre_dotazioni (room_id, altra_dotazione, presente, da_implementare, note, sort_order)
-                     VALUES (:room_id, :altra_dotazione, :presente, :da_implementare, :note, :sort_order)'
+                    'INSERT INTO room_altre_dotazioni (
+                        room_id, catalog_altra_dotazione_id, altra_dotazione, presente, da_implementare, note, sort_order
+                     ) VALUES (
+                        :room_id, :catalog_altra_dotazione_id, :altra_dotazione, :presente, :da_implementare, :note, :sort_order
+                     )'
                 );
                 $insertStatement->execute([
                     ':room_id' => $roomId,
+                    ':catalog_altra_dotazione_id' => $catalogAltraDotazioneId,
                     ':altra_dotazione' => $altraDotazione,
                     ':presente' => $presente,
                     ':da_implementare' => $daImplementare,
@@ -395,6 +432,11 @@ try {
             'inv' => $inventoryJson,
             'note' => asNullableString($row['note'] ?? null),
         ];
+        $catalogApparecchiaturaId = resolveCatalogIdByLabel(
+            $pdo,
+            'catalog_apparecchiature',
+            $normalizedRow['apparecchiatura']
+        );
 
         $hasUsefulValue = array_filter($normalizedRow, static fn($value) => $value !== null) !== [];
         $existingRoom = fetchExistingRoom($pdo, $blocco, $piano, $roomCode);
@@ -411,13 +453,14 @@ try {
             if ($hasUsefulValue) {
                 $insertStatement = $pdo->prepare(
                     'INSERT INTO room_apparecchiature (
-                        room_id, apparecchiatura, tipologia, produttore, modello, qta, nuovo, trasferimento, inv, note, sort_order
+                        room_id, catalog_apparecchiatura_id, apparecchiatura, tipologia, produttore, modello, qta, nuovo, trasferimento, inv, note, sort_order
                     ) VALUES (
-                        :room_id, :apparecchiatura, :tipologia, :produttore, :modello, :qta, :nuovo, :trasferimento, :inv, :note, :sort_order
+                        :room_id, :catalog_apparecchiatura_id, :apparecchiatura, :tipologia, :produttore, :modello, :qta, :nuovo, :trasferimento, :inv, :note, :sort_order
                     )'
                 );
                 $insertStatement->execute([
                     ':room_id' => $roomId,
+                    ':catalog_apparecchiatura_id' => $catalogApparecchiaturaId,
                     ':apparecchiatura' => $normalizedRow['apparecchiatura'],
                     ':tipologia' => $normalizedRow['tipologia'],
                     ':produttore' => $normalizedRow['produttore'],
