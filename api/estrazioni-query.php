@@ -5,7 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/utils.php';
 
 const ESTRAZIONI_VALID_BLOCCHI = ['nord', 'sud', 'piastra', 'sotterraneo'];
-const ESTRAZIONI_VALID_TIPI = ['apparecchiature', 'impiantistica', 'altre_dotazioni'];
+const ESTRAZIONI_VALID_TIPI = ['attributi_stanza', 'apparecchiature', 'impiantistica', 'altre_dotazioni'];
 
 /**
  * Condizioni WHERE su alias `r` (rooms) condivise da tutte le estrazioni.
@@ -114,6 +114,9 @@ function fetchEstrazioniDettaglioChoices(PDO $pdo, string $tipo, string $blocco,
     if (!in_array($tipo, ESTRAZIONI_VALID_TIPI, true)) {
         return [];
     }
+    if ($tipo === 'attributi_stanza') {
+        return [];
+    }
 
     $filters = [
         'blocco' => $blocco,
@@ -208,6 +211,9 @@ function fetchEstrazioniDettaglioChoicesLegacy(PDO $pdo, string $tipo, string $b
     if (!in_array($tipo, ESTRAZIONI_VALID_TIPI, true)) {
         return [];
     }
+    if ($tipo === 'attributi_stanza') {
+        return [];
+    }
 
     $filters = [
         'blocco' => $blocco,
@@ -246,6 +252,37 @@ function fetchEstrazioniDettaglioChoicesLegacy(PDO $pdo, string $tipo, string $b
     $statement->execute($params);
     $rows = $statement->fetchAll(PDO::FETCH_COLUMN, 0);
     return is_array($rows) ? array_values(array_unique(array_map('strval', $rows))) : [];
+}
+
+/**
+ * @param array<string, mixed> $filters
+ * @return list<array<string, mixed>>
+ */
+function fetchEstrazioniAttributiStanzaRows(PDO $pdo, array $filters): array
+{
+    [$roomWhere, $params] = estrazioniBuildRoomWhereAndParams($filters);
+
+    $sql = "SELECT
+            r.blocco AS blocco,
+            r.piano AS piano,
+            r.reparto AS reparto,
+            r.room_code AS roomCode,
+            r.room_code_name AS roomCodeName,
+            r.occupazione AS descrizione,
+            r.emipiano AS emipiano,
+            r.superficie AS superficie,
+            r.accreditamento_locale AS accreditamentoLocale,
+            r.posti_letto AS postiLetto,
+            r.note_arredi_segnaletica AS note
+        FROM rooms r
+        WHERE {$roomWhere}
+        ORDER BY r.blocco ASC, CAST(r.piano AS SIGNED) ASC, r.room_code ASC";
+
+    $statement = $pdo->prepare($sql);
+    $statement->execute($params);
+    $rows = $statement->fetchAll(PDO::FETCH_ASSOC);
+
+    return is_array($rows) ? $rows : [];
 }
 
 /**
@@ -380,6 +417,7 @@ function fetchEstrazioniRows(PDO $pdo, array $filters): array
     $tipo = $filters['tipo'];
 
     return match ($tipo) {
+        'attributi_stanza' => fetchEstrazioniAttributiStanzaRows($pdo, $filters),
         'impiantistica' => fetchEstrazioniImpiantisticaRows($pdo, $filters),
         'altre_dotazioni' => fetchEstrazioniAltreDotazioniRows($pdo, $filters),
         default => fetchEstrazioniApparecchiatureRows($pdo, $filters),
@@ -423,6 +461,19 @@ function estrazioniLabelPiano(?string $piano): string
 function estrazioniExportHeadersForTipo(string $tipo): array
 {
     return match ($tipo) {
+        'attributi_stanza' => [
+            'Blocco',
+            'Piano',
+            'Reparto',
+            'ID Stanza',
+            'Codice (Nome)',
+            'Descrizione',
+            'Emipiano',
+            'Superficie',
+            'Accreditamento locale',
+            'Posti letto',
+            'Note',
+        ],
         'impiantistica' => [
             'Blocco',
             'Piano',
@@ -459,6 +510,27 @@ function estrazioniExportHeadersForTipo(string $tipo): array
             'Note',
         ],
     };
+}
+
+/**
+ * @param array<string, mixed> $row
+ * @return list<string|int|float>
+ */
+function estrazioniAttributiStanzaRowToSpreadsheetLine(array $row): array
+{
+    return [
+        estrazioniLabelBlocco(isset($row['blocco']) ? (string)$row['blocco'] : ''),
+        estrazioniLabelPiano(isset($row['piano']) ? (string)$row['piano'] : ''),
+        isset($row['reparto']) ? (string)$row['reparto'] : '',
+        isset($row['roomCode']) ? (string)$row['roomCode'] : '',
+        isset($row['roomCodeName']) ? (string)$row['roomCodeName'] : '',
+        isset($row['descrizione']) ? (string)$row['descrizione'] : '',
+        isset($row['emipiano']) ? (string)$row['emipiano'] : '',
+        isset($row['superficie']) ? (string)$row['superficie'] : '',
+        isset($row['accreditamentoLocale']) ? (string)$row['accreditamentoLocale'] : '',
+        isset($row['postiLetto']) && $row['postiLetto'] !== null ? (string)$row['postiLetto'] : '',
+        isset($row['note']) ? (string)$row['note'] : '',
+    ];
 }
 
 /**
@@ -530,6 +602,7 @@ function estrazioniAltreDotazioniRowToSpreadsheetLine(array $row): array
 function estrazioniExportRowToLine(string $tipo, array $row): array
 {
     return match ($tipo) {
+        'attributi_stanza' => estrazioniAttributiStanzaRowToSpreadsheetLine($row),
         'impiantistica' => estrazioniImpiantisticaRowToSpreadsheetLine($row),
         'altre_dotazioni' => estrazioniAltreDotazioniRowToSpreadsheetLine($row),
         default => estrazioniRowToSpreadsheetLine($row),
@@ -542,6 +615,7 @@ function estrazioniExportRowToLine(string $tipo, array $row): array
 function estrazioniExportColumnLettersForTipo(string $tipo): array
 {
     return match ($tipo) {
+        'attributi_stanza' => range('A', 'K'),
         'impiantistica', 'altre_dotazioni' => range('A', 'H'),
         default => range('A', 'M'),
     };

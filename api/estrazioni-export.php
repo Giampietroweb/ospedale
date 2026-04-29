@@ -51,6 +51,7 @@ $headerRow = estrazioniExportHeadersForTipo($tipo);
 $spreadsheet = new Spreadsheet();
 $sheet = $spreadsheet->getActiveSheet();
 $sheet->setTitle(match ($tipo) {
+    'attributi_stanza' => 'Attributi stanza',
     'impiantistica' => 'Impiantistica',
     'altre_dotazioni' => 'Altre dotazioni',
     default => 'Apparecchiature',
@@ -72,6 +73,7 @@ foreach (estrazioniExportColumnLettersForTipo($tipo) as $columnId) {
 }
 
 $tipoSlug = match ($tipo) {
+    'attributi_stanza' => 'attributi-stanza',
     'impiantistica' => 'impiantistica',
     'altre_dotazioni' => 'altre-dotazioni',
     default => 'apparecchiature',

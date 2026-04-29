@@ -18,7 +18,7 @@
     <header class="estrazioni-header">
       <h1 class="estrazioni-title">Pagina estrazioni</h1>
       <p class="estrazioni-intro">
-        Scegli il tipo di estrazione, filtra per blocco, piano, reparto e ID stanza, opzionalmente per il dettaglio (apparecchiatura, tipologia impiantistica o altra dotazione), poi avvia la ricerca.
+        Scegli il tipo di estrazione, filtra per blocco, piano, reparto e ID stanza, poi avvia la ricerca.
       </p>
     </header>
 
@@ -27,7 +27,11 @@
         <legend class="estrazioni-tipo-legend">Tipo estrazione</legend>
         <div class="estrazioni-tipo-options">
           <label class="estrazioni-tipo-label">
-            <input type="radio" name="estrazioniTipo" value="apparecchiature" checked />
+            <input type="radio" name="estrazioniTipo" value="attributi_stanza" checked />
+            Attributi stanza
+          </label>
+          <label class="estrazioni-tipo-label">
+            <input type="radio" name="estrazioniTipo" value="apparecchiature" />
             Apparecchiature
           </label>
           <label class="estrazioni-tipo-label">
@@ -62,12 +66,6 @@
         <div class="estrazioni-field">
           <label class="estrazioni-label" for="filterStanza">ID Stanza</label>
           <select id="filterStanza" name="room_code" autocomplete="off">
-            <option value=""></option>
-          </select>
-        </div>
-        <div class="estrazioni-field estrazioni-field-span">
-          <label class="estrazioni-label" id="estrazioniDettaglioLabel" for="filterDettaglio">Apparecchiatura</label>
-          <select id="filterDettaglio" name="dettaglio" autocomplete="off">
             <option value=""></option>
           </select>
         </div>
@@ -112,6 +110,6 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
-  <script src="./estrazioni.js?v=20260427-7"></script>
+  <script src="./estrazioni.js?v=20260429-8"></script>
 </body>
 </html>
