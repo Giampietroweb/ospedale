@@ -154,6 +154,11 @@ button:hover {
   background: var(--color-surface-alt);
 }
 
+input:hover,
+textarea:hover {
+  cursor: pointer;
+}
+
 button:focus-visible {
   outline: none;
   box-shadow: var(--focus-ring);

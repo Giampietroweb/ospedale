@@ -16,7 +16,7 @@
     <header class="estrazioni-header">
       <h1 class="estrazioni-title">Backoffice cataloghi</h1>
       <p class="estrazioni-intro">
-        Gestisci le voci dei cataloghi usati nella pagina estrazioni: scegli il catalogo, aggiorna i campi e salva con upsert.
+        Gestisci le voci dei cataloghi usati nella pagina estrazioni: scegli il catalogo, aggiorna i campi e salva (crea o aggiorna).
       </p>
     </header>
 
@@ -36,8 +36,8 @@
           </select>
         </div>
         <div class="estrazioni-field">
-          <label class="estrazioni-label" for="catalogLabel">Nuova label</label>
-          <input id="catalogLabel" type="text" placeholder="Inserisci la label">
+          <label class="estrazioni-label" for="catalogLabel">Nuova etichetta</label>
+          <input id="catalogLabel" type="text" placeholder="Inserisci l'etichetta">
         </div>
         <div class="estrazioni-field">
           <label class="estrazioni-label" for="catalogCode">Code (opzionale)</label>
@@ -49,7 +49,7 @@
         </div>
       </div>
       <div class="estrazioni-actions">
-        <button id="catalogAddBtn" type="button" class="estrazioni-search-btn">Upsert</button>
+        <button id="catalogAddBtn" type="button" class="estrazioni-search-btn">Salva</button>
       </div>
       <p id="catalogError" class="estrazioni-error" hidden></p>
     </section>
