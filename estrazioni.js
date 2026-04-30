@@ -33,7 +33,7 @@ const TABLE_HEADERS = {
     'Reparto',
     'ID Stanza',
     'Apparecchiatura',
-    'Tipologia',
+    'Ancoraggio',
     'Produttore',
     'Modello',
     'Q.tà',

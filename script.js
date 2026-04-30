@@ -58,6 +58,7 @@ const appSaveButton = document.getElementById('appSaveButton');
 const appCancelButton = document.getElementById('appCancelButton');
 const apparecchiaturaEditor = document.getElementById('apparecchiaturaEditor');
 let appTipologiaTomSelect = null;
+let appProduttoreTomSelect = null;
 const catalogOptions = {
   apparecchiature: [],
   ancoraggiApparecchiature: [],
@@ -1868,7 +1869,7 @@ function applyCatalogRowsToFixedTables(nextImpiantisticaLabels, nextAltreDotazio
 function applyCatalogOptionsToModal() {
   populateApparecchiaturaSelectOptions();
   populateSelectOptions(appInstallazioneTipologiaInput, catalogOptions.ancoraggiApparecchiature);
-  populateSelectOptions(appProduttoreInput, catalogOptions.produttori);
+  populateProduttoreSelectOptions();
   populateSelectOptions(roomHemifloorInput, catalogOptions.emipiani, roomHemifloorValue.textContent);
   populateSelectOptions(roomDepartmentInput, catalogOptions.reparti, roomDepartmentValue.textContent);
   populateSelectOptions(roomAccreditationInput, catalogOptions.accreditamentiLocale, roomAccreditationValue.textContent);
@@ -1955,6 +1956,32 @@ function initializeApparecchiaturaTomSelect() {
   });
 }
 
+function initializeProduttoreTomSelect() {
+  if (!appProduttoreInput || typeof window.TomSelect !== 'function') {
+    return;
+  }
+
+  appProduttoreTomSelect = new window.TomSelect(appProduttoreInput, {
+    create: false,
+    maxItems: 1,
+    closeAfterSelect: true,
+    allowEmptyOption: true,
+    maxOptions: 500,
+    searchField: ['text', 'value'],
+    sortField: [
+      {
+        field: 'text',
+        direction: 'asc'
+      }
+    ],
+    placeholder: 'Cerca produttore...',
+    onItemAdd() {
+      this.close();
+      this.blur();
+    }
+  });
+}
+
 function setApparecchiaturaValue(value) {
   const normalizedValue = String(value || '').trim();
   if (appTipologiaTomSelect) {
@@ -1967,6 +1994,65 @@ function setApparecchiaturaValue(value) {
 
 function clearApparecchiaturaValue() {
   setApparecchiaturaValue('');
+}
+
+function setProduttoreValue(value) {
+  const normalizedValue = String(value || '').trim();
+  if (appProduttoreTomSelect) {
+    appProduttoreTomSelect.setValue(normalizedValue, true);
+    return;
+  }
+  appProduttoreInput.value = normalizedValue;
+}
+
+function clearProduttoreValue() {
+  setProduttoreValue('');
+}
+
+function ensureProduttoreOption(value) {
+  const normalizedValue = String(value || '').trim();
+  if (normalizedValue === '') {
+    return;
+  }
+  if (appProduttoreTomSelect) {
+    if (!appProduttoreTomSelect.options[normalizedValue]) {
+      appProduttoreTomSelect.addOption({ value: normalizedValue, text: normalizedValue });
+    }
+    return;
+  }
+  ensureSelectOption(appProduttoreInput, normalizedValue);
+}
+
+function populateProduttoreSelectOptions() {
+  if (!appProduttoreInput) {
+    return;
+  }
+  const optionValues = uniqueNonEmptyValues(catalogOptions.produttori);
+  const currentValue = String(appProduttoreInput.value || '').trim();
+  appProduttoreInput.innerHTML = '<option value="" selected></option>';
+
+  if (appProduttoreTomSelect) {
+    appProduttoreTomSelect.clear(true);
+    appProduttoreTomSelect.clearOptions();
+    appProduttoreTomSelect.addOption({ value: '', text: '' });
+    optionValues.forEach((optionValue) => {
+      appProduttoreTomSelect.addOption({ value: optionValue, text: optionValue });
+    });
+    if (currentValue !== '' && !optionValues.includes(currentValue)) {
+      appProduttoreTomSelect.addOption({ value: currentValue, text: currentValue });
+    }
+    appProduttoreTomSelect.refreshOptions(false);
+    setProduttoreValue(currentValue);
+    return;
+  }
+
+  optionValues.forEach((optionValue) => {
+    const optionElement = document.createElement('option');
+    optionElement.value = optionValue;
+    optionElement.textContent = optionValue;
+    appProduttoreInput.appendChild(optionElement);
+  });
+  setProduttoreValue(currentValue);
 }
 
 function populateApparecchiaturaSelectOptions() {
@@ -2062,7 +2148,7 @@ function parsePositiveQtaOrNull(rawValue) {
 function resetApparecchiaturaForm() {
   clearApparecchiaturaValue();
   appInstallazioneTipologiaInput.value = '';
-  appProduttoreInput.value = '';
+  clearProduttoreValue();
   appModelloInput.value = '';
   appQtaInput.value = '1';
   appNuovoInput.value = '';
@@ -2139,8 +2225,8 @@ function renderApparecchiaturaTable() {
       setApparecchiaturaValue(normalizedSelectedRow.apparecchiatura);
       ensureSelectOption(appInstallazioneTipologiaInput, normalizedSelectedRow.tipologia);
       appInstallazioneTipologiaInput.value = normalizedSelectedRow.tipologia;
-      ensureSelectOption(appProduttoreInput, normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore);
-      appProduttoreInput.value = normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore;
+      ensureProduttoreOption(normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore);
+      setProduttoreValue(normalizedSelectedRow.produttore === '-' ? '' : normalizedSelectedRow.produttore);
       appModelloInput.value = normalizedSelectedRow.modello === '-' ? '' : normalizedSelectedRow.modello;
       appQtaInput.value = normalizedSelectedRow.qta;
       appNuovoInput.value = normalizedSelectedRow.nuovo;
@@ -2305,8 +2391,8 @@ async function handleDeleteApparecchiatura(rowIndex) {
       setApparecchiaturaValue(restoredRow.apparecchiatura);
       ensureSelectOption(appInstallazioneTipologiaInput, restoredRow.tipologia);
       appInstallazioneTipologiaInput.value = restoredRow.tipologia;
-      ensureSelectOption(appProduttoreInput, restoredRow.produttore === '-' ? '' : restoredRow.produttore);
-      appProduttoreInput.value = restoredRow.produttore === '-' ? '' : restoredRow.produttore;
+      ensureProduttoreOption(restoredRow.produttore === '-' ? '' : restoredRow.produttore);
+      setProduttoreValue(restoredRow.produttore === '-' ? '' : restoredRow.produttore);
       appModelloInput.value = restoredRow.modello === '-' ? '' : restoredRow.modello;
       appQtaInput.value = restoredRow.qta;
       appNuovoInput.value = restoredRow.nuovo;
@@ -3207,7 +3293,9 @@ renderApparecchiaturaTable();
 renderImpiantisticaTable();
 renderAltreDotazioniTable();
 initializeApparecchiaturaTomSelect();
+initializeProduttoreTomSelect();
 populateApparecchiaturaSelectOptions();
+populateProduttoreSelectOptions();
 loadCatalogOptions().catch((error) => {
   console.warn('[Cataloghi] impossibile caricare cataloghi DB, uso fallback statico', error);
 });
