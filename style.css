@@ -1354,7 +1354,6 @@ body.page-structure {
   border: 1px solid #217346;
   border-radius: var(--radius-md);
   cursor: pointer;
-  margin-left: auto;
   transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
