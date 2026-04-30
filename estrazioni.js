@@ -739,8 +739,10 @@ if (!initTomSelects()) {
   wireTipoListeners();
   bindPageSizeButtons();
   updatePageSizeButtonsUi(String(pageSize));
-  loadRootOptions().catch((error) => {
-    console.error('[Estrazioni] opzioni iniziali', error);
-    setErrorMessage(error.message || 'Errore caricamento filtri');
-  });
+  loadRootOptions()
+    .then(() => runSearch())
+    .catch((error) => {
+      console.error('[Estrazioni] avvio iniziale', error);
+      setErrorMessage(error.message || 'Errore caricamento iniziale');
+    });
 }
