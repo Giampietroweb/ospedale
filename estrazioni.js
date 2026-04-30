@@ -5,6 +5,11 @@
 const API_URL = 'api/estrazioni.php';
 const EXPORT_URL = 'api/estrazioni-export.php';
 const SENZA_REPARTO_VALUE = '__SENZA_REPARTO__';
+const DETTAGLIO_LABELS = {
+  apparecchiature: 'Apparecchiatura',
+  impiantistica: 'Tipologia impiantistica',
+  altre_dotazioni: 'Altra dotazione',
+};
 
 const BLOCCO_LABELS = {
   nord: 'Blocco Nord',
@@ -85,6 +90,10 @@ function labelPiano(piano) {
 function getSelectedTipo() {
   const checked = document.querySelector('input[name="estrazioniTipo"]:checked');
   return checked && checked.value ? checked.value : 'attributi_stanza';
+}
+
+function getDettaglioLabel(tipo) {
+  return DETTAGLIO_LABELS[tipo] || 'Dettaglio';
 }
 
 function tomSelectBaseOptions() {
@@ -315,15 +324,33 @@ const filterBloccoEl = document.getElementById('filterBlocco');
 const filterPianoEl = document.getElementById('filterPiano');
 const filterRepartoEl = document.getElementById('filterReparto');
 const filterStanzaEl = document.getElementById('filterStanza');
+const filterDettaglioEl = document.getElementById('filterDettaglio');
+const filterDettaglioFieldEl = document.getElementById('filterDettaglioField');
+const filterDettaglioLabelEl = document.getElementById('filterDettaglioLabel');
 
 const TomSelect = getTomSelectConstructor();
 let tsBlocco = null;
 let tsPiano = null;
 let tsReparto = null;
 let tsStanza = null;
+let tsDettaglio = null;
 let currentRows = [];
 let currentPage = 1;
 let pageSize = 20;
+
+function updateDettaglioFilterUi() {
+  const tipo = getSelectedTipo();
+  const isVisible = tipo !== 'attributi_stanza';
+  if (filterDettaglioFieldEl) {
+    filterDettaglioFieldEl.hidden = !isVisible;
+  }
+  if (filterDettaglioLabelEl) {
+    filterDettaglioLabelEl.textContent = getDettaglioLabel(tipo);
+  }
+  if (!isVisible && tsDettaglio) {
+    tsDettaglio.clear(true);
+  }
+}
 
 function updatePageSizeButtonsUi(value) {
   const selectedValue = String(value ?? '20');
@@ -428,6 +455,7 @@ async function loadRootOptions() {
   fillTomSelectOptions(tsPiano, payload.piani || [], labelPiano);
   updateRepartoOptions(payload.reparti || [], Boolean(payload.hasEmptyReparto));
   fillTomSelectOptions(tsStanza, payload.stanze || [], (v) => v);
+  fillTomSelectOptions(tsDettaglio, payload.dettaglioChoices || [], (v) => v);
 }
 
 function updateRepartoOptions(reparti, hasEmptyReparto) {
@@ -485,6 +513,9 @@ async function loadOptionsForContext(blocco, piano) {
   if (Array.isArray(payload.stanze)) {
     fillTomSelectOptions(tsStanza, payload.stanze, (v) => v);
   }
+  if (Array.isArray(payload.dettaglioChoices)) {
+    fillTomSelectOptions(tsDettaglio, payload.dettaglioChoices, (v) => v);
+  }
 }
 
 async function onBloccoChanged() {
@@ -514,8 +545,10 @@ async function onPianoChanged() {
 async function onTipoChanged() {
   try {
     setErrorMessage('');
+    updateDettaglioFilterUi();
     await loadRootOptions();
     clearResultsTable();
+    await runSearch();
   } catch (error) {
     console.error('[Estrazioni] tipo changed', error);
     setErrorMessage(error.message || 'Errore aggiornamento opzioni');
@@ -548,6 +581,7 @@ function buildEstrazioniFilterParams() {
       ? [repartoRaw]
       : [];
   const stanza = tsStanza ? tsStanza.getValue() : '';
+  const dettaglio = tsDettaglio ? tsDettaglio.getValue() : '';
 
   if (blocco) {
     params.set('blocco', blocco);
@@ -567,6 +601,9 @@ function buildEstrazioniFilterParams() {
   if (stanza) {
     params.set('room_code', stanza);
   }
+  if (dettaglio) {
+    params.set('dettaglio', dettaglio);
+  }
   return params;
 }
 
@@ -582,7 +619,7 @@ function buildExportUrl() {
 }
 
 function clearAllTomSelectFilters() {
-  [tsBlocco, tsPiano, tsReparto, tsStanza].forEach((tomSelectInstance) => {
+  [tsBlocco, tsPiano, tsReparto, tsStanza, tsDettaglio].forEach((tomSelectInstance) => {
     if (tomSelectInstance) {
       tomSelectInstance.clear(true);
     }
@@ -642,11 +679,12 @@ async function resetFilters() {
   setLoading(true);
   try {
     if (shouldSwitchTipo) {
-      updateDettaglioLabel();
+      updateDettaglioFilterUi();
     }
     clearAllTomSelectFilters();
     await loadRootOptions();
     clearResultsTable();
+    await runSearch();
   } catch (error) {
     console.error('[Estrazioni] reset filtri', error);
     setErrorMessage(error.message || 'Errore durante il reset dei filtri');
@@ -661,7 +699,7 @@ function initTomSelects() {
     setErrorMessage('TomSelect non disponibile: controlla la connessione al CDN.');
     return false;
   }
-  if (!filterBloccoEl || !filterPianoEl || !filterRepartoEl || !filterStanzaEl) {
+  if (!filterBloccoEl || !filterPianoEl || !filterRepartoEl || !filterStanzaEl || !filterDettaglioEl) {
     setErrorMessage('Markup filtri non allineato: ricarica la pagina senza cache (Cmd+Shift+R).');
     return false;
   }
@@ -686,6 +724,7 @@ function initTomSelects() {
     maxItems: null,
   });
   tsStanza = new TS(filterStanzaEl, tomSelectBaseOptions());
+  tsDettaglio = new TS(filterDettaglioEl, tomSelectBaseOptions());
 
   return true;
 }
@@ -734,6 +773,7 @@ document.getElementById('estrazioniPageSize')?.addEventListener('change', (event
 if (!initTomSelects()) {
   // stop
 } else {
+  updateDettaglioFilterUi();
   renderTableHead(getSelectedTipo());
   updatePaginationUi(0);
   wireTipoListeners();
