@@ -7,6 +7,12 @@ const mapWrapper = document.getElementById('mapWrapper');
 const mapObject = document.getElementById('mapObject');
 const mapLoaderOverlay = document.getElementById('mapLoaderOverlay');
 const mapErrorCenterMessage = document.getElementById('mapErrorCenterMessage');
+const referenceSearchToggleButton = document.getElementById('referenceSearchToggle');
+const referenceSearchPanel = document.getElementById('referenceSearchPanel');
+const referenceSearchCloseButton = document.getElementById('referenceSearchClose');
+const referenceSearchForm = document.getElementById('referenceSearchForm');
+const referenceSearchInput = document.getElementById('referenceSearchInput');
+const referenceSearchMessage = document.getElementById('referenceSearchMessage');
 const modalOverlay = document.getElementById('modalOverlay');
 const modalCloseButton = document.getElementById('modalClose');
 const roomValidationStatus = document.getElementById('roomValidationStatus');
@@ -2920,7 +2926,10 @@ function validateRoomOccurrence(roomCode) {
     return;
   }
 
-  const record = occurrencesMap.get(roomCode);
+  const record = occurrencesMap.get(roomCode)
+    || (normalizedOccurrencesMap instanceof Map
+      ? normalizedOccurrencesMap.get(normalizeRoomCode(roomCode))
+      : null);
   if (!record) {
     showRoomValidationError('locale non trovato');
     return;
@@ -2934,6 +2943,89 @@ function validateRoomOccurrence(roomCode) {
   roomBedCountValue.textContent = getSafeRecordValue(record, 'Posti letto');
   roomFurnitureNotesValue.textContent = getSafeRecordValue(record, 'Note arredi e segnaletica');
   showRoomValidationOk();
+}
+
+function setReferenceSearchMessage(message, status = '') {
+  if (!referenceSearchMessage) {
+    return;
+  }
+
+  referenceSearchMessage.textContent = message;
+  referenceSearchMessage.classList.toggle('is-error', status === 'error');
+  referenceSearchMessage.classList.toggle('is-success', status === 'success');
+}
+
+function setReferenceSearchPanelOpen(isOpen) {
+  if (!referenceSearchPanel || !referenceSearchToggleButton) {
+    return;
+  }
+
+  referenceSearchPanel.hidden = !isOpen;
+  referenceSearchToggleButton.setAttribute('aria-expanded', String(isOpen));
+
+  if (isOpen && referenceSearchInput) {
+    window.setTimeout(() => referenceSearchInput.focus(), 0);
+  }
+
+  if (!isOpen) {
+    setReferenceSearchMessage('');
+  }
+}
+
+function getRoomCodeFromSvgByNormalizedCode(normalizedRoomCode) {
+  const svgDocument = mapObject?.contentDocument;
+  if (!svgDocument || normalizedRoomCode === '') {
+    return '';
+  }
+
+  const textNodes = svgDocument.querySelectorAll('text');
+  for (const textNode of textNodes) {
+    const textValue = textNode.textContent ? textNode.textContent.trim() : '';
+    const roomCode = getRoomCodeWithoutAsterisks(textValue);
+    if (normalizeRoomCode(roomCode) === normalizedRoomCode) {
+      return roomCode;
+    }
+  }
+
+  return '';
+}
+
+function resolveReferenceSearchRoomCode(rawReference) {
+  const reference = String(rawReference || '').trim();
+  const normalizedReference = normalizeRoomCode(reference);
+
+  if (normalizedReference === '') {
+    return '';
+  }
+
+  const occurrenceRecord = normalizedOccurrencesMap instanceof Map
+    ? normalizedOccurrencesMap.get(normalizedReference)
+    : null;
+  if (occurrenceRecord) {
+    return String(occurrenceRecord['Codice semplificato'] || reference).trim();
+  }
+
+  return getRoomCodeFromSvgByNormalizedCode(normalizedReference);
+}
+
+function handleReferenceSearchSubmit(event) {
+  event.preventDefault();
+
+  const searchedReference = referenceSearchInput ? referenceSearchInput.value.trim() : '';
+  if (searchedReference === '') {
+    setReferenceSearchMessage('Inserisci una referenza da cercare.', 'error');
+    return;
+  }
+
+  const roomCode = resolveReferenceSearchRoomCode(searchedReference);
+  if (roomCode === '') {
+    setReferenceSearchMessage('Referenza non trovata in questa planimetria.', 'error');
+    return;
+  }
+
+  setReferenceSearchMessage(`Referenza trovata: ${roomCode}`, 'success');
+  setReferenceSearchPanelOpen(false);
+  openModal(roomCode);
 }
 
 function openModal(textValue) {
@@ -3208,6 +3300,13 @@ async function handleSaveApparecchiatura() {
 zoomInButton.addEventListener('click', handleZoomIn);
 zoomOutButton.addEventListener('click', handleZoomOut);
 zoomResetButton.addEventListener('click', handleZoomReset);
+referenceSearchToggleButton.addEventListener('click', () => {
+  setReferenceSearchPanelOpen(referenceSearchPanel.hidden);
+});
+referenceSearchCloseButton.addEventListener('click', () => {
+  setReferenceSearchPanelOpen(false);
+});
+referenceSearchForm.addEventListener('submit', handleReferenceSearchSubmit);
 modalCloseButton.addEventListener('click', closeModal);
 setupEditableFieldEvents('roomCodeName');
 setupEditableFieldEvents('roomOccupazione');

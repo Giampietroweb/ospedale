@@ -17,18 +17,40 @@
   <meta name="sogou" content="noindex, nofollow">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css">
 </head>
-<body>
+<body class="planimetria-page">
   <div class="toolbar">
-    <a href="../index.html" class="home-cta-link-toolbar" aria-current="page">Mappa</a>
-    <a href="../estrazioni.html" class="home-cta-link-toolbar">Estrazioni</a>
-    <a href="../cataloghi.html" class="home-cta-link-toolbar">Cataloghi</a>
-    <button id="zoomOut" type="button">Zoom -</button>
-    <button id="zoomIn" type="button">Zoom +</button>
-    <button id="zoomReset" type="button">Reset 100%</button>
-    <span id="zoomValue" class="zoom-label">100%</span>
+    <div class="toolbar-group toolbar-zoom-controls" aria-label="Controlli zoom">
+      <button id="zoomOut" class="toolbar-utility-button" type="button">Zoom -</button>
+      <button id="zoomIn" class="toolbar-utility-button" type="button">Zoom +</button>
+      <button id="zoomReset" class="toolbar-utility-button" type="button">Reset 100%</button>
+      <strong>Zoom impostato:</strong>
+      <span id="zoomValue" class="zoom-label">100%</span>
+    </div>
+    <nav class="toolbar-navigation" aria-label="Navigazione principale">
+      <a href="../index.html" class="home-cta-link-toolbar" aria-current="page">Mappa</a>
+      <a href="../estrazioni.html" class="home-cta-link-toolbar">Estrazioni</a>
+      <a href="../cataloghi.html" class="home-cta-link-toolbar">Cataloghi</a>
+    </nav>
+    <div class="toolbar-group toolbar-reference-actions">
+      <button id="referenceSearchToggle" class="toolbar-primary-action" type="button" aria-expanded="false" aria-controls="referenceSearchPanel">Cerca referenza</button>
+    </div>
   </div>
 
   <div id="viewer" class="viewer">
+    <section id="referenceSearchPanel" class="reference-search-panel" aria-label="Ricerca referenza" hidden>
+      <div class="reference-search-header">
+        <h2 class="reference-search-title">Cerca referenza</h2>
+        <button id="referenceSearchClose" class="reference-search-close" type="button" aria-label="Chiudi ricerca">&times;</button>
+      </div>
+      <form id="referenceSearchForm" class="reference-search-form">
+        <label class="reference-search-label" for="referenceSearchInput">Referenza locale</label>
+        <div class="reference-search-row">
+          <input id="referenceSearchInput" class="reference-search-input" type="search" placeholder="Es. P6-191-052a" autocomplete="off">
+          <button class="reference-search-submit" type="submit">Cerca</button>
+        </div>
+        <p id="referenceSearchMessage" class="reference-search-message" aria-live="polite"></p>
+      </form>
+    </section>
     <div id="mapWrapper" class="map-wrapper">
       <object id="mapObject" data="" type="image/svg+xml" class="map-image" aria-label="Mappa SVG"></object>
     </div>
