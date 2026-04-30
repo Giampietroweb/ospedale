@@ -14,6 +14,8 @@ const ESTRAZIONI_VALID_TIPI = ['attributi_stanza', 'apparecchiature', 'impiantis
  *   blocco: string,
  *   piano: string,
  *   reparto_filter: bool,
+ *   include_empty_reparto?: bool,
+ *   reparto_values?: list<string>,
  *   reparto_empty: bool,
  *   reparto: string,
  *   room_code: string
@@ -35,11 +37,38 @@ function estrazioniBuildRoomWhereAndParams(array $filters): array
     }
 
     if ($filters['reparto_filter']) {
-        if ($filters['reparto_empty']) {
-            $conditions[] = '(r.reparto IS NULL OR TRIM(r.reparto) = \'\')';
-        } else {
-            $conditions[] = 'r.reparto = :reparto';
-            $params[':reparto'] = $filters['reparto'];
+        $repartoValues = [];
+        if (isset($filters['reparto_values']) && is_array($filters['reparto_values'])) {
+            foreach ($filters['reparto_values'] as $repartoValue) {
+                $normalized = trim((string)$repartoValue);
+                if ($normalized !== '') {
+                    $repartoValues[] = $normalized;
+                }
+            }
+            $repartoValues = array_values(array_unique($repartoValues));
+        } elseif (trim((string)$filters['reparto']) !== '') {
+            $repartoValues[] = trim((string)$filters['reparto']);
+        }
+
+        $includeEmptyReparto = isset($filters['include_empty_reparto'])
+            ? (bool)$filters['include_empty_reparto']
+            : (bool)$filters['reparto_empty'];
+
+        $repartoSubConditions = [];
+        if (!empty($repartoValues)) {
+            $repartoPlaceholders = [];
+            foreach ($repartoValues as $idx => $repartoValue) {
+                $placeholder = ':reparto_' . $idx;
+                $repartoPlaceholders[] = $placeholder;
+                $params[$placeholder] = $repartoValue;
+            }
+            $repartoSubConditions[] = 'r.reparto IN (' . implode(', ', $repartoPlaceholders) . ')';
+        }
+        if ($includeEmptyReparto) {
+            $repartoSubConditions[] = '(r.reparto IS NULL OR TRIM(r.reparto) = \'\')';
+        }
+        if (!empty($repartoSubConditions)) {
+            $conditions[] = '(' . implode(' OR ', $repartoSubConditions) . ')';
         }
     }
 
@@ -57,6 +86,8 @@ function estrazioniBuildRoomWhereAndParams(array $filters): array
  *   blocco: string,
  *   piano: string,
  *   reparto_filter: bool,
+ *   include_empty_reparto: bool,
+ *   reparto_values: list<string>,
  *   reparto_empty: bool,
  *   reparto: string,
  *   room_code: string,
@@ -88,15 +119,35 @@ function parseEstrazioniFiltersFromGet(array $get): array
 
     $repartoFilter = array_key_exists('reparto', $get);
     $repartoRaw = $get['reparto'] ?? null;
-    $repartoEmpty = $repartoFilter
-        && ($repartoRaw === null || (is_string($repartoRaw) && trim($repartoRaw) === ''));
-    $reparto = trim((string)$repartoRaw);
+    $repartoValuesRaw = [];
+    if (is_array($repartoRaw)) {
+        $repartoValuesRaw = $repartoRaw;
+    } elseif ($repartoRaw !== null || $repartoFilter) {
+        $repartoValuesRaw = [$repartoRaw];
+    }
+
+    $includeEmptyReparto = false;
+    $repartoValues = [];
+    foreach ($repartoValuesRaw as $rawValue) {
+        $normalized = trim((string)$rawValue);
+        if ($normalized === '' || $normalized === '__SENZA_REPARTO__') {
+            $includeEmptyReparto = true;
+            continue;
+        }
+        $repartoValues[] = $normalized;
+    }
+    $repartoValues = array_values(array_unique($repartoValues));
+
+    $repartoEmpty = $repartoFilter && $includeEmptyReparto && empty($repartoValues);
+    $reparto = !empty($repartoValues) ? $repartoValues[0] : '';
 
     return [
         'tipo' => $tipo,
         'blocco' => $blocco,
         'piano' => $piano,
         'reparto_filter' => $repartoFilter,
+        'include_empty_reparto' => $includeEmptyReparto,
+        'reparto_values' => $repartoValues,
         'reparto_empty' => $repartoEmpty,
         'reparto' => $reparto,
         'room_code' => $roomCode,

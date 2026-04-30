@@ -434,7 +434,12 @@ function updateRepartoOptions(reparti, hasEmptyReparto) {
   if (!tsReparto) {
     return;
   }
-  const previousReparto = tsReparto.getValue();
+  const previousRepartiRaw = tsReparto.getValue();
+  const previousReparti = Array.isArray(previousRepartiRaw)
+    ? previousRepartiRaw
+    : previousRepartiRaw
+      ? [previousRepartiRaw]
+      : [];
   tsReparto.clear(true);
   tsReparto.clearOptions();
   tsReparto.addOption({ value: '', text: '' });
@@ -445,14 +450,16 @@ function updateRepartoOptions(reparti, hasEmptyReparto) {
     tsReparto.addOption({ value, text: value });
   });
   tsReparto.refreshOptions(false);
-  if (
-    previousReparto &&
-    (reparti.includes(previousReparto) || (previousReparto === SENZA_REPARTO_VALUE && hasEmptyReparto))
-  ) {
-    tsReparto.setValue(previousReparto, true);
-  } else {
+  const nextReparti = previousReparti.filter(
+    (repartoValue) =>
+      reparti.includes(repartoValue) ||
+      (repartoValue === SENZA_REPARTO_VALUE && hasEmptyReparto)
+  );
+  if (!nextReparti.length) {
     tsReparto.clear(true);
+    return;
   }
+  tsReparto.setValue(nextReparti, true);
 }
 
 async function loadOptionsForContext(blocco, piano) {
@@ -534,7 +541,12 @@ function buildEstrazioniFilterParams() {
 
   const blocco = tsBlocco ? tsBlocco.getValue() : '';
   const piano = tsPiano ? tsPiano.getValue() : '';
-  const reparto = tsReparto ? tsReparto.getValue() : '';
+  const repartoRaw = tsReparto ? tsReparto.getValue() : [];
+  const reparti = Array.isArray(repartoRaw)
+    ? repartoRaw
+    : repartoRaw
+      ? [repartoRaw]
+      : [];
   const stanza = tsStanza ? tsStanza.getValue() : '';
 
   if (blocco) {
@@ -543,13 +555,15 @@ function buildEstrazioniFilterParams() {
   if (piano) {
     params.set('piano', piano);
   }
-  if (reparto !== '') {
-    if (reparto === SENZA_REPARTO_VALUE) {
-      params.set('reparto', '');
-    } else {
-      params.set('reparto', reparto);
+  reparti.forEach((repartoValue) => {
+    if (repartoValue === SENZA_REPARTO_VALUE) {
+      params.append('reparto[]', '');
+      return;
     }
-  }
+    if (repartoValue !== '') {
+      params.append('reparto[]', repartoValue);
+    }
+  });
   if (stanza) {
     params.set('room_code', stanza);
   }
@@ -666,7 +680,11 @@ function initTomSelects() {
     },
   });
 
-  tsReparto = new TS(filterRepartoEl, tomSelectBaseOptions());
+  tsReparto = new TS(filterRepartoEl, {
+    ...tomSelectBaseOptions(),
+    plugins: ['dropdown_input', 'clear_button', 'remove_button'],
+    maxItems: null,
+  });
   tsStanza = new TS(filterStanzaEl, tomSelectBaseOptions());
 
   return true;
