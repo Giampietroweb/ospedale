@@ -652,7 +652,20 @@ body::-webkit-scrollbar-corner,
 }
 
 .modal-header-fields-secondary .modal-field-main {
-  align-items: center
+  align-items: center;
+  min-width: 0;
+}
+
+/* Reparto / accreditamento: select (e Tom Select) non devono superare la cella della griglia */
+.modal-header-fields-secondary .modal-field-main > .ts-wrapper {
+  min-width: 0;
+  max-width: 100%;
+  flex: 1 1 0%;
+}
+
+.modal-header-fields-secondary .modal-field-main .ts-dropdown {
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 .modal-header-fields-secondary .modal-field-input {
@@ -678,6 +691,7 @@ body::-webkit-scrollbar-corner,
   display: flex;
   align-items: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .modal-field-label {
@@ -700,7 +714,9 @@ body::-webkit-scrollbar-corner,
 }
 
 .modal-field-input {
-  flex: 1;
+  flex: 1 1 0%;
+  min-width: 0;
+  max-width: 100%;
   font-size: 14px;
   font-family: inherit;
   border: 1px solid var(--color-border-strong);
@@ -718,6 +734,7 @@ body::-webkit-scrollbar-corner,
 }
 
 .modal-edit-button {
+  flex-shrink: 0;
   padding: 5px 10px;
   font-size: 12px;
   font-weight: var(--fw-semibold);
