@@ -20,10 +20,19 @@
 <body class="planimetria-page">
   <div class="toolbar">
     <div class="toolbar-group toolbar-zoom-controls" aria-label="Controlli zoom">
-      <button id="zoomOut" class="toolbar-utility-button" type="button">Zoom -</button>
-      <button id="zoomIn" class="toolbar-utility-button" type="button">Zoom +</button>
-      <button id="zoomReset" class="toolbar-utility-button" type="button">Reset 100%</button>
-      <strong>Zoom impostato:</strong>
+      <button id="zoomOut" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Zoom meno">
+        <span class="toolbar-zoom-icon" aria-hidden="true">-</span>
+        <span class="toolbar-zoom-text">Zoom -</span>
+      </button>
+      <button id="zoomIn" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Zoom più">
+        <span class="toolbar-zoom-icon" aria-hidden="true">+</span>
+        <span class="toolbar-zoom-text">Zoom +</span>
+      </button>
+      <button id="zoomReset" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Reset zoom al 100%">
+        <span class="toolbar-zoom-icon" aria-hidden="true">&#8635;</span>
+        <span class="toolbar-zoom-text">Reset 100%</span>
+      </button>
+      <strong class="zoom-prefix">Zoom impostato:</strong>
       <span id="zoomValue" class="zoom-label">100%</span>
     </div>
     <nav class="toolbar-navigation" aria-label="Navigazione principale">
@@ -32,7 +41,10 @@
       <a href="../cataloghi.html" class="home-cta-link-toolbar">Cataloghi</a>
     </nav>
     <div class="toolbar-group toolbar-reference-actions">
-      <button id="referenceSearchToggle" class="toolbar-primary-action" type="button" aria-expanded="false" aria-controls="referenceSearchPanel">Cerca referenza</button>
+      <button id="referenceSearchToggle" class="toolbar-primary-action toolbar-reference-toggle" type="button" aria-expanded="false" aria-controls="referenceSearchPanel" aria-label="Cerca referenza">
+        <span class="toolbar-reference-icon" aria-hidden="true">&#128269;</span>
+        <span class="toolbar-reference-text">Cerca referenza</span>
+      </button>
     </div>
   </div>
 

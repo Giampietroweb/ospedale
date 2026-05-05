@@ -3147,10 +3147,10 @@ function bindOccurrencesClick(svgDocument, roomCodesSet) {
     }
 
     if (isClickableOccurrence(textNode)) {
+      clickableCount += 1;
       if (textNode.dataset.clickBound === '1') {
         return;
       }
-      clickableCount += 1;
       textNode.dataset.clickBound = '1';
       textNode.style.cursor = 'pointer';
       textNode.addEventListener('click', () => {
@@ -3170,6 +3170,53 @@ function bindOccurrencesClick(svgDocument, roomCodesSet) {
     textNodeCount,
     clickableCount,
     highlightedCount
+  };
+}
+
+function clearMapBindingArtifacts(svgDocument) {
+  if (!svgDocument) {
+    return;
+  }
+  const nodesWithClasses = svgDocument.querySelectorAll('.room-present-in-db, .room-centralized-monitor');
+  nodesWithClasses.forEach((node) => {
+    node.classList.remove('room-present-in-db', 'room-centralized-monitor');
+  });
+}
+
+function getMapInitHealthStatus(bindStats, roomCodesSet) {
+  const textNodeCount = Number(bindStats?.textNodeCount || 0);
+  const clickableCount = Number(bindStats?.clickableCount || 0);
+  const highlightedCount = Number(bindStats?.highlightedCount || 0);
+  const roomCodesAvailable = roomCodesSet instanceof Set ? roomCodesSet.size : 0;
+
+  if (textNodeCount < 300) {
+    return {
+      ok: false,
+      reason: 'svg-partial',
+      details: { textNodeCount, clickableCount, highlightedCount, roomCodesAvailable }
+    };
+  }
+
+  if (roomCodesAvailable > 0 && clickableCount === 0) {
+    return {
+      ok: false,
+      reason: 'no-clickable-refs',
+      details: { textNodeCount, clickableCount, highlightedCount, roomCodesAvailable }
+    };
+  }
+
+  if (roomCodesAvailable > 0 && highlightedCount === 0) {
+    return {
+      ok: false,
+      reason: 'no-highlighted-db-rooms',
+      details: { textNodeCount, clickableCount, highlightedCount, roomCodesAvailable }
+    };
+  }
+
+  return {
+    ok: true,
+    reason: 'ok',
+    details: { textNodeCount, clickableCount, highlightedCount, roomCodesAvailable }
   };
 }
 
@@ -3222,9 +3269,6 @@ function initializeMapDimensions(roomCodesSet = null) {
   const svgDocument = mapObject.contentDocument;
   if (!svgDocument || !svgDocument.documentElement) {
     console.log('[MapLoader] initializeMapDimensions failed: missing svgDocument');
-    setCenteredMapErrorMessage(`Errore nel caricamento della planimetria SVG. Planimetria non trovata: ${requestedFloorName || '-'}.`);
-    setMapControlsEnabled(false);
-    markMapResourceReady();
     return;
   }
 
@@ -3244,7 +3288,6 @@ function initializeMapDimensions(roomCodesSet = null) {
   updateZoomDisplay();
   centerMapInViewport();
   console.log('[MapLoader] initializeMapDimensions success');
-  markMapResourceReady();
   return bindStats;
 }
 
@@ -3371,42 +3414,81 @@ if (isFloorMapReady) {
   loadOccurrencesData(requestedFloorName);
   startMapLoadSequence();
 
-  const MAP_FALLBACK_MAX_ATTEMPTS = 6;
-  const MAP_FALLBACK_RETRY_MS = 1200;
+  const MAP_RETRY_DELAYS_MS = [800, 1200, 1800, 2500, 3200, 4000, 5000, 6500];
+  const MAP_MAX_RETRY_ATTEMPTS = MAP_RETRY_DELAYS_MS.length;
   let mapInitDone = false;
-  let mapFallbackAttempts = 0;
+  let mapInitInProgress = false;
+  let mapRetryAttempts = 0;
 
-  async function runMapInitOnce(triggerSource = 'load') {
-    console.log('[MapLoader] runMapInitOnce called', { mapInitDone, triggerSource, mapFallbackAttempts });
-    if (mapInitDone) {
+  function failMapInitAfterRetries(reason) {
+    mapInitDone = true;
+    console.warn('[MapLoader] retry limit reached', {
+      reason,
+      mapRetryAttempts,
+      mapInitDone
+    });
+    setCenteredMapErrorMessage('Caricamento planimetria incompleto, ricarica la pagina.');
+    setMapControlsEnabled(false);
+    markMapResourceReady();
+  }
+
+  function scheduleMapInitRetry(reason) {
+    if (mapInitDone || mapRetryAttempts >= MAP_MAX_RETRY_ATTEMPTS) {
+      failMapInitAfterRetries(reason);
       return;
     }
+    const delayMs = MAP_RETRY_DELAYS_MS[Math.min(mapRetryAttempts, MAP_RETRY_DELAYS_MS.length - 1)];
+    console.warn('[MapLoader] scheduling retry', {
+      reason,
+      mapRetryAttempts,
+      delayMs
+    });
+    mapRetryAttempts += 1;
+    window.setTimeout(() => {
+      runMapInitOnce('retry');
+    }, delayMs);
+  }
+
+  async function runMapInitOnce(triggerSource = 'load') {
+    console.log('[MapLoader] runMapInitOnce called', {
+      mapInitDone,
+      mapInitInProgress,
+      triggerSource,
+      mapRetryAttempts
+    });
+    if (mapInitDone || mapInitInProgress) {
+      return;
+    }
+    mapInitInProgress = true;
     try {
       const roomCodesSet = await roomsInDbSetPromise;
       const mapInitResult = initializeMapDimensions(roomCodesSet);
       if (!mapInitResult) {
+        scheduleMapInitRetry('init-returned-empty');
         return;
       }
-
-      const clickableCount = Number(mapInitResult.clickableCount || 0);
-      if (triggerSource === 'fallback' && clickableCount === 0 && mapFallbackAttempts < MAP_FALLBACK_MAX_ATTEMPTS) {
-        console.warn('[MapLoader] fallback init without clickable references: retry', {
-          mapFallbackAttempts,
-          clickableCount
+      const healthStatus = getMapInitHealthStatus(mapInitResult, roomCodesSet);
+      if (!healthStatus.ok) {
+        const svgDocument = mapObject.contentDocument;
+        clearMapBindingArtifacts(svgDocument);
+        console.warn('[MapLoader] map init health check failed', {
+          triggerSource,
+          attempt: mapRetryAttempts,
+          reason: healthStatus.reason,
+          ...healthStatus.details
         });
-        window.setTimeout(() => {
-          mapFallbackAttempts += 1;
-          runMapInitOnce('fallback');
-        }, MAP_FALLBACK_RETRY_MS);
+        scheduleMapInitRetry(healthStatus.reason);
         return;
       }
 
       mapInitDone = true;
+      mapRetryAttempts = 0;
+      markMapResourceReady();
     } catch (error) {
       console.error('Errore inizializzazione mappa:', error);
-      setCenteredMapErrorMessage('Errore durante l\'inizializzazione della planimetria.');
-      setMapControlsEnabled(false);
-      markMapResourceReady();
+      scheduleMapInitRetry('init-error');
+    } finally {
+      mapInitInProgress = false;
     }
   }
 
@@ -3431,10 +3513,10 @@ if (isFloorMapReady) {
   window.setTimeout(() => {
     console.log('[MapLoader] fallback timeout tick', {
       mapInitDone,
+      mapInitInProgress,
       hasContentDocument: Boolean(mapObject.contentDocument)
     });
-    if (!mapInitDone && mapObject.contentDocument) {
-      mapFallbackAttempts += 1;
+    if (!mapInitDone && !mapInitInProgress && mapObject.contentDocument) {
       runMapInitOnce('fallback');
     }
   }, 3000);
