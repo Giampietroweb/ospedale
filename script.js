@@ -518,6 +518,7 @@ let occurrencesMap = null;
 let normalizedOccurrencesMap = null;
 let roomsInDatabaseSet = null;
 let centralizedMonitorRoomsSet = null;
+const FLOOR_ROOMS_FETCH_TIMEOUT_MS = 6000;
 
 function resetMapLoadSequence() {
   console.log('[MapLoader] resetMapLoadSequence');
@@ -775,12 +776,21 @@ async function loadRoomsInDbSet(floorContext) {
     return null;
   }
 
+  let timeoutId = null;
   try {
+    const abortController = typeof AbortController === 'function' ? new AbortController() : null;
+    timeoutId = window.setTimeout(() => {
+      if (abortController) {
+        abortController.abort();
+      }
+    }, FLOOR_ROOMS_FETCH_TIMEOUT_MS);
     const query = new URLSearchParams({
       blocco: floorContext.blocco,
       piano: floorContext.piano
     });
-    const response = await fetch(`../api/get-rooms-for-floor.php?${query.toString()}`);
+    const response = await fetch(`../api/get-rooms-for-floor.php?${query.toString()}`, {
+      signal: abortController ? abortController.signal : undefined
+    });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
@@ -808,10 +818,20 @@ async function loadRoomsInDbSet(floorContext) {
     });
     return roomsInDatabaseSet;
   } catch (error) {
+    if (error && error.name === 'AbortError') {
+      console.warn('[RoomsDbHighlight] Timeout fetch stanze DB', {
+        floorContext,
+        timeoutMs: FLOOR_ROOMS_FETCH_TIMEOUT_MS
+      });
+    }
     console.warn('[RoomsDbHighlight] Impossibile caricare stanze DB:', error);
     roomsInDatabaseSet = null;
     centralizedMonitorRoomsSet = null;
     return null;
+  } finally {
+    if (timeoutId !== null) {
+      window.clearTimeout(timeoutId);
+    }
   }
 }
 
@@ -3127,7 +3147,11 @@ function bindOccurrencesClick(svgDocument, roomCodesSet) {
     }
 
     if (isClickableOccurrence(textNode)) {
+      if (textNode.dataset.clickBound === '1') {
+        return;
+      }
       clickableCount += 1;
+      textNode.dataset.clickBound = '1';
       textNode.style.cursor = 'pointer';
       textNode.addEventListener('click', () => {
         const textValue = textNode.textContent.trim();
@@ -3142,6 +3166,11 @@ function bindOccurrencesClick(svgDocument, roomCodesSet) {
     highlightedCount,
     roomCodesAvailable: roomCodesSet instanceof Set ? roomCodesSet.size : 0
   });
+  return {
+    textNodeCount,
+    clickableCount,
+    highlightedCount
+  };
 }
 
 function getSvgSizeFromViewBox(svgRoot) {
@@ -3210,12 +3239,13 @@ function initializeMapDimensions(roomCodesSet = null) {
     baseImageHeight = mapObject.clientHeight || 1000;
   }
 
-  bindOccurrencesClick(svgDocument, roomCodesSet);
+  const bindStats = bindOccurrencesClick(svgDocument, roomCodesSet);
   setCenteredMapErrorMessage('');
   updateZoomDisplay();
   centerMapInViewport();
   console.log('[MapLoader] initializeMapDimensions success');
   markMapResourceReady();
+  return bindStats;
 }
 
 async function handleAddApparecchiatura() {
@@ -3341,16 +3371,37 @@ if (isFloorMapReady) {
   loadOccurrencesData(requestedFloorName);
   startMapLoadSequence();
 
+  const MAP_FALLBACK_MAX_ATTEMPTS = 6;
+  const MAP_FALLBACK_RETRY_MS = 1200;
   let mapInitDone = false;
-  async function runMapInitOnce() {
-    console.log('[MapLoader] runMapInitOnce called', { mapInitDone });
+  let mapFallbackAttempts = 0;
+
+  async function runMapInitOnce(triggerSource = 'load') {
+    console.log('[MapLoader] runMapInitOnce called', { mapInitDone, triggerSource, mapFallbackAttempts });
     if (mapInitDone) {
       return;
     }
-    mapInitDone = true;
     try {
       const roomCodesSet = await roomsInDbSetPromise;
-      initializeMapDimensions(roomCodesSet);
+      const mapInitResult = initializeMapDimensions(roomCodesSet);
+      if (!mapInitResult) {
+        return;
+      }
+
+      const clickableCount = Number(mapInitResult.clickableCount || 0);
+      if (triggerSource === 'fallback' && clickableCount === 0 && mapFallbackAttempts < MAP_FALLBACK_MAX_ATTEMPTS) {
+        console.warn('[MapLoader] fallback init without clickable references: retry', {
+          mapFallbackAttempts,
+          clickableCount
+        });
+        window.setTimeout(() => {
+          mapFallbackAttempts += 1;
+          runMapInitOnce('fallback');
+        }, MAP_FALLBACK_RETRY_MS);
+        return;
+      }
+
+      mapInitDone = true;
     } catch (error) {
       console.error('Errore inizializzazione mappa:', error);
       setCenteredMapErrorMessage('Errore durante l\'inizializzazione della planimetria.');
@@ -3383,7 +3434,8 @@ if (isFloorMapReady) {
       hasContentDocument: Boolean(mapObject.contentDocument)
     });
     if (!mapInitDone && mapObject.contentDocument) {
-      runMapInitOnce();
+      mapFallbackAttempts += 1;
+      runMapInitOnce('fallback');
     }
   }, 3000);
 }
