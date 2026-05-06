@@ -151,7 +151,67 @@ Incremento/decremento a click:
 - la viewport mantiene il centro durante zoom in/out
 - al reset torna a `100%` e ricentra
 
-## 5) Note manutentive
+## 5) Ottimizzazione vettoriale (`scripts/optimize-planimetria.mjs`)
+
+### 5.1 Obiettivo
+
+Ridurre drasticamente il peso di una planimetria (es. `nord-6.svg` da 17 MB)
+senza alterarne l'aspetto visivo e senza toccare gli elementi cliccabili
+(`<text>` con codici nel formato `*P6-...*`).
+
+### 5.2 Cosa modifica lo script
+
+Modifica solo path/rect/circle "decorativi nudi" — cioe' elementi che hanno
+unicamente attributi di stile (`stroke`, `stroke-width`, `fill`, `fill-opacity`)
+e niente `id`, `class`, `transform`, `onclick`, `style`. Per ognuno applica:
+
+- decimazione coordinate a 2 decimali
+- normalizzazione numerica di `stroke-width`/`fill-opacity` (round a 2 decimali)
+- eliminazione path "punto" (`<path d="M x,y z" />` o equivalenti)
+- dedupe degli elementi identici dopo decimazione
+- raggruppamento per firma di stile in `<g stroke=... stroke-width=... fill=... fill-opacity=...>` con stile condiviso e attributi inline rimossi
+
+### 5.3 Cosa NON modifica mai
+
+- nessun `<text>`, in particolare i 287 codici cliccabili `*P6...*`
+- nessun elemento con `id`, `class`, `transform`, `onclick`, `style`
+- `viewBox`, `width`, `height` del tag `<svg>`
+- header XML, DOCTYPE, encoding, newline non necessari
+- ordine relativo dei blocchi non-decorativi (z-order preservato)
+
+### 5.4 Idempotenza
+
+Rieseguendo lo script sull'output, l'output e' identico byte-per-byte all'input.
+Garanzia ottenuta tramite la guardia `hasInlineStyleAttribute`: gli elementi
+gia' dentro un `<g>` (privi di stile inline) vengono ignorati come
+"non-decorativi nudi".
+
+### 5.5 Verifica integrita'
+
+Lo script confronta il set di codici `*P6...*` tra input e output e fallisce
+con exit code `2` solo se l'ottimizzazione **rompe** qualcosa (codici persi).
+Le incongruenze pre-esistenti tra `occorenze-<piano>.json` e l'SVG sono
+segnalate come diagnostico ma NON fanno fallire lo script.
+
+### 5.6 Uso
+
+```bash
+node scripts/optimize-planimetria.mjs planimetrie/nord-6.svg
+```
+
+Output side-by-side: `planimetrie/nord-6.optimized.svg`. L'originale resta
+intatto. Il riepilogo dei numeri di compressione viene stampato a console.
+
+### 5.7 Risultato di riferimento (nord-6.svg)
+
+- 17.02 MB -> 8.80 MB (-48.3%)
+- 50.156 path decorativi -> 46.939 raggruppati (2.609 puntini scartati, 608 duplicati)
+- 42.281 rect raggruppati
+- 147 circle -> 138 raggruppati (9 duplicati)
+- 1.125 gruppi di stile generati (~30 stili reali, ripetuti perche' separati da `<text>`)
+- 286/286 codici cliccabili preservati
+
+## 6) Note manutentive
 
 - Se in futuro compaiono nuove varianti di codice `P6`, aggiornare il pattern di riconoscimento mantenendo la regola `*...*`.
 - Evitare sostituzioni manuali massive nel file SVG: preferire script idempotenti che:
@@ -163,7 +223,7 @@ Incremento/decremento a click:
   - `P6-191-060`
   - `P6191-014d`
 
-## 6) Prompt pronto da incollare in chat
+## 7) Prompt pronto da incollare in chat
 
 Copia e incolla questo prompt quando carichi una nuova SVG:
 
