@@ -97,11 +97,16 @@ ospedale/
 │   └── php/
 │       └── Dockerfile            # php:8.2-apache + pdo_mysql
 │
+├── scripts/
+│   ├── build-production.mjs      # Genera dist/ per deploy produzione
+│   └── optimize-planimetria.mjs  # Ottimizzazione safe SVG planimetrie
+│
 ├── .env                          # Variabili d'ambiente (NON versionare)
-├── .env.example                  # Template variabili (da creare)
+├── .env.example                  # Template variabili versionabile
 ├── docker-compose.yml            # Stack Docker completo
 ├── composer.json                 # Dipendenze PHP (phpspreadsheet)
 ├── composer.lock
+├── package.json                  # Script npm per build produzione
 ├── DEPENDENCIES.txt              # Istruzioni Composer
 └── documentazione-regole.md     # Regole formato SVG planimetrie
 ```
@@ -589,13 +594,39 @@ Lo schema viene inizializzato automaticamente da `database/schema.sql` al primo 
 
 ### 9.3 Deploy manuale (senza Docker)
 
-1. Requisiti: PHP 8.2+, MySQL 8.x, Apache/Nginx, Composer
-2. Clona il repository nella document root del web server
-3. Crea il database e importa `database/schema.sql`
-4. Crea il file `.env` con le credenziali
-5. Esegui `composer install` nella root del progetto
-6. Configura il virtual host per puntare alla root del progetto
-7. Assicurati che Apache/Nginx possa scrivere (se necessario) e leggere tutti i file
+1. Requisiti locali per preparare il pacchetto: Node.js 18+ e npm.
+2. Dalla root del progetto genera l'artefatto produzione:
+   ```bash
+   npm run build:prod
+   ```
+3. Carica sul server il contenuto della cartella `dist/` nella document root del virtual host.
+4. Sul server crea il file `.env` partendo da `.env.example` e inserisci credenziali reali.
+5. Crea il database MySQL e importa `database/schema.sql` più eventuali seed necessari.
+6. Sul server, dentro la document root, installa le dipendenze PHP ottimizzate:
+   ```bash
+   composer install --no-dev --optimize-autoloader
+   ```
+7. Configura Apache/Nginx per servire la root del progetto e proteggi file non pubblici come `.env`.
+8. Verifica almeno:
+   - caricamento di `index.html`;
+   - apertura di `piani/planimetria.html?piano=nord-6`;
+   - risposta delle API principali;
+   - export XLSX da `api/estrazioni-export.php`.
+
+### 9.3.1 Build produzione
+
+Il comando `npm run build:prod` esegue `scripts/build-production.mjs` e crea una cartella `dist/` pulita con i soli file necessari al deploy manuale:
+
+- pagine HTML, JavaScript e CSS dell'applicazione;
+- cartelle runtime `api/`, `piani/`, `planimetrie/`;
+- cartella `vendor/` con dipendenze PHP gia' pronte per server senza Composer;
+- `composer.json`, `composer.lock` e `.env.example`;
+- `build-manifest.json`, utile per controllare file inclusi, numero file e dimensione dell'artefatto.
+
+La build esclude automaticamente dipendenze installate localmente, output precedenti, log, cache, backup e file SVG di lavoro come `*_old.svg` o `*.optimized.svg`.
+Esclude inoltre `api/test-db.php`, perché è un endpoint diagnostico da non pubblicare in produzione.
+
+Prerequisito: prima della build produzione deve esistere `vendor/autoload.php` (installa le dipendenze in locale con `composer install --no-dev --optimize-autoloader`).
 
 ---
 
@@ -651,6 +682,18 @@ planimetrie/
 
 Installazione: `composer install`
 
+In produzione usare:
+
+```bash
+composer install --no-dev --optimize-autoloader
+```
+
+### Build produzione (Node.js)
+
+| Strumento | Versione | Uso |
+|-----------|----------|-----|
+| Node.js + npm | 18+ | Generazione cartella `dist/` con `npm run build:prod` |
+
 ### JavaScript (CDN)
 
 | Libreria | Uso | Pagine |
@@ -667,13 +710,13 @@ Installazione: `composer install`
 | # | Limitazione | Impatto |
 |---|-------------|---------|
 | 1 | Nessun sistema di autenticazione | Chiunque raggiunga il server può leggere e modificare i dati |
-| 2 | `.env` non escluso da git | Rischio esposizione credenziali se il repo è condiviso |
+| 2 | File `.env` da proteggere anche sul web server | Rischio esposizione credenziali se servito come file statico |
 | 3 | Righe apparecchiature identificate per posizione DOM | Riordinamento o inserimento può corrompere dati |
 | 4 | Nessun audit log | Non è tracciabile chi ha modificato cosa e quando |
 | 5 | Nessuna migrazione database versionata | Impossibile aggiornare produzione in modo controllato |
 | 6 | SVG non versionati nel repository | Il progetto non è autonomamente deployabile senza file esterni |
 | 7 | Console.log attivi in produzione | Esposizione dati interni nella console del browser |
-| 8 | Export Excel richiede Composer manuale | Può fallire silenziosamente se `vendor/` è assente |
+| 8 | Export Excel richiede `composer install` sul server | Può fallire con errore 503 se `vendor/` è assente |
 
 ### Sviluppi futuri consigliati
 

@@ -1,6 +1,35 @@
+# Dipendenze installate localmente
 /vendor/
+/node_modules/
+
+# Variabili d'ambiente e segreti locali
 .env
-.env.local
-.env.*.local
+.env.*
+!.env.example
+
+# Output di build/release
+/dist/
+/build/
+/release/
+
+# Log, cache e file temporanei
 *.log
+*.tmp
+*.temp
+*.cache
+/tmp/
+/cache/
+/coverage/
+
+# Artefatti locali di sviluppo
+REPORT-*.md
+*.bak
+*.backup
+*.swp
+*.swo
+
+# Editor e sistema operativo
 .DS_Store
+Thumbs.db
+.idea/
+.vscode/
