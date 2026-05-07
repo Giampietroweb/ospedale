@@ -164,7 +164,7 @@ Dopo la verifica/modifica mostra:
 
 ### Obiettivo
 
-Ottimizzare il viewBox per ridurre lo spazio bianco sopra/sotto, poi produrre il report di chiusura lavorazione.
+Ottimizzare il viewBox per racchiudere il contenuto con margine ~20 unità; se necessario, allineare `width`/`height` del tag `<svg>` al rapporto del viewBox per eliminare le bande vuote (letterboxing) in anteprima. Produrre infine il report di chiusura lavorazione.
 
 ### Prompt
 
@@ -180,8 +180,17 @@ FASE VIEWBOX:
 3. Se il viewBox corrente ha margini significativamente diversi da ~20 unità sui lati:
    - Calcola il nuovo viewBox: x_min-20, y_min-20, (x_max-x_min)+40, (y_max-y_min)+40
    - Modifica SOLO l'attributo viewBox del tag <svg>.
-   - Non modificare width, height, geometrie, path o testi.
+   - Non modificare geometrie, path o testi.
 4. Se il viewBox corrente è già calibrato entro ±5 unità dal valore ottimale: lasciarlo invariato.
+
+FASE CANVAS (letterboxing — solo se serve):
+Se dopo il viewBox ottimizzato la preview mostra ancora ampie bande trasparenti sopra/sotto (o ai lati), non è un problema di viewBox ma dell'aspect ratio tra gli attributi width/height del tag <svg> e il viewBox.
+- Con `preserveAspectRatio` predefinito (`xMidYMid meet`), il contenuto viene scalato uniformemente dentro il rettangolo width×height; se quel rettangolo non ha lo stesso rapporto larghezza/altezza del viewBox, compaiono bande vuote.
+- Per eliminarle senza deformare il disegno: mantenere `width` invariato e impostare `height` in modo che width/height = vb_width/vb_height (oppure il viceversa—mantenere height e ricalcolare width—ma nei nostri file si usa tipicamente width fisso). Formula:
+  height_pt = width_pt × (vb_height / vb_width)
+  dove vb_width e vb_height sono il terzo e il quarto numero del viewBox `min-x min-y vb_width vb_height`.
+- Modificare SOLO gli attributi width e/o height sulla riga del tag `<svg>` (nessun path, nessun testo).
+- Per file > 8 MiB usare `sed` sulla riga dell'header (vedi sezione «Strategia di edit su file SVG > 8 MB» e «Rimozione bande vuote»).
 
 REPORT FINALE OBBLIGATORIO:
 Riporta i seguenti valori:
@@ -191,12 +200,13 @@ Riporta i seguenti valori:
 - Numero casi *P{n}* incompleti (deve essere 0).
 - ViewBox precedente e nuovo (o "invariato" se non modificato).
 - Mostra git diff --stat del file.
-- Conferma esplicita: "Nessuna modifica fuori da referenze/stile P{n} e viewBox".
+- Conferma esplicita: "Nessuna modifica fuori da referenze/stile P{n}, viewBox e (se applicata) width/height del tag <svg> per rimozione letterboxing".
 ```
 
 ### Criteri di accettazione
 
 - Il viewBox è ottimale: contenuto visibile con margine ~20 unità.
+- Se si applica la FASE CANVAS (letterboxing): `width/height` del tag `<svg>` ha lo stesso rapporto di `vb_width/vb_height` del viewBox (a meno di arrotondamento).
 - Il report numerico è completo e coerente.
 - `git diff --stat` mostra le sole modifiche attese.
 - La conferma esplicita è presente.
@@ -212,6 +222,7 @@ Prima di considerare il file pronto, verificare manualmente:
 - [ ] `grep '>\*P{n}\*<' nord-{n}.svg` restituisce 0 (nessun caso incompleto)
 - [ ] `tail -5 nord-{n}.svg` mostra nodi `*P{n}-...*` seguiti da `</svg>`
 - [ ] `head -3 nord-{n}.svg | grep viewBox` mostra il viewBox aggiornato o invariato
+- [ ] Se la preview mostra ancora bande vuote sopra/sotto: il rapporto `width/height` coincide con `vb_width/vb_height` del viewBox (vedi «Rimozione bande vuote»)
 - [ ] Il file apre correttamente nel browser o in un visualizzatore SVG
 
 ---
@@ -242,6 +253,39 @@ x, y, font-family, text-anchor
 
 ### Margine viewBox
 Il margine di sicurezza standard attorno al bounding box del contenuto è **20 unità SVG**.
+
+### Rimozione bande vuote (letterboxing sopra/sotto o ai lati)
+
+Molti export CAD salvano il `<svg>` con `width` e `height` da foglio verticale (es. formato A4 in punti tipografici), mentre il `viewBox` dopo la calibrazione descrive una **fascia orizzontale stretta** attorno al disegno. Il viewBox da solo **non** rimuove le bande trasparenti che si vedono nell’anteprima: lo spazio vuoto nasce perché il **rapporto** `width / height` del viewport non coincide con `vb_width / vb_height` del viewBox.
+
+#### Diagnosi rapida
+- Se `width_pt / height_pt` ≠ `vb_width / vb_height` (con tolleranza di arrotondamento su 2 decimali), compariranno bande (`meet`) oppure il contenuto sarà tagliato (`slice` non è il default).
+- Esempio tipico: `width="2383.92pt"` `height="3370.32pt"` (aspect ~0,71, verticale) con `viewBox="… 1810.46 438.87"` (aspect ~4,12, fascia orizzontale) → ampie bande sopra/sotto.
+
+#### Strategia (senza deformare il disegno)
+1. Leggere dalla riga del tag `<svg>` i valori attuali di `width`, `height` e `viewBox`.
+2. Parsare il viewBox come quattro numeri: `min_x`, `min_y`, `vb_w`, `vb_h`.
+3. **Mantenere `width` invariato** e calcolare la nuova altezza del viewport:
+   ```
+   height_nuovo = width × (vb_h / vb_w)
+   ```
+   Arrotondare a **due decimali** come gli altri attributi pt (es. `577.88pt`).
+4. Sostituire **solo** `height="..."` sul tag `<svg>` radice. Non cambiare `viewBox` per questo passaggio se è già stato ottimizzato allo Step 5.
+5. Verificare: `width / height_nuovo ≈ vb_w / vb_h`.
+
+Variante equivalente (meno usata nei nostri file): mantenere `height` e ricalcolare `width = height × (vb_w / vb_h)`.
+
+#### Implementazione sicura
+- File **> 8 MiB**: usare `sed` sulla **riga 3** (header `<svg>`), mai edit che riscrivono l’intero file (vedi «Strategia di edit su file SVG > 8 MB`).
+  ```
+  sed -i '' '3s/height="VECCHIO"/height="NUOVO"/' planimetrie/nord-{n}/nord-{n}.svg
+  ```
+- File **≤ 8 MiB**: la stessa formula e gli stessi vincoli; si può comunque preferire `sed` per coerenza.
+
+#### Verifica dopo la modifica
+- `wc -c`: delta in byte coerente con la sostituzione della stringa `height` (spesso −1 byte).
+- `tail -c 200`: deve terminare con `</svg>` e l’ultimo `<text>` P{n}.
+- `grep -c '\*P{n}-'`: conteggio etichette invariato rispetto a prima.
 
 ### Strategia di edit su file SVG > 8 MB
 I file di planimetria possono superare i 20 MB. Gli strumenti di edit testuale che caricano l'intero file in memoria troncano il contenuto al limite di **8 MiB (8.388.608 byte)**, lasciando un SVG senza `</svg>` finale e con tutti i nodi `<text>` P{n} (collocati in fondo al file) persi.
@@ -283,5 +327,5 @@ Poi riapplicare la modifica con la strategia streaming descritta sopra.
 - Immagini embeddate (es. `<image>`)
 - Testi non-P{n}
 - Layer e gruppi (`<g>`)
-- Attributi globali del `<svg>` diversi da `viewBox`
+- Attributi globali del `<svg>` diversi da `viewBox` e da quanto richiesto dalla **Rimozione bande vuote** (`width` / `height` solo per allineare l’aspect del viewport al viewBox, senza alterare geometrie)
 - Encoding, dichiarazione XML, DOCTYPE
