@@ -737,11 +737,24 @@ function getNestedPlanimetryBasePath(floorName) {
 async function loadOccurrencesData(floorName) {
   try {
     const nestedBasePath = getNestedPlanimetryBasePath(floorName);
-    const nestedOccurrencesPath = `${nestedBasePath}/occorenze-${floorName}.json`;
-    const legacyOccurrencesPath = `../planimetrie/occorenze-${floorName}.json`;
-    let response = await fetch(nestedOccurrencesPath);
-    if (!response.ok) {
-      response = await fetch(legacyOccurrencesPath);
+    const candidatePaths = [
+      `${nestedBasePath}/occorrenze-${floorName}.json`,
+      `${nestedBasePath}/occorenze-${floorName}.json`,
+      `../planimetrie/occorrenze-${floorName}.json`,
+      `../planimetrie/occorenze-${floorName}.json`
+    ];
+    let response = null;
+    for (const candidatePath of candidatePaths) {
+      const candidateResponse = await fetch(candidatePath);
+      if (!candidateResponse.ok) {
+        continue;
+      }
+      response = candidateResponse;
+      break;
+    }
+
+    if (!response) {
+      throw new Error('JSON occorrenze non trovato');
     }
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
@@ -2897,7 +2910,7 @@ async function loadRoomDataFromDatabase(roomContext, roomCode, requestToken) {
     throw new Error(`HTTP ${response.status}`);
   }
 
-  const payload = await response.json();
+  const payload = await parseJsonResponseOrThrow(response);
   if (!payload?.ok) {
     throw new Error(payload?.error || 'Errore caricamento stanza');
   }
@@ -2910,6 +2923,26 @@ async function loadRoomDataFromDatabase(roomContext, roomCode, requestToken) {
     applyRoomAttributesFromPayload(payload.attributiStanza);
     applyTableRowsFromPayload(payload);
     return;
+  }
+}
+
+async function parseJsonResponseOrThrow(response) {
+  const responseText = await response.text();
+  if (responseText.trim() === '') {
+    return {};
+  }
+
+  try {
+    return JSON.parse(responseText);
+  } catch (error) {
+    const trimmedResponse = responseText.trimStart();
+    const phpSourceReturned = trimmedResponse.startsWith('<?php');
+    if (phpSourceReturned) {
+      throw new Error('Il server sta restituendo codice PHP come testo: avvia la app con un web server PHP (non file statici).');
+    }
+
+    const snippet = responseText.slice(0, 120).replace(/\s+/g, ' ').trim();
+    throw new Error(`Risposta non valida dal server (atteso JSON). Anteprima: ${snippet || '[vuota]'}`);
   }
 }
 

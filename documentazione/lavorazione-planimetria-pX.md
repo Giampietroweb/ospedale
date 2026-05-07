@@ -243,6 +243,41 @@ x, y, font-family, text-anchor
 ### Margine viewBox
 Il margine di sicurezza standard attorno al bounding box del contenuto è **20 unità SVG**.
 
+### Strategia di edit su file SVG > 8 MB
+I file di planimetria possono superare i 20 MB. Gli strumenti di edit testuale che caricano l'intero file in memoria troncano il contenuto al limite di **8 MiB (8.388.608 byte)**, lasciando un SVG senza `</svg>` finale e con tutti i nodi `<text>` P{n} (collocati in fondo al file) persi.
+
+#### Sintomi di troncamento
+- `wc -c nord-{n}.svg` restituisce esattamente `8388608` o `8388610`.
+- `tail -c 200 nord-{n}.svg` non contiene `</svg>` e finisce a metà di un attributo `d="..."`.
+- `grep -c '\*P{n}-' nord-{n}.svg` restituisce 0 (tutti i P{n} sono in coda al file).
+- La preview SVG nell'IDE/browser non si carica.
+
+#### Strategia raccomandata
+Per modifiche puntuali su SVG di grandi dimensioni usare sempre operazioni in streaming, mai edit che riscrivono l'intero file:
+
+- **Modifica di un singolo attributo o riga** (es. `viewBox`, `height`, `width`): usare `sed` in-place. Su macOS:
+  ```
+  sed -i '' '3s/height="OLD"/height="NEW"/' planimetrie/nord-{n}/nord-{n}.svg
+  ```
+  Limitare il range alla riga esatta (`3s/.../.../`) per evitare match accidentali nel resto del file.
+- **Modifiche multiple su nodi `<text>` P{n}**: script Python che legge e scrive in streaming (riga per riga), oppure `sed` con più espressioni `-e`.
+- **Mai** eseguire un'operazione che ricarica e riscrive l'intero file.
+
+#### Verifica post-modifica obbligatoria
+Dopo ogni edit su un file > 8 MB, verificare in quest'ordine:
+
+1. `wc -c nord-{n}.svg` — la dimensione deve essere coerente col delta atteso (es. `-1` byte se la nuova stringa è 1 carattere più corta).
+2. `tail -c 200 nord-{n}.svg` — deve terminare con `</svg>` preceduto dall'ultimo nodo `<text>` P{n}.
+3. `git diff --stat planimetrie/nord-{n}/nord-{n}.svg` — deve mostrare il numero esatto di righe modificate previste, non migliaia.
+4. `grep -c '\*P{n}-' nord-{n}.svg` — il conteggio deve essere identico a prima della modifica.
+
+#### Recovery in caso di troncamento
+Se il file risulta troncato, ripristinare immediatamente dall'ultimo commit:
+```
+git checkout HEAD -- planimetrie/nord-{n}/nord-{n}.svg
+```
+Poi riapplicare la modifica con la strategia streaming descritta sopra.
+
 ### Cosa non toccare mai
 - `<path>` e geometrie
 - Immagini embeddate (es. `<image>`)
