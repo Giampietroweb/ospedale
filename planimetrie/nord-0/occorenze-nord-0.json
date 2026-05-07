@@ -1,0 +1,1172 @@
+[
+  {
+    "Codice semplificato": "P0-231-055",
+    "Nome": "DAP",
+    "Occupazione": "Deposito apparecchiature",
+    "Area": "26,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-037",
+    "Nome": "LME",
+    "Occupazione": "Locale medici",
+    "Area": "19,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-038",
+    "Nome": "RIU",
+    "Occupazione": "Sala riunioni",
+    "Area": "41,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-057",
+    "Nome": "DEP",
+    "Occupazione": "Deposito",
+    "Area": "9,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-042",
+    "Nome": "LME",
+    "Occupazione": "Locale medici",
+    "Area": "27,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-043",
+    "Nome": "LME",
+    "Occupazione": "Locale medici",
+    "Area": "28,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-044",
+    "Nome": "OSS",
+    "Occupazione": "Osservazione",
+    "Area": "20,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-045",
+    "Nome": "AMB",
+    "Occupazione": "Ambulatorio",
+    "Area": "14,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-046",
+    "Nome": "AMB",
+    "Occupazione": "Ambulatorio",
+    "Area": "14,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-047",
+    "Nome": "DIP",
+    "Occupazione": "Dialisi peritoneale",
+    "Area": "20,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-054",
+    "Nome": "AMB",
+    "Occupazione": "Ambulatorio",
+    "Area": "18,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-049",
+    "Nome": "AMB",
+    "Occupazione": "Ambulatorio",
+    "Area": "12,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-059",
+    "Nome": "AMB",
+    "Occupazione": "Ambulatorio",
+    "Area": "17,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-041",
+    "Nome": "WPD",
+    "Occupazione": "WC personale donne",
+    "Area": "2,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-052",
+    "Nome": "ALL",
+    "Occupazione": "Allattamento",
+    "Area": "3,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-060",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "28,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-004",
+    "Nome": "DI1",
+    "Occupazione": "Day Hospital 1 letto",
+    "Area": "13,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-056",
+    "Nome": "MAP",
+    "Occupazione": "Manutenzione apparecchiature",
+    "Area": "16,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-134",
+    "Nome": "PUL",
+    "Occupazione": "Ripostiglio materiale pulizia",
+    "Area": "4,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-133",
+    "Nome": "LSP",
+    "Occupazione": "Lavoro sporco",
+    "Area": "9,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-010",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "96,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-002",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "7,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-029",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "4,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-030",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "3,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-027",
+    "Nome": "PAN",
+    "Occupazione": "Cucinetta",
+    "Area": "12,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-026",
+    "Nome": "DPU",
+    "Occupazione": "Deposito pulito",
+    "Area": "9,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-048",
+    "Nome": "ABP",
+    "Occupazione": "Antibagno personale",
+    "Area": "4,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-022",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "5,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-021",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "5,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-058",
+    "Nome": "WPU",
+    "Occupazione": "WC personale uomini",
+    "Area": "2,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-005",
+    "Nome": "DIA",
+    "Occupazione": "Dialisi",
+    "Area": "109,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-007",
+    "Nome": "CSA",
+    "Occupazione": "Caposala",
+    "Area": "18,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-031",
+    "Nome": "ATT",
+    "Occupazione": "Attesa",
+    "Area": "18,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-008",
+    "Nome": "LPE",
+    "Occupazione": "Lavoro personale",
+    "Area": "14,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-009",
+    "Nome": "LME",
+    "Occupazione": "Locale medici",
+    "Area": "21,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-011",
+    "Nome": "SPU",
+    "Occupazione": "Spogliatoio uomini",
+    "Area": "6,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-014",
+    "Nome": "SPD",
+    "Occupazione": "Spogliatoio donne",
+    "Area": "6,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-012",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "4,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-013",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "4,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-018",
+    "Nome": "UFF",
+    "Occupazione": "Ufficio",
+    "Area": "5,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-039",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "62,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-035",
+    "Nome": "ATT",
+    "Occupazione": "Attesa",
+    "Area": "22,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-028",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "11,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-003",
+    "Nome": "DI1",
+    "Occupazione": "Day Hospital 1 letto",
+    "Area": "14,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-051",
+    "Nome": "AMB",
+    "Occupazione": "Ambulatorio",
+    "Area": "17,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-062",
+    "Nome": "ALL",
+    "Occupazione": "Allattamento",
+    "Area": "4,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-053",
+    "Nome": "ATT",
+    "Occupazione": "Attesa",
+    "Area": "7,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-032",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "14,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-040",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "38,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-019",
+    "Nome": "GIO",
+    "Occupazione": "Area gioco",
+    "Area": "28,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-010s",
+    "Nome": "DSM",
+    "Occupazione": "Disimpegno",
+    "Area": "8,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-033c",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "7,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-023",
+    "Nome": "ABP",
+    "Occupazione": "Antibagno personale",
+    "Area": "3,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-016",
+    "Nome": "ABP",
+    "Occupazione": "Antibagno personale",
+    "Area": "1,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-015",
+    "Nome": "WCP",
+    "Occupazione": "WC personale",
+    "Area": "1,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-001",
+    "Nome": "FLS",
+    "Occupazione": "Filtro sanitario",
+    "Area": "4,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-002",
+    "Nome": "LSP",
+    "Occupazione": "Lavoro sporco",
+    "Area": "4,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-061",
+    "Nome": "FLS",
+    "Occupazione": "Filtro sanitario",
+    "Area": "4,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-024",
+    "Nome": "WPD",
+    "Occupazione": "WC personale donne",
+    "Area": "1,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-231-025",
+    "Nome": "WPU",
+    "Occupazione": "WC personale uomini",
+    "Area": "1,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-064",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-006",
+    "Nome": "ACC",
+    "Occupazione": "Accettazione",
+    "Area": "10,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-035",
+    "Nome": "LPU",
+    "Occupazione": "Lavoro pulito",
+    "Area": "9,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-051",
+    "Nome": "DAP",
+    "Occupazione": "Deposito apparecchiature",
+    "Area": "28,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-050",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "8,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-069",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "8,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-061",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "9,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-052",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "25,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-062",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "43,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-074",
+    "Nome": "DI1",
+    "Occupazione": "Day Hospital 1 letto",
+    "Area": "16,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-071",
+    "Nome": "DI1",
+    "Occupazione": "Day Hospital 1 letto",
+    "Area": "17,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-072",
+    "Nome": "BA5",
+    "Occupazione": "Bagno degenza dialisi 1pl",
+    "Area": "3,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-075",
+    "Nome": "BA5",
+    "Occupazione": "Bagno degenza dialisi 1pl",
+    "Area": "3,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-082",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-086",
+    "Nome": "LME",
+    "Occupazione": "Locale medici",
+    "Area": "19,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-084",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "9,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-044",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "11,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-043",
+    "Nome": "DPU",
+    "Occupazione": "Deposito pulito",
+    "Area": "6,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-087",
+    "Nome": "DPU",
+    "Occupazione": "Deposito pulito",
+    "Area": "6,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-046",
+    "Nome": "PUL",
+    "Occupazione": "Ripostiglio materiale pulizia",
+    "Area": "2,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-042",
+    "Nome": "WPD",
+    "Occupazione": "WC personale donne",
+    "Area": "1,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-041",
+    "Nome": "WPU",
+    "Occupazione": "WC personale uomini",
+    "Area": "1,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-040",
+    "Nome": "ABP",
+    "Occupazione": "Antibagno personale",
+    "Area": "3,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-038",
+    "Nome": "PAN",
+    "Occupazione": "Cucinetta",
+    "Area": "7,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-048",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "4,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-036",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "4,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-089",
+    "Nome": "LSP",
+    "Occupazione": "Lavoro sporco",
+    "Area": "8,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-039",
+    "Nome": "DPU",
+    "Occupazione": "Deposito pulito",
+    "Area": "6,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-088",
+    "Nome": "DPU",
+    "Occupazione": "Deposito pulito",
+    "Area": "6,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-003",
+    "Nome": "CSA",
+    "Occupazione": "Caposala",
+    "Area": "10,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-005",
+    "Nome": "AMB",
+    "Occupazione": "Ambulatorio",
+    "Area": "17,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-006",
+    "Nome": "DEP",
+    "Occupazione": "Deposito",
+    "Area": "8,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-002",
+    "Nome": "ATT",
+    "Occupazione": "Attesa",
+    "Area": "11,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-008",
+    "Nome": "DIP",
+    "Occupazione": "Dialisi peritoneale",
+    "Area": "26,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-010",
+    "Nome": "SPU",
+    "Occupazione": "Spogliatoio uomini",
+    "Area": "22,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-012",
+    "Nome": "SPU",
+    "Occupazione": "Spogliatoio uomini",
+    "Area": "23,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-011",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "3,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-013",
+    "Nome": "WC3",
+    "Occupazione": "WC per disabili",
+    "Area": "3,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-015",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "39,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-023",
+    "Nome": "GUI",
+    "Occupazione": "Guardia infermieri",
+    "Area": "10,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-024",
+    "Nome": "LPU",
+    "Occupazione": "Lavoro pulito",
+    "Area": "10,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-025",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "29,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-037",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "12,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-010b",
+    "Nome": "DSM",
+    "Occupazione": "Disimpegno",
+    "Area": "10,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-090",
+    "Nome": "DAP",
+    "Occupazione": "Deposito apparecchiature",
+    "Area": "39,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-085",
+    "Nome": "DEP",
+    "Occupazione": "Deposito",
+    "Area": "9,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-083",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-081",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-080",
+    "Nome": "GUI",
+    "Occupazione": "Guardia infermieri",
+    "Area": "6,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-079",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "6,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-078",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-077",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-065",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "6,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-063",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-066",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "8,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-067",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "8,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-068",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "8,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-059",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "8,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-058",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "8,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-057",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "8,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-056",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-053",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-054",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-055",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-026",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-027",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-028",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-018",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-017",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-016",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-029",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-030",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-031",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "9,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-032",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "10,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-021",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "9,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-020",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "9,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-019",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "9,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-010d",
+    "Nome": "DSM",
+    "Occupazione": "Disimpegno",
+    "Area": "3,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-010e",
+    "Nome": "DSM",
+    "Occupazione": "Disimpegno",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-276",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "28,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-038",
+    "Nome": "DSM",
+    "Occupazione": "Disimpegno",
+    "Area": "13,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-005a",
+    "Nome": "DSM",
+    "Occupazione": "Disimpegno",
+    "Area": "3,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-045",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "37,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-001",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "29,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-014",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "57,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-047",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "57,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-034",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "9,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-033",
+    "Nome": "BOX",
+    "Occupazione": "Box di trattamento",
+    "Area": "9,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-073",
+    "Nome": "FLS",
+    "Occupazione": "Filtro sanitario",
+    "Area": "3,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-070",
+    "Nome": "FLS",
+    "Occupazione": "Filtro sanitario",
+    "Area": "4,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-232-060",
+    "Nome": "GUI",
+    "Occupazione": "Guardia infermieri",
+    "Area": "9,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-531-001",
+    "Nome": "ADI",
+    "Occupazione": "Area dipartimentale-Studi medici open space",
+    "Area": "31,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-013",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "7,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-007",
+    "Nome": "SBA",
+    "Occupazione": "Sbarco ascensore",
+    "Area": "14,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-006",
+    "Nome": "SPC",
+    "Occupazione": "Spazio calmo",
+    "Area": "19,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-011",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "15,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-012",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "4,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-003",
+    "Nome": "FIL",
+    "Occupazione": "Filtro VVF",
+    "Area": "10,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-004",
+    "Nome": "SBA",
+    "Occupazione": "Sbarco ascensore",
+    "Area": "26,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-008",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "16,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-005",
+    "Nome": "SBA",
+    "Occupazione": "Sbarco ascensore",
+    "Area": "35,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-931-001",
+    "Nome": "COR",
+    "Occupazione": "Corridoio",
+    "Area": "43,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-C31-102",
+    "Nome": "CEE",
+    "Occupazione": "Cavedio elettrico energia",
+    "Area": "7,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-C31-101",
+    "Nome": "CES",
+    "Occupazione": "Cavedio elettrico sicurezza (UPS-GE)",
+    "Area": "3,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3I-112",
+    "Nome": "CEE",
+    "Occupazione": "Cavedio elettrico energia",
+    "Area": "2,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-C31-110",
+    "Nome": "CEE",
+    "Occupazione": "Cavedio elettrico energia",
+    "Area": "7,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-C31-109",
+    "Nome": "CES",
+    "Occupazione": "Cavedio elettrico sicurezza (UPS-GE)",
+    "Area": "3,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-C31-113",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "3,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-111",
+    "Nome": "CIM",
+    "Occupazione": "Cavedio meccanico",
+    "Area": "3,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-103",
+    "Nome": "CIM",
+    "Occupazione": "Cavedio meccanico",
+    "Area": "19,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-104",
+    "Nome": "CET",
+    "Occupazione": "Cavedio elettrico tecnico speciali",
+    "Area": "3,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-108",
+    "Nome": "CIM",
+    "Occupazione": "Cavedio meccanico",
+    "Area": "19,6 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-106",
+    "Nome": "CET",
+    "Occupazione": "Cavedio elettrico tecnico speciali",
+    "Area": "3,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-153b",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "1,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-153",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "1,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-152",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "0,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-151",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "0,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-155",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "1,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-154",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "1,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-157",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "0,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3M-156",
+    "Nome": "CAV",
+    "Occupazione": "Cavedio",
+    "Area": "0,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3S-105",
+    "Nome": "LTD",
+    "Occupazione": "Locale tecnico rete dati",
+    "Area": "3,8 m²"
+  },
+  {
+    "Codice semplificato": "P0-C3S-107",
+    "Nome": "LTD",
+    "Occupazione": "Locale tecnico rete dati",
+    "Area": "3,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-E31-001",
+    "Nome": "ASC",
+    "Occupazione": "Ascensore",
+    "Area": "6,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-E31-002",
+    "Nome": "ASC",
+    "Occupazione": "Ascensore",
+    "Area": "6,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-E31-003",
+    "Nome": "ASC",
+    "Occupazione": "Ascensore",
+    "Area": "6,7 m²"
+  },
+  {
+    "Codice semplificato": "P0-E32-002",
+    "Nome": "MCA",
+    "Occupazione": "Montacarichi",
+    "Area": "6,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-E32-001",
+    "Nome": "MCA",
+    "Occupazione": "Montacarichi",
+    "Area": "5,9 m²"
+  },
+  {
+    "Codice semplificato": "P0-E33-001",
+    "Nome": "MLE",
+    "Occupazione": "Montalettighe",
+    "Area": "6,4 m²"
+  },
+  {
+    "Codice semplificato": "P0-E33-002",
+    "Nome": "MLE",
+    "Occupazione": "Montalettighe",
+    "Area": "7,5 m²"
+  },
+  {
+    "Codice semplificato": "P0-E33-003",
+    "Nome": "MLE",
+    "Occupazione": "Montalettighe",
+    "Area": "8,3 m²"
+  },
+  {
+    "Codice semplificato": "P0-E33-004",
+    "Nome": "MLE",
+    "Occupazione": "Montalettighe",
+    "Area": "8,1 m²"
+  },
+  {
+    "Codice semplificato": "P0-E33-005",
+    "Nome": "MLE",
+    "Occupazione": "Montalettighe",
+    "Area": "7,2 m²"
+  },
+  {
+    "Codice semplificato": "P0-S31-002",
+    "Nome": "VSC",
+    "Occupazione": "Vano scale",
+    "Area": "36,0 m²"
+  },
+  {
+    "Codice semplificato": "P0-S32-001",
+    "Nome": "VSC",
+    "Occupazione": "Vano scale",
+    "Area": "39,1 m²"
+  }
+]
