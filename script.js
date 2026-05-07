@@ -726,9 +726,23 @@ function resetRoomTables() {
   renderAltreDotazioniTable();
 }
 
+function getNestedPlanimetryBasePath(floorName) {
+  const normalizedFloorName = String(floorName || '').trim();
+  if (normalizedFloorName === '') {
+    return '';
+  }
+  return `../planimetrie/${normalizedFloorName}`;
+}
+
 async function loadOccurrencesData(floorName) {
   try {
-    const response = await fetch(`../planimetrie/occorenze-${floorName}.json`);
+    const nestedBasePath = getNestedPlanimetryBasePath(floorName);
+    const nestedOccurrencesPath = `${nestedBasePath}/occorenze-${floorName}.json`;
+    const legacyOccurrencesPath = `../planimetrie/occorenze-${floorName}.json`;
+    let response = await fetch(nestedOccurrencesPath);
+    if (!response.ok) {
+      response = await fetch(legacyOccurrencesPath);
+    }
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
@@ -3496,8 +3510,21 @@ if (isFloorMapReady) {
   // e perso in corsa (il loader resterebbe all'infinito).
   mapObject.addEventListener('load', runMapInitOnce, { once: true });
   console.log('[MapLoader] load listener registered');
+  const nestedPlanimetryBasePath = getNestedPlanimetryBasePath(requestedFloorName);
+  const nestedPlanimetryPath = `${nestedPlanimetryBasePath}/${requestedFloorName}.svg`;
+  const legacyPlanimetryPath = `../planimetrie/${requestedFloorName}.svg`;
+  let hasRetriedLegacyPlanimetryPath = false;
   mapObject.addEventListener('error', () => {
     console.log('[MapLoader] object error event');
+    if (!hasRetriedLegacyPlanimetryPath) {
+      hasRetriedLegacyPlanimetryPath = true;
+      mapObject.data = legacyPlanimetryPath;
+      console.warn('[MapLoader] nested planimetry not found, retrying legacy path', {
+        nestedPlanimetryPath,
+        legacyPlanimetryPath
+      });
+      return;
+    }
     const errorMessage = `Errore nel caricamento della planimetria SVG. Planimetria non trovata: ${requestedFloorName || '-'}.`;
     setCenteredMapErrorMessage(errorMessage);
     setMapControlsEnabled(false);
@@ -3505,7 +3532,7 @@ if (isFloorMapReady) {
   });
   console.log('[MapLoader] error listener registered');
 
-  mapObject.data = `../planimetrie/${requestedFloorName}.svg`;
+  mapObject.data = nestedPlanimetryPath;
   console.log('[MapLoader] mapObject.data assigned', { data: mapObject.data });
 
   // Fallback di sicurezza: se per qualsiasi motivo `load` non arriva,
