@@ -1,0 +1,681 @@
+[
+    {
+      "Codifica locale": "-DG2-181-029",
+      "Codice semplificato": "P5-181-029",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,6 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-032",
+      "Codice semplificato": "P5-181-032",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
+    },
+    {
+      "Codifica locale": "DG2-181-035",
+      "Codice semplificato": "P5-181-035",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-038",
+      "Codice semplificato": "P5-181-038",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
+    },
+    {
+      "Codifica locale": "DG2-181-040",
+      "Codice semplificato": "P5-181-040",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-042",
+      "Codice semplificato": "P5-181-042",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
+    },
+    {
+      "Codifica locale": "-CSA-181-045",
+      "Codice semplificato": "P5-181-045",
+      "Nome": "CSA",
+      "Occupazione": "Caposala",
+      "Area": "18,9 m²"
+    },
+    {
+      "Codifica locale": "-MED-181-046",
+      "Codice semplificato": "P5-181-046",
+      "Nome": "MED",
+      "Occupazione": "Medicheria",
+      "Area": "18,9 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-048",
+      "Codice semplificato": "P5-181-048",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
+    },
+    {
+      "Codifica locale": "DG2-181-050",
+      "Codice semplificato": "P5-181-050",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,4 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-052",
+      "Codice semplificato": "P5-181-052",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-054",
+      "Codice semplificato": "P5-181-054",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
+    },
+    {
+      "Codifica locale": "DG2-181-056",
+      "Codice semplificato": "P5-181-056",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "-LME-181-058",
+      "Codice semplificato": "P5-181-058",
+      "Nome": "LME",
+      "Occupazione": "Locale medici",
+      "Area": "17,3 m²"
+    },
+    {
+      "Codifica locale": "COR181-027-",
+      "Codice semplificato": "P5-181-027",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "65,8 m²"
+    },
+    {
+      "Codifica locale": "-AAF-181-071",
+      "Codice semplificato": "P5-181-071",
+      "Nome": "AAF",
+      "Occupazione": "Armadi automatizzati farmaci",
+      "Area": "6,1 m²"
+    },
+    {
+      "Codifica locale": "-LSP-181-072",
+      "Codice semplificato": "P5-181-072",
+      "Nome": "LSP",
+      "Occupazione": "Lavoro sporco",
+      "Area": "9,4 m²"
+    },
+    {
+      "Codifica locale": "-LPU-181-070",
+      "Codice semplificato": "P5-181-070",
+      "Nome": "LPU",
+      "Occupazione": "Lavoro pulito",
+      "Area": "10,0 m²"
+    },
+    {
+      "Codifica locale": "-PAN-181-068",
+      "Codice semplificato": "P5-181-068",
+      "Nome": "PAN",
+      "Occupazione": "Tisaneria",
+      "Area": "10,2 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-025",
+      "Codice semplificato": "P5-181-025",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,6 m²"
+    },
+    {
+      "Codifica locale": "DG2-181-073",
+      "Codice semplificato": "P5-181-073",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-021",
+      "Codice semplificato": "P5-181-021",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-019",
+      "Codice semplificato": "P5-181-019",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
+    },
+    {
+      "Codifica locale": "DG2-181-017",
+      "Codice semplificato": "P5-181-017",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "DG2-181-015",
+      "Codice semplificato": "P5-181-015",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
+    },
+    {
+      "Codifica locale": "BA7-181-030",
+      "Codice semplificato": "P5-181-030",
+      "Nome": "BA7",
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "BA2-181-031",
+      "Codice semplificato": "P5-181-031",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "BA2-181-036",
+      "Codice semplificato": "P5-181-036",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-039",
+      "Codice semplificato": "P5-181-039",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA7-181-041",
+      "Codice semplificato": "P5-181-041",
+      "Nome": "BA7",
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-043",
+      "Codice semplificato": "P5-181-043",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA7-181-049",
+      "Codice semplificato": "P5-181-049",
+      "Nome": "BA7",
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-051",
+      "Codice semplificato": "P5-181-051",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-053",
+      "Codice semplificato": "P5-181-053",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-055",
+      "Codice semplificato": "P5-181-055",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-057",
+      "Codice semplificato": "P5-181-057",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-059",
+      "Codice semplificato": "P5-181-059",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-026",
+      "Codice semplificato": "P5-181-026",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA7-181-024",
+      "Codice semplificato": "P5-181-024",
+      "Nome": "BA7",
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-022",
+      "Codice semplificato": "P5-181-022",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-020",
+      "Codice semplificato": "P5-181-020",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-018",
+      "Codice semplificato": "P5-181-018",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA7-181-016",
+      "Codice semplificato": "P5-181-016",
+      "Nome": "BA7",
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-COR-181-001",
+      "Codice semplificato": "P5-181-001",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "47,2 m²"
+    },
+    {
+      "Codifica locale": "-COR181-047-",
+      "Codice semplificato": "P5-181-047",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "73,9 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-010",
+      "Codice semplificato": "P5-181-010",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-008",
+      "Codice semplificato": "P5-181-008",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,4 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-011",
+      "Codice semplificato": "P5-181-011",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA7-181-009",
+      "Codice semplificato": "P5-181-009",
+      "Nome": "BA7",
+      "Occupazione": "Bagno degenza disabile",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-006",
+      "Codice semplificato": "P5-181-006",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,3 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-004",
+      "Codice semplificato": "P5-181-004",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-007",
+      "Codice semplificato": "P5-181-007",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-005",
+      "Codice semplificato": "P5-181-005",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-002",
+      "Codice semplificato": "P5-181-002",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,7 m²"
+    },
+    {
+      "Codifica locale": "-BA2-181-003",
+      "Codice semplificato": "P5-181-003",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3.8 m²"
+    },
+    {
+      "Codifica locale": "-SOG181-013-",
+      "Codice semplificato": "P5-181-013",
+      "Nome": "SOG",
+      "Occupazione": "Soggiorno",
+      "Area": "44,4 m²"
+    },
+    {
+      "Codifica locale": "-COR-181-073",
+      "Codice semplificato": "P5-181-073",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "43.7 m²"
+    },
+    {
+      "Codifica locale": "-DG2-181-082",
+      "Codice semplificato": "P5-181-082",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,3 m²"
+    },
+    {
+      "Codifica locale": "P5-DG2-181-080",
+      "Codice semplificato": "P5-181-080",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "17,0 m²"
+    },
+    {
+      "Codifica locale": "P5-BA2-181-081",
+      "Codice semplificato": "P5-181-081",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "P5-BA2-181-083",
+      "Codice semplificato": "P5-181-083",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "P5-DG2-181-078",
+      "Codice semplificato": "P5-181-078",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "P5-DG2-181-076",
+      "Codice semplificato": "P5-181-076",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "P5-BA2-181-079",
+      "Codice semplificato": "P5-181-079",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "P5-BA2-181-077",
+      "Codice semplificato": "P5-181-077",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "P5-DG2-181-074",
+      "Codice semplificato": "P5-181-074",
+      "Nome": "DG2",
+      "Occupazione": "Degenza 2 PL",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "P5-BA2-181-075",
+      "Codice semplificato": "P5-181-075",
+      "Nome": "BA2",
+      "Occupazione": "Bagno degenza 2pl",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "P5-ABP-181-060",
+      "Codice semplificato": "P5-181-060",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "5,0 m²"
+    },
+    {
+      "Codifica locale": "P5-WPD-181-061",
+      "Codice semplificato": "P5-181-061",
+      "Nome": "WPD",
+      "Occupazione": "WC personale donne",
+      "Area": "1,5 m²"
+    },
+    {
+      "Codifica locale": "P5-WPU-181-062",
+      "Codice semplificato": "P5-181-062",
+      "Nome": "WPU",
+      "Occupazione": "WC personale uomini",
+      "Area": "1,6 m²"
+    },
+    {
+      "Codifica locale": "P5-DAP-181-085",
+      "Codice semplificato": "P5-181-085",
+      "Nome": "DAP",
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "9,7 m²"
+    },
+    {
+      "Codifica locale": "P5-DPU-181-066",
+      "Codice semplificato": "P5-181-066",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "6,7 m²"
+    },
+    {
+      "Codifica locale": "P5-DSM181-073d-",
+      "Codice semplificato": "P5-181-073d",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "4,1 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC-181-082a",
+      "Codice semplificato": "P5-181-082a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC-181-080a",
+      "Codice semplificato": "P5-181-080a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
+    },
+    {
+      "Codifica locale": "P5-DSM181-073c-",
+      "Codice semplificato": "P5-181-073c",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,2 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC-181-078a",
+      "Codice semplificato": "P5-181-078a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC-181-076a",
+      "Codice semplificato": "P5-181-076a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
+    },
+    {
+      "Codifica locale": "P5-DSM-181-073b",
+      "Codice semplificato": "P5-181-073b",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC-181-166",
+      "Codice semplificato": "P5-181-166",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
+    },
+    {
+      "Codifica locale": "P5-DSM181-001a-",
+      "Codice semplificato": "P5-181-001a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "4,0 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC181-010a-",
+      "Codice semplificato": "P5-181-010a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "2,9 m²"
+    },
+    {
+      "Codifica locale": "P5-DSM-181-001b",
+      "Codice semplificato": "P5-181-001b",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,2 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC-181-008a",
+      "Codice semplificato": "P5-181-008a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,2 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC181-006a-",
+      "Codice semplificato": "P5-181-006a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "2.9 m²"
+    },
+    {
+      "Codifica locale": "P5-DSM-181-001c",
+      "Codice semplificato": "P5-181-001c",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,3 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC181-004a-",
+      "Codice semplificato": "P5-181-004a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
+    },
+    {
+      "Codifica locale": "P5-ANC-181-002q",
+      "Codice semplificato": "P5-181-002q",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,0m²"
+    },
+    {
+      "Codifica locale": "-DSM-181-047d",
+      "Codice semplificato": "P5-181-047d",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "6,1 m²"
+    },
+    {
+      "Codifica locale": "-ANC-181-058a",
+      "Codice semplificato": "P5-181-058a",
+      "Nome": "ANC",
+      "Occupazione": "Anticamera",
+      "Area": "3,0 m²"
+    },
+    {
+      "Codifica locale": "-GUI181-069-",
+      "Codice semplificato": "P5-181-069",
+      "Nome": "GUI",
+      "Occupazione": "Guardia infermieri",
+      "Area": "11,1 m²"
+    },
+    {
+      "Codifica locale": "DEI182-029-",
+      "Codice semplificato": "P5-182-029",
+      "Nome": "DEI",
+      "Occupazione": "Degenza elevata assistenza isolato",
+      "Area": "17,5 m²"
+    },
+    {
+      "Codifica locale": "BA6-182-030",
+      "Codice semplificato": "P5-182-030",
+      "Nome": "BA6",
+      "Occupazione": "Bagno degenza isolato disabile",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "P5-DE2-182-054",
+      "Codice semplificato": "P5-182-054",
+      "Nome": "DE2",
+      "Occupazione": "Degenza elevata assistenza 2 posti",
+      "Area": "16,9 m²"
+    },
+    {
+      "Codifica locale": "P5-BAS-183-006",
+      "Codice semplificato": "P5-183-006",
+      "Nome": "BAS",
+      "Occupazione": "Bagno assistito",
+      "Area": "10,2 m²"
+    },
+    {
+      "Codifica locale": "P5-ADI-581-001",
+      "Codice semplificato": "P5-581-001",
+      "Nome": "ADI",
+      "Occupazione": "Area dipartimentale-Studi medici open space",
+      "Area": "102,8 m²"
+    },
+    {
+      "Codifica locale": "-VSC-S81-002",
+      "Codice semplificato": "P5-581-002",
+      "Nome": "VSC",
+      "Occupazione": "Vano scale",
+      "Area": "38,9 m²"
+    }
+  ]
