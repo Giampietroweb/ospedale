@@ -1,0 +1,1409 @@
+[
+    {
+      "Codifica locale": "P1-FIL-141-063",
+      "Codice semplificato": "P1-141-063",
+      "Nome": "FIL",
+      "Occupazione": "Filtro VVF",
+      "Area": "34,4 m²"
+    },
+    {
+      "Codifica locale": "P1-FLS141-062-",
+      "Codice semplificato": "P1-141-062",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "11,4 m²"
+    },
+    {
+      "Codifica locale": "P1-WCU141-060-",
+      "Codice semplificato": "P1-141-060",
+      "Nome": "WCU",
+      "Occupazione": "WC uomini",
+      "Area": "1,6 m²"
+    },
+    {
+      "Codifica locale": "P1-WCD141-059-",
+      "Codice semplificato": "P1-141-059",
+      "Nome": "WCD",
+      "Occupazione": "WC donne",
+      "Area": "1,7 m²"
+    },
+    {
+      "Codifica locale": "P1-AB2-141-069",
+      "Codice semplificato": "P1-141-069",
+      "Nome": "AB2",
+      "Occupazione": "Antibagno con lavabo",
+      "Area": "4,1 m²"
+    },
+    {
+      "Codifica locale": "P1-WC3-141-061",
+      "Codice semplificato": "P1-141-061",
+      "Nome": "WC3",
+      "Occupazione": "WC per disabili",
+      "Area": "3,6 m²"
+    },
+    {
+      "Codifica locale": "P1-FLS-141-067",
+      "Codice semplificato": "P1-141-067",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "6,3 m²"
+    },
+    {
+      "Codifica locale": "P1-LME-141-054a",
+      "Codice semplificato": "P1-141-054a",
+      "Nome": "LME",
+      "Occupazione": "Locale medici",
+      "Area": "17,9 m²"
+    },
+    {
+      "Codifica locale": "P1-ATT-141-068",
+      "Codice semplificato": "P1-141-068",
+      "Nome": "ATT",
+      "Occupazione": "Attesa",
+      "Area": "11,3 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM141-049a-",
+      "Codice semplificato": "P1-141-049a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "3,4 m²"
+    },
+    {
+      "Codifica locale": "P1-MED-141-066",
+      "Codice semplificato": "P1-141-066",
+      "Nome": "MED",
+      "Occupazione": "Medicheria",
+      "Area": "17,4 m²"
+    },
+    {
+      "Codifica locale": "P1-LME-141-053",
+      "Codice semplificato": "P1-141-053",
+      "Nome": "LME",
+      "Occupazione": "Locale medici",
+      "Area": "11,8 m²"
+    },
+    {
+      "Codifica locale": "P1-VUO-141-070",
+      "Codice semplificato": "P1-141-070",
+      "Nome": "VUO",
+      "Occupazione": "Vuotatoio",
+      "Area": "3,6 m²"
+    },
+    {
+      "Codifica locale": "P1-PAN-141-064",
+      "Codice semplificato": "P1-141-064",
+      "Nome": "PAN",
+      "Occupazione": "Cucinetta",
+      "Area": "9,4 m²"
+    },
+    {
+      "Codifica locale": "P1-CSA-141-066",
+      "Codice semplificato": "P1-141-066",
+      "Nome": "CSA",
+      "Occupazione": "Caposala",
+      "Area": "17,2 m²"
+    },
+    {
+      "Codifica locale": "P1-DPU-141-073",
+      "Codice semplificato": "P1-141-073",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "4,2 m²"
+    },
+    {
+      "Codifica locale": "P1-RIP-141-050",
+      "Codice semplificato": "P1-141-050",
+      "Nome": "RIP",
+      "Occupazione": "Riposo personale",
+      "Area": "10,0 m²"
+    },
+    {
+      "Codifica locale": "P1-WCP-141-013",
+      "Codice semplificato": "P1-141-013",
+      "Nome": "WCP",
+      "Occupazione": "WC personale",
+      "Area": "3,4 m²"
+    },
+    {
+      "Codifica locale": "P1-DAP-141-016",
+      "Codice semplificato": "P1-141-016",
+      "Nome": "DAP",
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "7,4 m²"
+    },
+    {
+      "Codifica locale": "P1-LSP-141-019",
+      "Codice semplificato": "P1-141-019",
+      "Nome": "LSP",
+      "Occupazione": "Lavoro sporco",
+      "Area": "9,5 m²"
+    },
+    {
+      "Codifica locale": "P1-DPU-141-035",
+      "Codice semplificato": "P1-141-035",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "10,1 m²"
+    },
+    {
+      "Codifica locale": "P1-DST-141-037",
+      "Codice semplificato": "P1-141-037",
+      "Nome": "DST",
+      "Occupazione": "Deposito sterile",
+      "Area": "27,4 m²"
+    },
+    {
+      "Codifica locale": "P1-DPU-141-039",
+      "Codice semplificato": "P1-141-039",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "9,5 m²"
+    },
+    {
+      "Codifica locale": "P1-DAP-141-051",
+      "Codice semplificato": "P1-141-051",
+      "Nome": "DAP",
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "10,2 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM141-011-",
+      "Codice semplificato": "P1-141-011",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "7,0 m²"
+    },
+    {
+      "Codifica locale": "P1-SPP141-007-",
+      "Codice semplificato": "P1-141-007",
+      "Nome": "SPP",
+      "Occupazione": "Spogliatoio personale",
+      "Area": "25,1 m²"
+    },
+    {
+      "Codifica locale": "P1-SPP-141-300",
+      "Codice semplificato": "P1-141-300",
+      "Nome": "SPP",
+      "Occupazione": "Spogliatoio personale",
+      "Area": "11,8 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM-141-002",
+      "Codice semplificato": "P1-141-002",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,9 m²"
+    },
+    {
+      "Codifica locale": "P1-WPD141-006-",
+      "Codice semplificato": "P1-141-006",
+      "Nome": "WPD",
+      "Occupazione": "WC personale donne",
+      "Area": "1,8 m²"
+    },
+    {
+      "Codifica locale": "P1-WPU-141-010",
+      "Codice semplificato": "P1-141-010",
+      "Nome": "WPU",
+      "Occupazione": "WC personale uomini",
+      "Area": "1,8 m²"
+    },
+    {
+      "Codifica locale": "P1-ABP-141-008",
+      "Codice semplificato": "P1-141-008",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "3,3 m²"
+    },
+    {
+      "Codifica locale": "P1-ABP-141-004",
+      "Codice semplificato": "P1-141-004",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "3,3 m²"
+    },
+    {
+      "Codifica locale": "P1-LPE-141-012",
+      "Codice semplificato": "P1-141-012",
+      "Nome": "LPE",
+      "Occupazione": "Lavoro personale",
+      "Area": "13,7 m²"
+    },
+    {
+      "Codifica locale": "P1-LME-141-015",
+      "Codice semplificato": "P1-141-015",
+      "Nome": "LME",
+      "Occupazione": "Locale medici",
+      "Area": "13,1 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM-141-075a",
+      "Codice semplificato": "P1-141-075a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,6 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-141-075",
+      "Codice semplificato": "P1-141-075",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "23,1 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-141-076",
+      "Codice semplificato": "P1-141-076",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "19,2 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-141-049",
+      "Codice semplificato": "P1-141-049",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "21,8 m²"
+    },
+    {
+      "Codifica locale": "P1-TII141-074-",
+      "Codice semplificato": "P1-141-074",
+      "Nome": "TII",
+      "Occupazione": "Terapia intensiva isolamento",
+      "Area": "22,1 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-047",
+      "Codice semplificato": "P1-141-047",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "21,3 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-046",
+      "Codice semplificato": "P1-141-046",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "21,7 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-045",
+      "Codice semplificato": "P1-141-045",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "20,9 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI141-044-",
+      "Codice semplificato": "P1-141-044",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "21,7 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-043",
+      "Codice semplificato": "P1-141-043",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "20,8 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM-141-040b",
+      "Codice semplificato": "P1-141-040b",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "8,2 m²"
+    },
+    {
+      "Codifica locale": "P1-WC3-141-065",
+      "Codice semplificato": "P1-141-065",
+      "Nome": "WC3",
+      "Occupazione": "WC per disabili",
+      "Area": "5,2 m²"
+    },
+    {
+      "Codifica locale": "P1-LSP-141-1'RM",
+      "Codice semplificato": "P1-141-1'RM",
+      "Nome": "LSP",
+      "Occupazione": "Lavoro sporco",
+      "Area": "7,4 m²"
+    },
+    {
+      "Codifica locale": "P1-LPE-141-041",
+      "Codice semplificato": "P1-141-041",
+      "Nome": "LPE",
+      "Occupazione": "Lavoro personale",
+      "Area": "9,6 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM141-040a-",
+      "Codice semplificato": "P1-141-040a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "7,1 m²"
+    },
+    {
+      "Codifica locale": "P1-GUI-141-038",
+      "Codice semplificato": "P1-141-038",
+      "Nome": "GUI",
+      "Occupazione": "Guardia infermieri",
+      "Area": "13,4 m²"
+    },
+    {
+      "Codifica locale": "P1-LPU-141-036",
+      "Codice semplificato": "P1-141-036",
+      "Nome": "LPU",
+      "Occupazione": "Lavoro pulito",
+      "Area": "16,6 m²"
+    },
+    {
+      "Codifica locale": "P1-GUI-141-033",
+      "Codice semplificato": "P1-141-033",
+      "Nome": "GUI",
+      "Occupazione": "Guardia infermieri",
+      "Area": "14,9 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-141-034",
+      "Codice semplificato": "P1-141-034",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "19,6 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-141-040",
+      "Codice semplificato": "P1-141-040",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "87,2 m²"
+    },
+    {
+      "Codifica locale": "P1-WC3-141-058",
+      "Codice semplificato": "P1-141-058",
+      "Nome": "WC3",
+      "Occupazione": "WC per disabili",
+      "Area": "4,4 m²"
+    },
+    {
+      "Codifica locale": "P1-WCU-141-022",
+      "Codice semplificato": "P1-141-022",
+      "Nome": "WCU",
+      "Occupazione": "WC uomini",
+      "Area": "2,4 m²"
+    },
+    {
+      "Codifica locale": "P1-ABP-141-020",
+      "Codice semplificato": "P1-141-020",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "3,7 m²"
+    },
+    {
+      "Codifica locale": "P1-WCD-141-021",
+      "Codice semplificato": "P1-141-021",
+      "Nome": "WCD",
+      "Occupazione": "WC donne",
+      "Area": "2,4 m²"
+    },
+    {
+      "Codifica locale": "P1-VUO-141-023",
+      "Codice semplificato": "P1-141-023",
+      "Nome": "VUO",
+      "Occupazione": "Vuotatoio",
+      "Area": "3,4 m²"
+    },
+    {
+      "Codifica locale": "P1-FLS-141-056",
+      "Codice semplificato": "P1-141-056",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "4,3 m²"
+    },
+    {
+      "Codifica locale": "P1-TII-141-024",
+      "Codice semplificato": "P1-141-024",
+      "Nome": "TII",
+      "Occupazione": "Terapia intensiva isolamento",
+      "Area": "29,3 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM-141-018a",
+      "Codice semplificato": "P1-141-018a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "6,4 m²"
+    },
+    {
+      "Codifica locale": "P1-FLS-141-001",
+      "Codice semplificato": "P1-141-001",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "11,5 m²"
+    },
+    {
+      "Codifica locale": "P1-FLS-141-055",
+      "Codice semplificato": "P1-141-055",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "4,2 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-048",
+      "Codice semplificato": "P1-141-048",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "20,1 m²"
+    },
+    {
+      "Codifica locale": "P1-ABP-141-017",
+      "Codice semplificato": "P1-141-017",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "2,2 m²"
+    },
+    {
+      "Codifica locale": "P1-POC-141-021",
+      "Codice semplificato": "P1-141-021",
+      "Nome": "POC",
+      "Occupazione": "Point of Care",
+      "Area": "5,0 m²"
+    },
+    {
+      "Codifica locale": "P1-DOC-141-005",
+      "Codice semplificato": "P1-141-005",
+      "Nome": "DOC",
+      "Occupazione": "Doccia",
+      "Area": "1,0 m²"
+    },
+    {
+      "Codifica locale": "P1-DOC-141-009",
+      "Codice semplificato": "P1-141-009",
+      "Nome": "DOC",
+      "Occupazione": "Doccia",
+      "Area": "1,0 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-025",
+      "Codice semplificato": "P1-141-025",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "30,2 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-026",
+      "Codice semplificato": "P1-141-026",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "30,0 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-027",
+      "Codice semplificato": "P1-141-027",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "29,8 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI141-028-",
+      "Codice semplificato": "P1-141-028",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "30,2 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-141-029",
+      "Codice semplificato": "P1-141-029",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "29,3 m²"
+    },
+    {
+      "Codifica locale": "P1-CTR-141-057",
+      "Codice semplificato": "P1-141-057",
+      "Nome": "CTR",
+      "Occupazione": "Area tecnica operatori",
+      "Area": "2,0 m²"
+    },
+    {
+      "Codifica locale": "P1-CTR-141-031",
+      "Codice semplificato": "P1-141-031",
+      "Nome": "CTR",
+      "Occupazione": "Area tecnica operatori",
+      "Area": "2,0 m²"
+    },
+    {
+      "Codifica locale": "P1-CTR-141-030",
+      "Codice semplificato": "P1-141-030",
+      "Nome": "CTR",
+      "Occupazione": "Area tecnica operatori",
+      "Area": "2,0 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-141-031",
+      "Codice semplificato": "P1-141-031",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "92,5 m²"
+    },
+    {
+      "Codifica locale": "P1-LSP-142-023",
+      "Codice semplificato": "P1-142-023",
+      "Nome": "LSP",
+      "Occupazione": "Lavoro sporco",
+      "Area": "7,8 m²"
+    },
+    {
+      "Codifica locale": "P1-WPD-142-021",
+      "Codice semplificato": "P1-142-021",
+      "Nome": "WPD",
+      "Occupazione": "WC personale donne",
+      "Area": "2,2 m²"
+    },
+    {
+      "Codifica locale": "P1-ABP-142-020",
+      "Codice semplificato": "P1-142-020",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "3,6 m²"
+    },
+    {
+      "Codifica locale": "P1-WPU-142-022",
+      "Codice semplificato": "P1-142-022",
+      "Nome": "WPU",
+      "Occupazione": "WC personale uomini",
+      "Area": "2,1 m²"
+    },
+    {
+      "Codifica locale": "P1-LPE-142-041",
+      "Codice semplificato": "P1-142-041",
+      "Nome": "LPE",
+      "Occupazione": "Lavoro personale",
+      "Area": "9,8 m²"
+    },
+    {
+      "Codifica locale": "P1-LSP-142-721",
+      "Codice semplificato": "P1-142-721",
+      "Nome": "LSP",
+      "Occupazione": "Lavoro sporco",
+      "Area": "7,8 m²"
+    },
+    {
+      "Codifica locale": "P1-WC3-142-042",
+      "Codice semplificato": "P1-142-042",
+      "Nome": "WC3",
+      "Occupazione": "WC per disabili",
+      "Area": "4,6 m²"
+    },
+    {
+      "Codifica locale": "P1-LPU-142-036",
+      "Codice semplificato": "P1-142-036",
+      "Nome": "LPU",
+      "Occupazione": "Lavoro pulito",
+      "Area": "16,5 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-142-035",
+      "Codice semplificato": "P1-142-035",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "24,8 m²"
+    },
+    {
+      "Codifica locale": "P1-GUI-142-033",
+      "Codice semplificato": "P1-142-033",
+      "Nome": "GUI",
+      "Occupazione": "Guardia infermieri",
+      "Area": "10,2 m²"
+    },
+    {
+      "Codifica locale": "-DSM-142-011b",
+      "Codice semplificato": "P1-142-011b",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,4 m²"
+    },
+    {
+      "Codifica locale": "-GUI-142-038",
+      "Codice semplificato": "P1-142-038",
+      "Nome": "GUI",
+      "Occupazione": "Guardia infermieri",
+      "Area": "13,7 m²"
+    },
+    {
+      "Codifica locale": "-DSM-142-040a",
+      "Codice semplificato": "P1-142-040a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "6,5 m²"
+    },
+    {
+      "Codifica locale": "P1-CSA-142-054",
+      "Codice semplificato": "P1-142-054",
+      "Nome": "CSA",
+      "Occupazione": "Caposala",
+      "Area": "15,8 m²"
+    },
+    {
+      "Codifica locale": "-LME-142-055",
+      "Codice semplificato": "P1-142-055",
+      "Nome": "LME",
+      "Occupazione": "Locale medici",
+      "Area": "32,8 m²"
+    },
+    {
+      "Codifica locale": "P1-MED-142-053",
+      "Codice semplificato": "P1-142-053",
+      "Nome": "MED",
+      "Occupazione": "Medicheria",
+      "Area": "17,4 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM142-160-",
+      "Codice semplificato": "P1-142-160",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "2,7 m²"
+    },
+    {
+      "Codifica locale": "-COR-142-049",
+      "Codice semplificato": "P1-142-049",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "40,4 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-142-076",
+      "Codice semplificato": "P1-142-076",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "19,6 m²"
+    },
+    {
+      "Codifica locale": "P1-POC-142-039",
+      "Codice semplificato": "P1-142-039",
+      "Nome": "POC",
+      "Occupazione": "Point of Care",
+      "Area": "6,6 m²"
+    },
+    {
+      "Codifica locale": "-DPU-142-073",
+      "Codice semplificato": "P1-142-073",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "7,5 m²"
+    },
+    {
+      "Codifica locale": "-RIP-142-050",
+      "Codice semplificato": "P1-142-050",
+      "Nome": "RIP",
+      "Occupazione": "Riposo personale",
+      "Area": "11,9 m²"
+    },
+    {
+      "Codifica locale": "-DEP-142-048",
+      "Codice semplificato": "P1-142-048",
+      "Nome": "DEP",
+      "Occupazione": "Deposito",
+      "Area": "7,8 m²"
+    },
+    {
+      "Codifica locale": "-DPU-142-051",
+      "Codice semplificato": "P1-142-051",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "8,9 m²"
+    },
+    {
+      "Codifica locale": "-DAP-142-052",
+      "Codice semplificato": "P1-142-052",
+      "Nome": "DAP",
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "8,5 m²"
+    },
+    {
+      "Codifica locale": "-DEP-142-074",
+      "Codice semplificato": "P1-142-074",
+      "Nome": "DEP",
+      "Occupazione": "Deposito",
+      "Area": "9,7 m²"
+    },
+    {
+      "Codifica locale": "-PUL-142-017",
+      "Codice semplificato": "P1-142-017",
+      "Nome": "PUL",
+      "Occupazione": "Ripostiglio materiale pulizia",
+      "Area": "6,7 m²"
+    },
+    {
+      "Codifica locale": "-DPU-142-015",
+      "Codice semplificato": "P1-142-015",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "6,3 m²"
+    },
+    {
+      "Codifica locale": "-DPU-142-016",
+      "Codice semplificato": "P1-142-016",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "3,7 m²"
+    },
+    {
+      "Codifica locale": "-DPU-142-019",
+      "Codice semplificato": "P1-142-019",
+      "Nome": "DPU",
+      "Occupazione": "Deposito pulito",
+      "Area": "8,1 m²"
+    },
+    {
+      "Codifica locale": "-DAP-142-034",
+      "Codice semplificato": "P1-142-034",
+      "Nome": "DAP",
+      "Occupazione": "Deposito apparecchiature",
+      "Area": "9,9 m²"
+    },
+    {
+      "Codifica locale": "-DST-142-037",
+      "Codice semplificato": "P1-142-037",
+      "Nome": "DST",
+      "Occupazione": "Deposito sterile",
+      "Area": "26,9 m²"
+    },
+    {
+      "Codifica locale": "-FLS-142-062",
+      "Codice semplificato": "P1-142-062",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "9,8 m²"
+    },
+    {
+      "Codifica locale": "-WC3-142-061",
+      "Codice semplificato": "P1-142-061",
+      "Nome": "WC3",
+      "Occupazione": "WC per disabili",
+      "Area": "4,2 m²"
+    },
+    {
+      "Codifica locale": "-WCU-142-059",
+      "Codice semplificato": "P1-142-059",
+      "Nome": "WCU",
+      "Occupazione": "WC uomini",
+      "Area": "1,4 m²"
+    },
+    {
+      "Codifica locale": "P1-WCD142-060-",
+      "Codice semplificato": "P1-142-060",
+      "Nome": "WCD",
+      "Occupazione": "WC donne",
+      "Area": "1,3 m²"
+    },
+    {
+      "Codifica locale": "-AB2-142-058",
+      "Codice semplificato": "P1-142-058",
+      "Nome": "AB2",
+      "Occupazione": "Antibagno con lavabo",
+      "Area": "3,3 m²"
+    },
+    {
+      "Codifica locale": "-FLS142-057-",
+      "Codice semplificato": "P1-142-057",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "10,1 m²"
+    },
+    {
+      "Codifica locale": "-LME-142-064",
+      "Codice semplificato": "P1-142-064",
+      "Nome": "LME",
+      "Occupazione": "Locale medici",
+      "Area": "22,7 m²"
+    },
+    {
+      "Codifica locale": "-DSM-142-002",
+      "Codice semplificato": "P1-142-002",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,0 m²"
+    },
+    {
+      "Codifica locale": "P1-SPP-142-007",
+      "Codice semplificato": "P1-142-007",
+      "Nome": "SPP",
+      "Occupazione": "Spogliatoio personale",
+      "Area": "20,6 m²"
+    },
+    {
+      "Codifica locale": "P1-ABP-142-077",
+      "Codice semplificato": "P1-142-077",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "2,3 m²"
+    },
+    {
+      "Codifica locale": "P1-WCP-142-006",
+      "Codice semplificato": "P1-142-006",
+      "Nome": "WCP",
+      "Occupazione": "WC personale",
+      "Area": "1,3 m²"
+    },
+    {
+      "Codifica locale": "P1-WCP-142-004",
+      "Codice semplificato": "P1-142-004",
+      "Nome": "WCP",
+      "Occupazione": "WC personale",
+      "Area": "1,3 m²"
+    },
+    {
+      "Codifica locale": "P1-ABP-142-078",
+      "Codice semplificato": "P1-142-078",
+      "Nome": "ABP",
+      "Occupazione": "Antibagno personale",
+      "Area": "2,3 m²"
+    },
+    {
+      "Codifica locale": "P1-SPP-142-300",
+      "Codice semplificato": "P1-142-300",
+      "Nome": "SPP",
+      "Occupazione": "Spogliatoio personale",
+      "Area": "9,3 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM142-005-",
+      "Codice semplificato": "P1-142-005",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "5,6 m²"
+    },
+    {
+      "Codifica locale": "P1-FLS-142-001",
+      "Codice semplificato": "P1-142-001",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "12,8 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM-142-011c",
+      "Codice semplificato": "P1-142-011c",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "6,5 m²"
+    },
+    {
+      "Codifica locale": "P1-VUO-142-065",
+      "Codice semplificato": "P1-142-065",
+      "Nome": "VUO",
+      "Occupazione": "Vuotatoio",
+      "Area": "3,7 m²"
+    },
+    {
+      "Codifica locale": "P1-FLS-142-056",
+      "Codice semplificato": "P1-142-056",
+      "Nome": "FLS",
+      "Occupazione": "Filtro sanitario",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "P1-TII-142-043",
+      "Codice semplificato": "P1-142-043",
+      "Nome": "TII",
+      "Occupazione": "Terapia intensiva isolamento",
+      "Area": "25,3 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-142-075",
+      "Codice semplificato": "P1-142-075",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "10,7 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM142-040b-",
+      "Codice semplificato": "P1-142-040b",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "8,2 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-142-040",
+      "Codice semplificato": "P1-142-040",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "65,3 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-046",
+      "Codice semplificato": "P1-142-046",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "30,4 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-435",
+      "Codice semplificato": "P1-142-435",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "29,0 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI142-044-",
+      "Codice semplificato": "P1-142-044",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "28,7 m²"
+    },
+    {
+      "Codifica locale": "P1-LSP-142-003",
+      "Codice semplificato": "P1-142-003",
+      "Nome": "LSP",
+      "Occupazione": "Lavoro sporco",
+      "Area": "6,4 m²"
+    },
+    {
+      "Codifica locale": "P1-DOC-142-080",
+      "Codice semplificato": "P1-142-080",
+      "Nome": "DOC",
+      "Occupazione": "Doccia",
+      "Area": "1,1 m²"
+    },
+    {
+      "Codifica locale": "P1-DOC-142-079",
+      "Codice semplificato": "P1-142-079",
+      "Nome": "DOC",
+      "Occupazione": "Doccia",
+      "Area": "1,1 m²"
+    },
+    {
+      "Codifica locale": "P1-FIL-142-063",
+      "Codice semplificato": "P1-142-063",
+      "Nome": "FIL",
+      "Occupazione": "Filtro VVF",
+      "Area": "35,5 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM142-075a-",
+      "Codice semplificato": "P1-142-075a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "7,4 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-008",
+      "Codice semplificato": "P1-142-008",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "29,5 m²"
+    },
+    {
+      "Codifica locale": "P1-CTR-142-009",
+      "Codice semplificato": "P1-142-009",
+      "Nome": "CTR",
+      "Occupazione": "Area tecnica operatori",
+      "Area": "1,8 m²"
+    },
+    {
+      "Codifica locale": "P1-CTR-142-012",
+      "Codice semplificato": "P1-142-012",
+      "Nome": "CTR",
+      "Occupazione": "Area tecnica operatori",
+      "Area": "1,8 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-026",
+      "Codice semplificato": "P1-142-026",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "28,1 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-010",
+      "Codice semplificato": "P1-142-010",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "25,6 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-025",
+      "Codice semplificato": "P1-142-025",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "30,2 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-027",
+      "Codice semplificato": "P1-142-027",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "28,9 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-028",
+      "Codice semplificato": "P1-142-028",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "28,3 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI142-029-",
+      "Codice semplificato": "P1-142-029",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "28,5 m²"
+    },
+    {
+      "Codifica locale": "P1-BTI-142-030",
+      "Codice semplificato": "P1-142-030",
+      "Nome": "BTI",
+      "Occupazione": "Terapia intensiva",
+      "Area": "26,9 m²"
+    },
+    {
+      "Codifica locale": "P1-CTR-142-014",
+      "Codice semplificato": "P1-142-014",
+      "Nome": "CTR",
+      "Occupazione": "Area tecnica operatori",
+      "Area": "1,8 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-142-011",
+      "Codice semplificato": "P1-142-011",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "104,9 m²"
+    },
+    {
+      "Codifica locale": "P1-CTR-142-013",
+      "Codice semplificato": "P1-142-013",
+      "Nome": "CTR",
+      "Occupazione": "Area tecnica operatori",
+      "Area": "1,8 m²"
+    },
+    {
+      "Codifica locale": "P1-ADI-541-001",
+      "Codice semplificato": "P1-541-001",
+      "Nome": "ADI",
+      "Occupazione": "Area dipartimentale-Studi medici open space",
+      "Area": "105,2 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-941-002",
+      "Codice semplificato": "P1-941-002",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "22,6 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM-941-001b",
+      "Codice semplificato": "P1-941-001b",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "3,3 m²"
+    },
+    {
+      "Codifica locale": "P1-SPC-941-010",
+      "Codice semplificato": "P1-941-010",
+      "Nome": "SPC",
+      "Occupazione": "Spazio calmo",
+      "Area": "18,8 m²"
+    },
+    {
+      "Codifica locale": "P1-FIL-941-009",
+      "Codice semplificato": "P1-941-009",
+      "Nome": "FIL",
+      "Occupazione": "Filtro VVF",
+      "Area": "12,3 m²"
+    },
+    {
+      "Codifica locale": "P1-SBA-941-004",
+      "Codice semplificato": "P1-941-004",
+      "Nome": "SBA",
+      "Occupazione": "Sbarco ascensore",
+      "Area": "31,4 m²"
+    },
+    {
+      "Codifica locale": "P1-SBA-941-005",
+      "Codice semplificato": "P1-941-005",
+      "Nome": "SBA",
+      "Occupazione": "Sbarco ascensore",
+      "Area": "31,6 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-941-300",
+      "Codice semplificato": "P1-941-300",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "37,2 m²"
+    },
+    {
+      "Codifica locale": "P1-SBA-941-012",
+      "Codice semplificato": "P1-941-012",
+      "Nome": "SBA",
+      "Occupazione": "Sbarco ascensore",
+      "Area": "19,0 m²"
+    },
+    {
+      "Codifica locale": "P1-COR-941-001",
+      "Codice semplificato": "P1-941-001",
+      "Nome": "COR",
+      "Occupazione": "Corridoio",
+      "Area": "22,9 m²"
+    },
+    {
+      "Codifica locale": "P1-FIL-941-011",
+      "Codice semplificato": "P1-941-011",
+      "Nome": "FIL",
+      "Occupazione": "Filtro VVF",
+      "Area": "13,2 m²"
+    },
+    {
+      "Codifica locale": "P1-DSM-941-001a",
+      "Codice semplificato": "P1-941-001a",
+      "Nome": "DSM",
+      "Occupazione": "Disimpegno",
+      "Area": "4,1 m²"
+    },
+    {
+      "Codifica locale": "P1-FIL-942-001",
+      "Codice semplificato": "P1-942-001",
+      "Nome": "FIL",
+      "Occupazione": "Filtro VVF",
+      "Area": "12,2 m²"
+    },
+    {
+      "Codifica locale": "P1-FIL-942-002",
+      "Codice semplificato": "P1-942-002",
+      "Nome": "FIL",
+      "Occupazione": "Filtro VVF",
+      "Area": "12,3 m²"
+    },
+    {
+      "Codifica locale": "P1-CES-C4I-109",
+      "Codice semplificato": "P1-C4I-109",
+      "Nome": "CES",
+      "Occupazione": "Cavedio elettrico sicurezza (UPSGE-)",
+      "Area": "3,6 m²"
+    },
+    {
+      "Codifica locale": "P1-CEE-C4I-110",
+      "Codice semplificato": "P1-C4I-110",
+      "Nome": "CEE",
+      "Occupazione": "Cavedio elettrico energia",
+      "Area": "7,0 m²"
+    },
+    {
+      "Codifica locale": "P1-CEE-C4I-112",
+      "Codice semplificato": "P1-C4I-112",
+      "Nome": "CEE",
+      "Occupazione": "Cavedio elettrico energia",
+      "Area": "3,1 m²"
+    },
+    {
+      "Codifica locale": "P1-CAV-C4M-156",
+      "Codice semplificato": "P1-C4M-156",
+      "Nome": "CAV",
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
+    },
+    {
+      "Codifica locale": "P1-CAV-C4M-157",
+      "Codice semplificato": "P1-C4M-157",
+      "Nome": "CAV",
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
+    },
+    {
+      "Codifica locale": "P1-CME-C4M-113",
+      "Codice semplificato": "P1-C4M-113",
+      "Nome": "CME",
+      "Occupazione": "Cavedio elettrico-meccanico",
+      "Area": "3,4 m²"
+    },
+    {
+      "Codifica locale": "P1-CAV-C4M-153",
+      "Codice semplificato": "P1-C4M-153",
+      "Nome": "CAV",
+      "Occupazione": "Cavedio",
+      "Area": "0,5 m²"
+    },
+    {
+      "Codifica locale": "P1-CIM-C4M-108",
+      "Codice semplificato": "P1-C4M-108",
+      "Nome": "CIM",
+      "Occupazione": "Cavedio meccanico",
+      "Area": "19,6 m²"
+    },
+    {
+      "Codifica locale": "P1-CIM-C4M-111",
+      "Codice semplificato": "P1-C4M-111",
+      "Nome": "CIM",
+      "Occupazione": "Cavedio meccanico",
+      "Area": "3,4 m²"
+    },
+    {
+      "Codifica locale": "P1-CIM-C4M-103",
+      "Codice semplificato": "P1-C4M-103",
+      "Nome": "CIM",
+      "Occupazione": "Cavedio meccanico",
+      "Area": "19,6 m²"
+    },
+    {
+      "Codifica locale": "-CET-C4M-104",
+      "Codice semplificato": "P1-C4M-104",
+      "Nome": "CET",
+      "Occupazione": "Cavedio elettrico tecnico speciali",
+      "Area": "3,9 m²"
+    },
+    {
+      "Codifica locale": "-CAV-C4M-154",
+      "Codice semplificato": "P1-C4M-154",
+      "Nome": "CAV",
+      "Occupazione": "Cavedio",
+      "Area": "0,9 m²"
+    },
+    {
+      "Codifica locale": "-CAV-C4M-155",
+      "Codice semplificato": "P1-C4M-155",
+      "Nome": "CAV",
+      "Occupazione": "Cavedio",
+      "Area": "0,9 m²"
+    },
+    {
+      "Codifica locale": "-CET-C4M-106",
+      "Codice semplificato": "P1-C4M-106",
+      "Nome": "CET",
+      "Occupazione": "Cavedio elettrico tecnico speciali",
+      "Area": "3,8 m²"
+    },
+    {
+      "Codifica locale": "-CAV-C4M-152",
+      "Codice semplificato": "P1-C4M-152",
+      "Nome": "CAV",
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
+    },
+    {
+      "Codifica locale": "-CAV-C4M-151",
+      "Codice semplificato": "P1-C4M-151",
+      "Nome": "CAV",
+      "Occupazione": "Cavedio",
+      "Area": "0,8 m²"
+    },
+    {
+      "Codifica locale": "-LTD-C4S105-",
+      "Codice semplificato": "P1-C4S-105",
+      "Nome": "LTD",
+      "Occupazione": "Locale tecnico rete dati",
+      "Area": "4,0 m²"
+    },
+    {
+      "Codifica locale": "-LTD-C4S-107",
+      "Codice semplificato": "P1-C4S-107",
+      "Nome": "LTD",
+      "Occupazione": "Locale tecnico rete dati",
+      "Area": "3,9 m²"
+    },
+    {
+      "Codifica locale": "P1-CEE-C41-102",
+      "Codice semplificato": "P1-C41-102",
+      "Nome": "CEE",
+      "Occupazione": "Cavedio elettrico energia",
+      "Area": "7,0 m²"
+    },
+    {
+      "Codifica locale": "P1-CES-C41-101",
+      "Codice semplificato": "P1-C41-101",
+      "Nome": "CES",
+      "Occupazione": "Cavedio elettrico sicurezza (UPS-GE)",
+      "Area": "3,6 m²"
+    },
+    {
+      "Codifica locale": "P1-ASC-E41-003",
+      "Codice semplificato": "P1-E41-003",
+      "Nome": "ASC",
+      "Occupazione": "Ascensore",
+      "Area": "6,7 m²"
+    },
+    {
+      "Codifica locale": "P1-ASC-E41-002",
+      "Codice semplificato": "P1-E41-002",
+      "Nome": "ASC",
+      "Occupazione": "Ascensore",
+      "Area": "6,7 m²"
+    },
+    {
+      "Codifica locale": "-ASC-E41-001",
+      "Codice semplificato": "P1-E41-001",
+      "Nome": "ASC",
+      "Occupazione": "Ascensore",
+      "Area": "6,8 m²"
+    },
+    {
+      "Codifica locale": "P1-MCA-E42-002",
+      "Codice semplificato": "P1-E42-002",
+      "Nome": "MCA",
+      "Occupazione": "Montacarichi",
+      "Area": "7,2 m²"
+    },
+    {
+      "Codifica locale": "-MCA-E42-001",
+      "Codice semplificato": "P1-E42-001",
+      "Nome": "MCA",
+      "Occupazione": "Montacarichi",
+      "Area": "6,2 m²"
+    },
+    {
+      "Codifica locale": "P1-MLE-E43-003",
+      "Codice semplificato": "P1-E43-003",
+      "Nome": "MLE",
+      "Occupazione": "Montalettighe",
+      "Area": "8,1 m²"
+    },
+    {
+      "Codifica locale": "P1-MLE-E43-004",
+      "Codice semplificato": "P1-E43-004",
+      "Nome": "MLE",
+      "Occupazione": "Montalettighe",
+      "Area": "8,1 m²"
+    },
+    {
+      "Codifica locale": "P1-MLE-E43-005",
+      "Codice semplificato": "P1-E43-005",
+      "Nome": "MLE",
+      "Occupazione": "Montalettighe",
+      "Area": "7,2 m²"
+    },
+    {
+      "Codifica locale": "P1-MLE-E43-002",
+      "Codice semplificato": "P1-E43-002",
+      "Nome": "MLE",
+      "Occupazione": "Montalettighe",
+      "Area": "7,5 m²"
+    },
+    {
+      "Codifica locale": "-MLE-E43-001",
+      "Codice semplificato": "P1-E43-001",
+      "Nome": "MLE",
+      "Occupazione": "Montalettighe",
+      "Area": "6,4 m²"
+    },
+    {
+      "Codifica locale": "P1-VSC-S41-161",
+      "Codice semplificato": "P1-S41-161",
+      "Nome": "VSC",
+      "Occupazione": "Vano scale",
+      "Area": "39,0 m²"
+    },
+    {
+      "Codifica locale": "P1-VSC-S42-300",
+      "Codice semplificato": "P1-S42-300",
+      "Nome": "VSC",
+      "Occupazione": "Vano scale",
+      "Area": "39,1 m²"
+    },
+    {
+      "Codifica locale": "-VSC-S42-001",
+      "Codice semplificato": "P1-S42-001",
+      "Nome": "VSC",
+      "Occupazione": "Vano scale",
+      "Area": "39,1 m²"
+    }
+  ]
