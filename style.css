@@ -119,6 +119,100 @@ body {
   justify-self: start;
 }
 
+.toolbar-controls-dropdown {
+  position: relative;
+}
+
+.toolbar-controls-dropdown-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  border: 1px solid #1d4ed8;
+  background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+  color: #ffffff;
+  font-weight: var(--fw-bold);
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 14px rgba(29, 78, 216, 0.3);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+}
+
+.toolbar-controls-dropdown-trigger:hover {
+  background: linear-gradient(135deg, #1d4ed8 0%, #1e40af 100%);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(30, 64, 175, 0.34);
+  transform: translateY(-1px);
+}
+
+.toolbar-controls-dropdown-trigger[aria-expanded="true"] {
+  background: linear-gradient(135deg, #1e40af 0%, #1e3a8a 100%);
+  box-shadow: 0 9px 20px rgba(30, 58, 138, 0.4);
+}
+
+.toolbar-controls-dropdown-trigger:focus-visible {
+  box-shadow: 0 0 0 3px rgba(191, 219, 254, 0.95), 0 0 0 6px rgba(37, 99, 235, 0.6);
+}
+
+.toolbar-controls-dropdown-trigger-arrow {
+  transition: transform 0.2s ease;
+}
+
+.toolbar-controls-dropdown.is-open .toolbar-controls-dropdown-trigger-arrow {
+  transform: rotate(180deg);
+}
+
+.toolbar-controls-dropdown-panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  min-width: 360px;
+  max-width: min(92vw, 560px);
+  padding: 12px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-surface);
+  box-shadow: var(--shadow-lg);
+  display: grid;
+  gap: 10px;
+  z-index: 30;
+}
+
+.toolbar-controls-dropdown-panel[hidden] {
+  display: none;
+}
+
+.toolbar-controls-section {
+  display: grid;
+  gap: 8px;
+  padding: 10px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface-muted);
+}
+
+.toolbar-controls-row {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toolbar-font-size-select-label {
+  font-size: 12px;
+  font-weight: var(--fw-semibold);
+  color: var(--color-text-muted);
+}
+
+.toolbar-font-size-select {
+  min-height: 34px;
+  padding: 7px 10px;
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background: var(--color-surface);
+  color: var(--color-text-body);
+  font-size: 13px;
+}
+
 .toolbar-navigation {
   justify-self: center;
   padding: 3px;
@@ -1786,47 +1880,97 @@ body.page-structure {
   }
 
   .toolbar {
-    gap: 8px;
-    padding: 8px;
+    gap: 6px;
+    padding: 6px 8px;
   }
 
   .planimetria-page .toolbar {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: 6px;
   }
 
   .planimetria-page .toolbar-navigation {
     order: 1;
-    justify-self: center;
-    flex-wrap: wrap;
-    justify-content: center;
+    grid-column: 1 / -1;
+    justify-self: stretch;
+    justify-content: flex-start;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding: 2px;
   }
 
   .planimetria-page .toolbar-zoom-controls {
     order: 2;
-    justify-self: center;
-    justify-content: center;
-    flex-wrap: wrap;
+    justify-self: stretch;
+    justify-content: flex-start;
+    width: 100%;
+  }
+
+  .planimetria-page .toolbar-controls-dropdown-panel {
+    left: 0;
+    transform: none;
+    min-width: min(94vw, 360px);
+    max-width: min(94vw, 420px);
+    padding: 10px;
   }
 
   .planimetria-page .zoom-prefix {
     display: none;
   }
 
+  .planimetria-page .toolbar-controls-section .zoom-prefix {
+    display: block;
+    font-size: 12px;
+    color: var(--color-text-muted);
+  }
+
   .planimetria-page .toolbar-reference-actions {
     order: 3;
-    justify-self: center;
+    justify-self: stretch;
+    justify-content: flex-end;
+    width: 100%;
   }
 
-  .home-cta-link-toolbar,
-  .toolbar button {
-    flex: 1 1 auto;
-    min-height: 40px;
+  .planimetria-page .home-cta-link-toolbar {
+    flex: 0 0 auto;
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 13px;
   }
 
-  .zoom-label {
-    flex: 1 1 100%;
-    text-align: center;
-    min-width: 0;
+  .planimetria-page .toolbar-controls-dropdown-trigger,
+  .planimetria-page .toolbar-reference-toggle {
+    min-height: 34px;
+    padding: 6px 10px;
+    font-size: 13px;
+  }
+
+  .planimetria-page .toolbar-reference-icon {
+    display: inline-block;
+    font-size: 16px;
+  }
+
+  .planimetria-page .toolbar-reference-text {
+    display: none;
+  }
+
+  .planimetria-page .toolbar-controls-row {
+    gap: 6px;
+  }
+
+  .planimetria-page .toolbar-controls-row .toolbar-utility-button,
+  .planimetria-page .toolbar-controls-row .toolbar-font-size-select {
+    min-height: 32px;
+    padding: 6px 8px;
+    font-size: 12px;
+  }
+
+  .planimetria-page .toolbar-controls-row .zoom-label {
+    min-width: 48px;
+    font-size: 12px;
+    text-align: right;
+    flex: 0 0 auto;
   }
 
   .viewer {

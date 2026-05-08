@@ -19,21 +19,69 @@
 </head>
 <body class="planimetria-page">
   <div class="toolbar">
-    <div class="toolbar-group toolbar-zoom-controls" aria-label="Controlli zoom">
-      <button id="zoomOut" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Zoom meno">
-        <span class="toolbar-zoom-icon" aria-hidden="true">-</span>
-        <span class="toolbar-zoom-text">Zoom -</span>
-      </button>
-      <button id="zoomIn" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Zoom più">
-        <span class="toolbar-zoom-icon" aria-hidden="true">+</span>
-        <span class="toolbar-zoom-text">Zoom +</span>
-      </button>
-      <button id="zoomReset" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Reset zoom al 100%">
-        <span class="toolbar-zoom-icon" aria-hidden="true">&#8635;</span>
-        <span class="toolbar-zoom-text">Reset 100%</span>
-      </button>
-      <strong class="zoom-prefix">Zoom impostato:</strong>
-      <span id="zoomValue" class="zoom-label">100%</span>
+    <div class="toolbar-group toolbar-zoom-controls" aria-label="Controlli mappa">
+      <div class="toolbar-controls-dropdown">
+        <button
+          id="mapControlsDropdownToggle"
+          class="toolbar-primary-action toolbar-controls-dropdown-trigger"
+          type="button"
+          aria-label="Apri controlli mappa"
+          aria-expanded="false"
+          aria-controls="mapControlsDropdownPanel"
+        >
+          <span>Controlli mappa</span>
+          <span class="toolbar-controls-dropdown-trigger-arrow" aria-hidden="true">&#9662;</span>
+        </button>
+        <div id="mapControlsDropdownPanel" class="toolbar-controls-dropdown-panel" role="group" aria-label="Controlli zoom e font referenze" hidden>
+          <div class="toolbar-controls-section">
+            <strong class="zoom-prefix">Zoom mappa</strong>
+            <div class="toolbar-controls-row">
+              <button id="zoomOut" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Zoom meno">
+                <span class="toolbar-zoom-icon" aria-hidden="true">-</span>
+                <span class="toolbar-zoom-text">Zoom -</span>
+              </button>
+              <button id="zoomIn" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Zoom più">
+                <span class="toolbar-zoom-icon" aria-hidden="true">+</span>
+                <span class="toolbar-zoom-text">Zoom +</span>
+              </button>
+              <button id="zoomReset" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Reset zoom al 100%">
+                <span class="toolbar-zoom-icon" aria-hidden="true">&#8635;</span>
+                <span class="toolbar-zoom-text">Reset 100%</span>
+              </button>
+              <span id="zoomValue" class="zoom-label">100%</span>
+            </div>
+          </div>
+
+          <div class="toolbar-controls-section">
+            <strong class="zoom-prefix">Font referenze</strong>
+            <div class="toolbar-controls-row">
+              <label class="toolbar-font-size-select-label" for="occurrenceFontPresetSelect">Dimensione</label>
+              <select id="occurrenceFontPresetSelect" class="toolbar-font-size-select" aria-label="Seleziona dimensione font referenze">
+                <option value="0.6">60%</option>
+                <option value="0.8">80%</option>
+                <option value="1" selected>100%</option>
+                <option value="1.2">120%</option>
+                <option value="1.4">140%</option>
+                <option value="1.6">160%</option>
+                <option value="2">200%</option>
+              </select>
+              <button id="occurrenceFontDecrease" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Riduci font referenze">
+                <span class="toolbar-zoom-icon" aria-hidden="true">-</span>
+                <span class="toolbar-zoom-text">Font -</span>
+              </button>
+              <button id="occurrenceFontIncrease" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Aumenta font referenze">
+                <span class="toolbar-zoom-icon" aria-hidden="true">+</span>
+                <span class="toolbar-zoom-text">Font +</span>
+              </button>
+              <button id="occurrenceFontReset" class="toolbar-utility-button toolbar-zoom-button" type="button" aria-label="Reset font referenze al 100%">
+                <span class="toolbar-zoom-icon" aria-hidden="true">&#8635;</span>
+                <span class="toolbar-zoom-text">Font 100%</span>
+              </button>
+              <span id="occurrenceFontSizeValue" class="zoom-label">100%</span>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <nav class="toolbar-navigation" aria-label="Navigazione principale">
       <a href="../index.html" class="home-cta-link-toolbar" aria-current="page">Mappa</a>

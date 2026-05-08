@@ -2,6 +2,14 @@ const zoomOutButton = document.getElementById('zoomOut');
 const zoomInButton = document.getElementById('zoomIn');
 const zoomResetButton = document.getElementById('zoomReset');
 const zoomValueLabel = document.getElementById('zoomValue');
+const mapControlsDropdown = document.querySelector('.toolbar-controls-dropdown');
+const mapControlsDropdownToggle = document.getElementById('mapControlsDropdownToggle');
+const mapControlsDropdownPanel = document.getElementById('mapControlsDropdownPanel');
+const occurrenceFontDecreaseButton = document.getElementById('occurrenceFontDecrease');
+const occurrenceFontIncreaseButton = document.getElementById('occurrenceFontIncrease');
+const occurrenceFontResetButton = document.getElementById('occurrenceFontReset');
+const occurrenceFontSizeValueLabel = document.getElementById('occurrenceFontSizeValue');
+const occurrenceFontPresetSelect = document.getElementById('occurrenceFontPresetSelect');
 const viewer = document.getElementById('viewer');
 const mapWrapper = document.getElementById('mapWrapper');
 const mapObject = document.getElementById('mapObject');
@@ -79,7 +87,11 @@ const catalogOptions = {
 const minZoom = 0.1;
 const maxZoom = 50;
 const zoomStep = 0.2;
+const minOccurrenceFontScale = 0.5;
+const maxOccurrenceFontScale = 3;
+const occurrenceFontScaleStep = 0.1;
 let currentZoom = 2;
+let currentOccurrenceFontScale = 1;
 let baseImageWidth = 0;
 let baseImageHeight = 0;
 let activeFieldBeingEdited = null;
@@ -590,6 +602,9 @@ function setMapControlsEnabled(isEnabled) {
   zoomOutButton.disabled = !isEnabled;
   zoomInButton.disabled = !isEnabled;
   zoomResetButton.disabled = !isEnabled;
+  occurrenceFontDecreaseButton.disabled = !isEnabled;
+  occurrenceFontIncreaseButton.disabled = !isEnabled;
+  occurrenceFontResetButton.disabled = !isEnabled;
 }
 
 function getFloorNameFromQuery() {
@@ -1066,6 +1081,82 @@ function handleZoomReset() {
   currentZoom = 1;
   updateZoomDisplay();
   centerMapInViewport();
+}
+
+function updateOccurrenceFontScaleDisplay() {
+  if (!occurrenceFontSizeValueLabel) {
+    return;
+  }
+  occurrenceFontSizeValueLabel.textContent = `${Math.round(currentOccurrenceFontScale * 100)}%`;
+  if (occurrenceFontPresetSelect) {
+    occurrenceFontPresetSelect.value = String(currentOccurrenceFontScale);
+  }
+}
+
+function applyOccurrenceFontScale(svgDocument = mapObject?.contentDocument) {
+  if (!svgDocument) {
+    return;
+  }
+
+  const occurrenceTextNodes = svgDocument.querySelectorAll('text');
+  occurrenceTextNodes.forEach((textNode) => {
+    if (!isClickableOccurrence(textNode)) {
+      return;
+    }
+
+    if (!textNode.dataset.baseFontSizePx) {
+      const computedFontSize = svgDocument.defaultView
+        ? window.parseFloat(svgDocument.defaultView.getComputedStyle(textNode).fontSize)
+        : Number.NaN;
+      const attributeFontSize = window.parseFloat(textNode.getAttribute('font-size') || '');
+      const fallbackFontSizePx = 10;
+      const baseFontSizePx = Number.isFinite(computedFontSize)
+        ? computedFontSize
+        : (Number.isFinite(attributeFontSize) ? attributeFontSize : fallbackFontSizePx);
+      textNode.dataset.baseFontSizePx = String(baseFontSizePx);
+    }
+
+    const baseFontSizePx = window.parseFloat(textNode.dataset.baseFontSizePx || '');
+    if (!Number.isFinite(baseFontSizePx)) {
+      return;
+    }
+    textNode.style.fontSize = `${(baseFontSizePx * currentOccurrenceFontScale).toFixed(2)}px`;
+  });
+}
+
+function handleOccurrenceFontIncrease() {
+  currentOccurrenceFontScale = Math.min(
+    maxOccurrenceFontScale,
+    Number((currentOccurrenceFontScale + occurrenceFontScaleStep).toFixed(2))
+  );
+  applyOccurrenceFontScale();
+  updateOccurrenceFontScaleDisplay();
+}
+
+function handleOccurrenceFontDecrease() {
+  currentOccurrenceFontScale = Math.max(
+    minOccurrenceFontScale,
+    Number((currentOccurrenceFontScale - occurrenceFontScaleStep).toFixed(2))
+  );
+  applyOccurrenceFontScale();
+  updateOccurrenceFontScaleDisplay();
+}
+
+function handleOccurrenceFontReset() {
+  currentOccurrenceFontScale = 1;
+  applyOccurrenceFontScale();
+  updateOccurrenceFontScaleDisplay();
+}
+
+function handleOccurrenceFontPresetChange() {
+  const selectedScale = window.parseFloat(occurrenceFontPresetSelect?.value || '');
+  if (!Number.isFinite(selectedScale)) {
+    return;
+  }
+
+  currentOccurrenceFontScale = Math.min(maxOccurrenceFontScale, Math.max(minOccurrenceFontScale, selectedScale));
+  applyOccurrenceFontScale();
+  updateOccurrenceFontScaleDisplay();
 }
 
 function getRoomCodeWithoutAsterisks(textValue) {
@@ -3039,6 +3130,49 @@ function setReferenceSearchPanelOpen(isOpen) {
   }
 }
 
+function setMapControlsDropdownOpen(isOpen) {
+  if (!mapControlsDropdown || !mapControlsDropdownToggle || !mapControlsDropdownPanel) {
+    return;
+  }
+
+  mapControlsDropdown.classList.toggle('is-open', isOpen);
+  mapControlsDropdownPanel.hidden = !isOpen;
+  mapControlsDropdownToggle.setAttribute('aria-expanded', String(isOpen));
+}
+
+function handleMapControlsDropdownToggle() {
+  const isOpen = mapControlsDropdownToggle?.getAttribute('aria-expanded') === 'true';
+  setMapControlsDropdownOpen(!isOpen);
+}
+
+function handleMapControlsDropdownOuterClick(event) {
+  if (!mapControlsDropdown || !mapControlsDropdownPanel || mapControlsDropdownPanel.hidden) {
+    return;
+  }
+
+  const clickedTarget = event.target;
+  if (!(clickedTarget instanceof Node)) {
+    return;
+  }
+
+  if (!mapControlsDropdown.contains(clickedTarget)) {
+    setMapControlsDropdownOpen(false);
+  }
+}
+
+function handleMapControlsDropdownEscape(event) {
+  if (event.key !== 'Escape') {
+    return;
+  }
+
+  if (mapControlsDropdownPanel?.hidden) {
+    return;
+  }
+
+  setMapControlsDropdownOpen(false);
+  mapControlsDropdownToggle?.focus();
+}
+
 function getRoomCodeFromSvgByNormalizedCode(normalizedRoomCode) {
   const svgDocument = mapObject?.contentDocument;
   if (!svgDocument || normalizedRoomCode === '') {
@@ -3213,6 +3347,7 @@ function bindOccurrencesClick(svgDocument, roomCodesSet) {
     highlightedCount,
     roomCodesAvailable: roomCodesSet instanceof Set ? roomCodesSet.size : 0
   });
+  applyOccurrenceFontScale(svgDocument);
   return {
     textNodeCount,
     clickableCount,
@@ -3420,6 +3555,10 @@ async function handleSaveApparecchiatura() {
 zoomInButton.addEventListener('click', handleZoomIn);
 zoomOutButton.addEventListener('click', handleZoomOut);
 zoomResetButton.addEventListener('click', handleZoomReset);
+occurrenceFontIncreaseButton.addEventListener('click', handleOccurrenceFontIncrease);
+occurrenceFontDecreaseButton.addEventListener('click', handleOccurrenceFontDecrease);
+occurrenceFontResetButton.addEventListener('click', handleOccurrenceFontReset);
+occurrenceFontPresetSelect.addEventListener('change', handleOccurrenceFontPresetChange);
 referenceSearchToggleButton.addEventListener('click', () => {
   setReferenceSearchPanelOpen(referenceSearchPanel.hidden);
 });
@@ -3427,6 +3566,9 @@ referenceSearchCloseButton.addEventListener('click', () => {
   setReferenceSearchPanelOpen(false);
 });
 referenceSearchForm.addEventListener('submit', handleReferenceSearchSubmit);
+mapControlsDropdownToggle.addEventListener('click', handleMapControlsDropdownToggle);
+document.addEventListener('click', handleMapControlsDropdownOuterClick);
+document.addEventListener('keydown', handleMapControlsDropdownEscape);
 modalCloseButton.addEventListener('click', closeModal);
 setupEditableFieldEvents('roomCodeName');
 setupEditableFieldEvents('roomOccupazione');
@@ -3594,6 +3736,7 @@ loadCatalogOptions().catch((error) => {
 });
 ensureApparecchiaturaStatusBadgeElement();
 applyApparecchiaturaFieldStatusClasses();
+updateOccurrenceFontScaleDisplay();
 [appTipologiaInput, appInstallazioneTipologiaInput, appProduttoreInput, appModelloInput, appQtaInput, appNuovoInput, appTrasferimentoInput, appInvInput, appNoteInput]
   .forEach((fieldElement) => {
     if (!fieldElement) {
