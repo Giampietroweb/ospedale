@@ -2,6 +2,7 @@ const zoomOutButton = document.getElementById('zoomOut');
 const zoomInButton = document.getElementById('zoomIn');
 const zoomResetButton = document.getElementById('zoomReset');
 const zoomValueLabel = document.getElementById('zoomValue');
+const toolbarElement = document.querySelector('.toolbar');
 const mapControlsDropdown = document.querySelector('.toolbar-controls-dropdown');
 const mapControlsDropdownToggle = document.getElementById('mapControlsDropdownToggle');
 const mapControlsDropdownPanel = document.getElementById('mapControlsDropdownPanel');
@@ -605,6 +606,11 @@ function setMapControlsEnabled(isEnabled) {
   occurrenceFontDecreaseButton.disabled = !isEnabled;
   occurrenceFontIncreaseButton.disabled = !isEnabled;
   occurrenceFontResetButton.disabled = !isEnabled;
+}
+
+function updateToolbarViewportHeightVar() {
+  const toolbarHeightPx = toolbarElement ? Math.ceil(toolbarElement.getBoundingClientRect().height) : 0;
+  document.documentElement.style.setProperty('--toolbar-height', `${toolbarHeightPx}px`);
 }
 
 function getFloorNameFromQuery() {
@@ -3569,6 +3575,7 @@ referenceSearchForm.addEventListener('submit', handleReferenceSearchSubmit);
 mapControlsDropdownToggle.addEventListener('click', handleMapControlsDropdownToggle);
 document.addEventListener('click', handleMapControlsDropdownOuterClick);
 document.addEventListener('keydown', handleMapControlsDropdownEscape);
+window.addEventListener('resize', updateToolbarViewportHeightVar);
 modalCloseButton.addEventListener('click', closeModal);
 setupEditableFieldEvents('roomCodeName');
 setupEditableFieldEvents('roomOccupazione');
@@ -3737,6 +3744,13 @@ loadCatalogOptions().catch((error) => {
 ensureApparecchiaturaStatusBadgeElement();
 applyApparecchiaturaFieldStatusClasses();
 updateOccurrenceFontScaleDisplay();
+updateToolbarViewportHeightVar();
+if (toolbarElement && 'ResizeObserver' in window) {
+  const toolbarResizeObserver = new ResizeObserver(() => {
+    updateToolbarViewportHeightVar();
+  });
+  toolbarResizeObserver.observe(toolbarElement);
+}
 [appTipologiaInput, appInstallazioneTipologiaInput, appProduttoreInput, appModelloInput, appQtaInput, appNuovoInput, appTrasferimentoInput, appInvInput, appNoteInput]
   .forEach((fieldElement) => {
     if (!fieldElement) {

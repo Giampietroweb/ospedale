@@ -77,7 +77,8 @@ body {
   font-size: 14px;
   line-height: 1.5;
   color: var(--color-text-body);
-  height: 100vh;
+  height: 100dvh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   background: var(--color-bg);
@@ -361,6 +362,14 @@ button:focus-visible {
   scrollbar-color: #334155 #cbd5e1;
 }
 
+.planimetria-page .viewer {
+  height: calc(100dvh - var(--toolbar-height, 68px));
+  min-height: calc(100dvh - var(--toolbar-height, 68px));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .reference-search-panel {
   position: fixed;
   top: 68px;
@@ -571,6 +580,8 @@ body::-webkit-scrollbar-corner,
 
 .map-wrapper {
   width: max-content;
+  flex: 0 0 auto;
+  margin: auto;
 } 
 
 .map-image {
