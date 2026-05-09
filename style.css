@@ -365,9 +365,24 @@ button:focus-visible {
 .planimetria-page .viewer {
   height: calc(100dvh - var(--toolbar-height, 68px));
   min-height: calc(100dvh - var(--toolbar-height, 68px));
+  display: block;
+  overflow: auto;
+}
+
+/* Il flex va sullo stage interno, non sul contenitore scrollabile: altrimenti con
+   justify-content:center lo scroll orizzontale non espone per intero contenuti larghi. */
+.planimetria-page .viewer-map-stage {
   display: flex;
   align-items: center;
   justify-content: center;
+  width: max-content;
+  min-width: 100%;
+  min-height: 100%;
+  box-sizing: border-box;
+}
+
+.planimetria-page .viewer-map-stage .map-wrapper {
+  margin: 0;
 }
 
 .reference-search-panel {
