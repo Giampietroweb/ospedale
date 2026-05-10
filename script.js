@@ -3303,7 +3303,7 @@ function ensureSvgHighlightClassStyle(svgDocument) {
 
     .room-centralized-monitor,
     .room-centralized-monitor tspan {
-      fill:rgb(178, 128, 2) !important;
+      fill: rgb(193, 0, 226) !important;
       font-weight: 800;
     }
   `;
