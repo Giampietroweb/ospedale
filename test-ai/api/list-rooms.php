@@ -21,14 +21,18 @@ $bloccoLabels = [
     'sotterraneo' => 'Interrato',
 ];
 
+/** Solo stanza demo presentazione (tendina Test AI). */
+$demoRoomCodeOnly = 'P2-151-058';
+
 try {
     $pdo = getDatabaseConnection();
-    $statement = $pdo->query(
+    $statement = $pdo->prepare(
         'SELECT id, blocco, piano, room_code, room_code_name
          FROM rooms
-         ORDER BY blocco ASC, CAST(piano AS SIGNED) ASC, piano ASC, room_code ASC
-         LIMIT 10'
+         WHERE room_code = :room_code
+         LIMIT 1'
     );
+    $statement->execute([':room_code' => $demoRoomCodeOnly]);
     $rows = $statement->fetchAll();
 
     $rooms = [];
