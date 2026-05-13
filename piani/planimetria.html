@@ -5,6 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Mappa SVG con Zoom</title>
   <link rel="stylesheet" href="../style.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1e40af">
   <meta name="robots" content="noindex, nofollow">
   <meta name="googlebot" content="noindex, nofollow">
   <meta name="bingbot" content="noindex, nofollow">
@@ -15,7 +17,8 @@
   <meta name="360" content="noindex, nofollow">
   <meta name="sogou" content="noindex, nofollow">
   <meta name="sogou" content="noindex, nofollow">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/css/tom-select.css">
+  <link rel="stylesheet" href="/assets/vendor/tom-select.css">
+
 </head>
 <body class="planimetria-page">
   <div class="toolbar">
@@ -334,7 +337,18 @@
     </div>
   </div>
 
-  <script src="https://cdn.jsdelivr.net/npm/tom-select@2.4.3/dist/js/tom-select.complete.min.js"></script>
+  <script src="/assets/vendor/tom-select.complete.min.js"></script>
+  <script src="/offline-store.js"></script>
+  <script src="/api-client.js"></script>
+  <script src="/sync-engine.js"></script>
+  <script src="/sync-ui.js"></script>
   <script src="../script.js?v=20260429-cataloghi"></script>
+  <script src="/pwa-register.js" defer></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      window.syncUI.init();
+      window.syncEngine.init();
+    });
+  </script>
 </body>
 </html>

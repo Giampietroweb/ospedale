@@ -3104,3 +3104,248 @@ body.estrazioni-page.test-ai-page {
     min-height: 240px;
   }
 }
+
+/* ============================================================
+   PWA — Badge rete, badge coda, pannello debug, stato salvataggio
+   ============================================================ */
+
+/* Contenitore badge: fisso in alto a destra, sopra tutto */
+.pwa-badge-container {
+  position: fixed;
+  top: 8px;
+  right: 12px;
+  z-index: 10001;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  pointer-events: auto;
+}
+
+.pwa-network-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  white-space: nowrap;
+  line-height: 1.4;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.15s, color 0.15s, opacity 0.15s;
+}
+
+.pwa-network-badge:hover {
+  opacity: 0.8;
+}
+
+.pwa-network-badge--online {
+  background-color: #dcfce7;
+  color: #15803d;
+}
+
+.pwa-network-badge--offline {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.pwa-queue-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.7rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: none;
+  transition: background-color 0.2s, opacity 0.2s;
+  white-space: nowrap;
+  line-height: 1.4;
+}
+
+.pwa-queue-badge:hover {
+  opacity: 0.8;
+}
+
+.pwa-queue-badge--idle {
+  background-color: #f1f5f9;
+  color: #64748b;
+}
+
+.pwa-queue-badge--active {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+/* Pannello debug */
+.pwa-debug-panel {
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  z-index: 10002;
+  width: min(380px, calc(100vw - 2rem));
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+  font-size: 0.8rem;
+  overflow: hidden;
+}
+
+/* .pwa-debug-panel usa style.display direttamente per show/hide */
+
+.pwa-debug-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.8rem;
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.pwa-debug-title {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.pwa-debug-actions {
+  display: flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.pwa-debug-btn {
+  padding: 2px 10px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: #334155;
+  transition: background-color 0.15s, opacity 0.15s;
+}
+
+.pwa-debug-btn:hover:not(:disabled) {
+  background-color: #f1f5f9;
+}
+
+.pwa-debug-btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.pwa-sync-status-line {
+  margin: 0;
+  padding: 2px 10px 4px;
+  font-size: 0.68rem;
+  color: #64748b;
+  min-height: 1.2em;
+  font-style: italic;
+}
+
+.pwa-debug-close {
+  padding: 2px 6px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 0.85rem;
+  color: #94a3b8;
+  border-radius: 4px;
+  transition: color 0.15s;
+}
+
+.pwa-debug-close:hover {
+  color: #1e293b;
+}
+
+.pwa-debug-list {
+  list-style: none;
+  margin: 0;
+  padding: 0.4rem 0;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.pwa-debug-empty {
+  padding: 0.8rem;
+  color: #94a3b8;
+  text-align: center;
+  font-style: italic;
+  margin: 0;
+}
+
+.pwa-debug-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 0.3rem 0.5rem;
+  padding: 0.35rem 0.8rem;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.pwa-debug-item:last-child {
+  border-bottom: none;
+}
+
+.pwa-debug-item--pending .pwa-debug-item-status { color: #92400e; }
+.pwa-debug-item--syncing .pwa-debug-item-status { color: #1d4ed8; }
+.pwa-debug-item--synced  .pwa-debug-item-status { color: #15803d; }
+.pwa-debug-item--error   .pwa-debug-item-status { color: #b91c1c; }
+
+.pwa-debug-item-status {
+  font-weight: 600;
+  font-size: 0.7rem;
+  white-space: nowrap;
+}
+
+.pwa-debug-item-action {
+  font-size: 0.72rem;
+  color: #334155;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pwa-debug-item-time {
+  font-size: 0.68rem;
+  color: #94a3b8;
+  white-space: nowrap;
+}
+
+.pwa-debug-item-error {
+  grid-column: 1 / -1;
+  font-size: 0.68rem;
+  color: #b91c1c;
+  background: #fff5f5;
+  border-radius: 4px;
+  padding: 2px 4px;
+}
+
+/* Stato salvataggio nella modale */
+.pwa-save-status {
+  font-size: 0.78rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  display: block;
+  min-height: 1.5em;
+  transition: opacity 0.3s;
+}
+
+.pwa-save-status--saved {
+  background: #dcfce7;
+  color: #15803d;
+}
+
+.pwa-save-status--queued {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+.pwa-save-status--error {
+  background: #fee2e2;
+  color: #b91c1c;
+}

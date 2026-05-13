@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+// Impedisce che warning/notice PHP inquinino la risposta JSON
+ini_set('display_errors', '0');
+ini_set('log_errors', '1');
+
 require __DIR__ . '/database.php';
 require_once __DIR__ . '/utils.php';
 require_once __DIR__ . '/catalog-utils.php';
@@ -241,6 +245,42 @@ if (!in_array($action, ['saveField', 'saveApparecchiaturaRow', 'saveImpiantistic
     apiErrorResponse('action non valida');
 }
 $autoAttributes = is_array($payload['autoAttributes'] ?? null) ? $payload['autoAttributes'] : [];
+
+// Idempotenza: se il client include un operationId, verifica se già processato
+$operationId = null;
+$rawOperationId = trim((string)($payload['operationId'] ?? ''));
+if ($rawOperationId !== '') {
+    if (!preg_match('/^[0-9a-f\-]{8,64}$/i', $rawOperationId)) {
+        apiErrorResponse('operationId non valido');
+    }
+    $operationId = $rawOperationId;
+}
+
+if ($operationId !== null) {
+    try {
+        $pdoCheck = getDatabaseConnection();
+        $checkStmt = $pdoCheck->prepare(
+            'SELECT outcome FROM sync_operations WHERE operation_id = :operation_id LIMIT 1'
+        );
+        $checkStmt->execute([':operation_id' => $operationId]);
+        $existingOp = $checkStmt->fetch(PDO::FETCH_ASSOC);
+
+        if (is_array($existingOp) && $existingOp['outcome'] === 'success') {
+            // Operazione già processata con successo: risposta idempotente
+            echo json_encode([
+                'ok' => true,
+                'action' => $action,
+                'idempotent' => true,
+                'operationId' => $operationId,
+            ], JSON_UNESCAPED_UNICODE);
+            exit;
+        }
+    } catch (Throwable) {
+        // La tabella sync_operations potrebbe non esistere ancora (migration non eseguita):
+        // procedi con il salvataggio normale, ignorando la deduplicazione.
+        $operationId = null;
+    }
+}
 
 try {
     $pdo = getDatabaseConnection();
@@ -484,12 +524,38 @@ try {
     }
 
     $pdo->commit();
-    echo json_encode([
+
+    // Registra l'operazione come completata per deduplicazione futura
+    if ($operationId !== null) {
+        try {
+            $roomRefJson = json_encode($roomRef, JSON_UNESCAPED_UNICODE);
+            $insertOpStmt = $pdo->prepare(
+                'INSERT INTO sync_operations (operation_id, action, room_ref, processed_at, outcome)
+                 VALUES (:operation_id, :action, :room_ref, NOW(), :outcome)
+                 ON DUPLICATE KEY UPDATE processed_at = NOW(), outcome = :outcome'
+            );
+            $insertOpStmt->execute([
+                ':operation_id' => $operationId,
+                ':action' => $action,
+                ':room_ref' => $roomRefJson,
+                ':outcome' => 'success',
+            ]);
+        } catch (Throwable) {
+            // La registrazione è best-effort: non bloccare la risposta
+        }
+    }
+
+    $responseData = [
         'ok' => true,
         'action' => $action,
         'roomId' => $roomId > 0 ? $roomId : null,
         'skipped' => $skipped,
-    ], JSON_UNESCAPED_UNICODE);
+    ];
+    if ($operationId !== null) {
+        $responseData['operationId'] = $operationId;
+    }
+
+    echo json_encode($responseData, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $throwable) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
