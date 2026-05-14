@@ -16,7 +16,7 @@
  * 5. Le vecchie cache vengono eliminate nell'handler activate
  */
 
-const CACHE_VERSION = 'app-shell-v2';
+const CACHE_VERSION = 'app-shell-v3';
 const RUNTIME_ASSETS_CACHE = 'runtime-assets-v1';
 const RUNTIME_API_CACHE = 'runtime-api-v1';
 
@@ -32,6 +32,7 @@ const APP_SHELL_ASSETS = [
   '/estrazioni.js',
   '/cataloghi.js',
   '/pwa-register.js',
+  '/toolbar-nav.js',
   '/manifest.webmanifest',
   '/assets/icons/icon-192.svg',
   '/assets/icons/icon-512.svg',

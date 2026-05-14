@@ -21,8 +21,46 @@
 
 </head>
 <body class="planimetria-page">
-  <div class="toolbar">
-    <div class="toolbar-group toolbar-zoom-controls" aria-label="Controlli mappa">
+  <header class="toolbar toolbar-app planimetria-toolbar" role="banner">
+    <div class="toolbar-app__start">
+      <div class="toolbar-nav-hamburger toolbar-dropdown" data-toolbar-dropdown>
+        <button
+          type="button"
+          class="toolbar-dropdown__trigger toolbar-hamburger__trigger"
+          aria-expanded="false"
+          aria-haspopup="true"
+          aria-label="Menu navigazione"
+        >
+          <span class="toolbar-hamburger__icon" aria-hidden="true">&#9776;</span>
+          <span class="toolbar-hamburger__label">Menu</span>
+        </button>
+        <nav class="toolbar-dropdown__panel toolbar-nav-hamburger__panel" aria-label="Navigazione principale" hidden>
+          <a href="../index.html" class="toolbar-nav-hamburger__link home-cta-link-toolbar" aria-current="page">Mappa</a>
+          <a href="../estrazioni.html" class="toolbar-nav-hamburger__link home-cta-link-toolbar">Estrazioni</a>
+          <a href="../cataloghi.html" class="toolbar-nav-hamburger__link home-cta-link-toolbar">Cataloghi</a>
+          <a href="../sync.html" class="toolbar-nav-hamburger__link home-cta-link-toolbar">Monitor sync</a>
+          <a href="../test-ai/" class="toolbar-nav-hamburger__link home-cta-link-toolbar">Test AI</a>
+        </nav>
+      </div>
+      <nav class="toolbar-navigation toolbar-navigation--desktop" aria-label="Navigazione principale">
+        <a href="../index.html" class="home-cta-link-toolbar" aria-current="page">Mappa</a>
+        <a href="../estrazioni.html" class="home-cta-link-toolbar">Estrazioni</a>
+        <a href="../cataloghi.html" class="home-cta-link-toolbar">Cataloghi</a>
+        <a href="../sync.html" class="home-cta-link-toolbar">Monitor sync</a>
+        <a href="../test-ai/" class="home-cta-link-toolbar">Test AI</a>
+      </nav>
+    </div>
+    <div class="toolbar-app__center">
+      <div id="pwa-toolbar-slot" class="pwa-toolbar-slot"></div>
+    </div>
+    <div class="toolbar-app__end">
+      <div class="toolbar-group toolbar-reference-actions">
+        <button id="referenceSearchToggle" class="toolbar-primary-action toolbar-reference-toggle" type="button" aria-expanded="false" aria-controls="referenceSearchPanel" aria-label="Cerca referenza">
+          <span class="toolbar-reference-icon" aria-hidden="true">&#128269;</span>
+          <span class="toolbar-reference-text">Cerca referenza</span>
+        </button>
+      </div>
+      <div class="toolbar-group toolbar-zoom-controls" aria-label="Controlli mappa">
       <div class="toolbar-controls-dropdown">
         <button
           id="mapControlsDropdownToggle"
@@ -32,7 +70,8 @@
           aria-expanded="false"
           aria-controls="mapControlsDropdownPanel"
         >
-          <span>Controlli mappa</span>
+          <span class="toolbar-controls-icon" aria-hidden="true">&#9881;</span>
+          <span class="toolbar-controls-text">Controlli mappa</span>
           <span class="toolbar-controls-dropdown-trigger-arrow" aria-hidden="true">&#9662;</span>
         </button>
         <div id="mapControlsDropdownPanel" class="toolbar-controls-dropdown-panel" role="group" aria-label="Controlli zoom e font referenze" hidden>
@@ -85,21 +124,9 @@
           </div>
         </div>
       </div>
+      </div>
     </div>
-    <nav class="toolbar-navigation" aria-label="Navigazione principale">
-      <a href="../index.html" class="home-cta-link-toolbar" aria-current="page">Mappa</a>
-      <a href="../estrazioni.html" class="home-cta-link-toolbar">Estrazioni</a>
-      <a href="../cataloghi.html" class="home-cta-link-toolbar">Cataloghi</a>
-      <a href="../sync.html" class="home-cta-link-toolbar">Monitor sync</a>
-      <a href="../test-ai/" class="home-cta-link-toolbar">Test AI</a>
-    </nav>
-    <div class="toolbar-group toolbar-reference-actions">
-      <button id="referenceSearchToggle" class="toolbar-primary-action toolbar-reference-toggle" type="button" aria-expanded="false" aria-controls="referenceSearchPanel" aria-label="Cerca referenza">
-        <span class="toolbar-reference-icon" aria-hidden="true">&#128269;</span>
-        <span class="toolbar-reference-text">Cerca referenza</span>
-      </button>
-    </div>
-  </div>
+  </header>
 
   <div id="viewer" class="viewer">
     <section id="referenceSearchPanel" class="reference-search-panel" aria-label="Ricerca referenza" hidden>
@@ -339,10 +366,11 @@
   </div>
 
   <script src="/assets/vendor/tom-select.complete.min.js"></script>
+  <script src="/toolbar-nav.js?v=20260514"></script>
   <script src="/offline-store.js"></script>
   <script src="/api-client.js"></script>
   <script src="/sync-engine.js"></script>
-  <script src="/sync-ui.js"></script>
+  <script src="/sync-ui.js?v=20260514"></script>
   <script src="../script.js?v=20260429-cataloghi"></script>
   <script src="/pwa-register.js" defer></script>
   <script>

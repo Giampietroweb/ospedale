@@ -13,6 +13,10 @@
 
   // ── Stato ──────────────────────────────────────────────────────────────────
 
+  let syncToolbarEl = null;
+  let syncToolbarDotEl = null;
+  let syncToolbarStatusEl = null;
+  let syncToolbarQueueEl = null;
   let networkBadgeEl = null;
   let queueBadgeEl = null;
   let debugPanelEl = null;
@@ -88,6 +92,67 @@
   }
 
   // ── Creazione elementi UI ──────────────────────────────────────────────────
+
+  function createSyncToolbarDropdown() {
+    const wrapper = document.createElement('div');
+    wrapper.className = 'pwa-sync-dropdown toolbar-dropdown';
+    wrapper.setAttribute('data-toolbar-dropdown', '');
+
+    wrapper.innerHTML = `
+      <button
+        type="button"
+        id="pwa-sync-toolbar-trigger"
+        class="toolbar-dropdown__trigger pwa-sync-toolbar__trigger"
+        aria-expanded="false"
+        aria-haspopup="true"
+        aria-label="Stato sincronizzazione"
+      >
+        <span id="pwa-sync-toolbar-dot" class="pwa-badge-dot pwa-badge-dot--online" aria-hidden="true"></span>
+        <span id="pwa-sync-toolbar-status" class="pwa-sync-toolbar__status">Online</span>
+        <span id="pwa-sync-toolbar-queue" class="pwa-sync-toolbar__queue pwa-sync-toolbar__queue--idle">Sync</span>
+        <span class="toolbar-dropdown__arrow" aria-hidden="true">&#9662;</span>
+      </button>
+      <div class="toolbar-dropdown__panel pwa-sync-toolbar__panel" hidden>
+        <p class="pwa-sync-toolbar__meta" id="pwa-sync-toolbar-last-sync">Ultima sync: —</p>
+        <div class="pwa-sync-toolbar__stats" id="pwa-sync-toolbar-stats" aria-live="polite"></div>
+        <div class="pwa-sync-toolbar__actions">
+          <button type="button" class="pwa-sync-toolbar__action" id="pwa-sync-toolbar-retry">Riprova ora</button>
+          <button type="button" class="pwa-sync-toolbar__action" id="pwa-sync-toolbar-details">Dettagli rapidi</button>
+          <a class="pwa-sync-toolbar__action pwa-sync-toolbar__action--link" id="pwa-sync-toolbar-report" href="${syncReportHref()}">Report completo</a>
+        </div>
+      </div>
+    `;
+
+    wrapper.querySelector('#pwa-sync-toolbar-retry').addEventListener('click', async (event) => {
+      event.stopPropagation();
+      const btn = event.currentTarget;
+      btn.disabled = true;
+      btn.textContent = 'Sincronizzando...';
+      try {
+        if (global.syncEngine) await global.syncEngine.flushOutbox({ reason: 'manual' });
+        await refreshDebugPanel();
+        await updateQueueBadge();
+      } catch (err) {
+        console.error('[syncUI] Errore durante "Riprova ora":', err);
+      } finally {
+        btn.disabled = false;
+        btn.textContent = 'Riprova ora';
+        global.toolbarNav?.closeAll();
+      }
+    });
+
+    wrapper.querySelector('#pwa-sync-toolbar-details').addEventListener('click', (event) => {
+      event.stopPropagation();
+      global.toolbarNav?.closeAll();
+      showDebugPanel();
+    });
+
+    return wrapper;
+  }
+
+  function resolveToolbarSlot() {
+    return document.getElementById('pwa-toolbar-slot');
+  }
 
   function createNetworkBadge() {
     const badge = document.createElement('button');
@@ -194,6 +259,17 @@
     debugListEl = debugPanelEl.querySelector('#pwa-debug-list');
     document.body.appendChild(debugPanelEl);
 
+    const slot = resolveToolbarSlot();
+    if (slot) {
+      syncToolbarEl = createSyncToolbarDropdown();
+      slot.appendChild(syncToolbarEl);
+      syncToolbarDotEl = syncToolbarEl.querySelector('#pwa-sync-toolbar-dot');
+      syncToolbarStatusEl = syncToolbarEl.querySelector('#pwa-sync-toolbar-status');
+      syncToolbarQueueEl = syncToolbarEl.querySelector('#pwa-sync-toolbar-queue');
+      global.toolbarNav?.bindDropdown(syncToolbarEl);
+      return;
+    }
+
     const badgeContainer = document.createElement('div');
     badgeContainer.id = 'pwa-badge-container';
     badgeContainer.className = 'pwa-badge-container';
@@ -208,6 +284,15 @@
   // ── Aggiornamenti UI ───────────────────────────────────────────────────────
 
   function updateNetworkBadge(isOnline) {
+    if (syncToolbarDotEl && syncToolbarStatusEl) {
+      syncToolbarDotEl.className = `pwa-badge-dot pwa-badge-dot--${isOnline ? 'online' : 'offline'}`;
+      syncToolbarStatusEl.textContent = isOnline ? 'Online' : 'Offline';
+      syncToolbarEl?.querySelector('.pwa-sync-toolbar__trigger')?.classList.toggle(
+        'pwa-sync-toolbar__trigger--offline',
+        !isOnline
+      );
+      return;
+    }
     if (!networkBadgeEl) return;
     const icon = isOnline
       ? '<span class="pwa-badge-dot pwa-badge-dot--online" aria-hidden="true"></span>'
@@ -216,7 +301,67 @@
     networkBadgeEl.className = `pwa-network-badge pwa-network-badge--${isOnline ? 'online' : 'offline'}`;
   }
 
+  async function updateSyncToolbarStats() {
+    const statsEl = syncToolbarEl?.querySelector('#pwa-sync-toolbar-stats');
+    const lastSyncEl = syncToolbarEl?.querySelector('#pwa-sync-toolbar-last-sync');
+    if (!statsEl || !global.offlineStore) return;
+
+    const [stats, lastSyncAt] = await Promise.all([
+      global.offlineStore.getStats().catch(() => null),
+      global.offlineStore.getLastSyncAt().catch(() => null),
+    ]);
+
+    if (lastSyncEl) {
+      lastSyncEl.textContent = lastSyncAt
+        ? `Ultima sync: ${formatShortTime(lastSyncAt)} (${formatRelative(lastSyncAt)})`
+        : 'Nessuna sincronizzazione ancora effettuata';
+    }
+
+    if (!stats) {
+      statsEl.textContent = '';
+      return;
+    }
+
+    statsEl.innerHTML = [
+      stats.pending ? `${stats.pending} in attesa` : null,
+      stats.syncing ? `${stats.syncing} in corso` : null,
+      stats.error ? `${stats.error} errori` : null,
+      (!stats.pending && !stats.syncing && !stats.error) ? 'Nessuna operazione in coda' : null,
+    ].filter(Boolean).map((line) => `<span class="pwa-sync-toolbar__stat-line">${escapeHtml(line)}</span>`).join('');
+  }
+
   async function updateQueueBadge() {
+    if (syncToolbarQueueEl) {
+      if (!global.offlineStore) {
+        syncToolbarQueueEl.textContent = 'Sync';
+        syncToolbarQueueEl.className = 'pwa-sync-toolbar__queue pwa-sync-toolbar__queue--idle';
+        return;
+      }
+      try {
+        const stats = await global.offlineStore.getStats();
+        const pending = stats.pending || 0;
+        const errors = stats.error || 0;
+        const syncing = stats.syncing || 0;
+        let cls = 'pwa-sync-toolbar__queue--idle';
+        let label = 'Sync';
+        if (syncing > 0) {
+          cls = 'pwa-sync-toolbar__queue--syncing';
+          label = `${syncing} in corso`;
+        } else if (errors > 0) {
+          cls = 'pwa-sync-toolbar__queue--error';
+          label = `${errors} errori`;
+        } else if (pending > 0) {
+          cls = 'pwa-sync-toolbar__queue--active';
+          label = `${pending} in coda`;
+        }
+        syncToolbarQueueEl.textContent = label;
+        syncToolbarQueueEl.className = `pwa-sync-toolbar__queue ${cls}`;
+        await updateSyncToolbarStats();
+      } catch (err) {
+        console.warn('[syncUI] Errore aggiornamento toolbar sync:', err);
+      }
+      return;
+    }
     if (!queueBadgeEl) return;
 
     if (!global.offlineStore) {
