@@ -16,7 +16,7 @@
  * 5. Le vecchie cache vengono eliminate nell'handler activate
  */
 
-const CACHE_VERSION = 'app-shell-v1';
+const CACHE_VERSION = 'app-shell-v2';
 const RUNTIME_ASSETS_CACHE = 'runtime-assets-v1';
 const RUNTIME_API_CACHE = 'runtime-api-v1';
 
@@ -25,6 +25,7 @@ const APP_SHELL_ASSETS = [
   '/index.html',
   '/estrazioni.html',
   '/cataloghi.html',
+  '/sync.html',
   '/piani/planimetria.html',
   '/style.css',
   '/script.js',
@@ -41,6 +42,7 @@ const APP_SHELL_ASSETS = [
   '/api-client.js',
   '/sync-engine.js',
   '/sync-ui.js',
+  '/sync-page.js',
 ];
 
 const API_GET_PATHS = [

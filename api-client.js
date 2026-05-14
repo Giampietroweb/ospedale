@@ -5,6 +5,12 @@
  * Se online tenta l'invio diretto; se offline o in caso di errore di rete
  * accoda l'operazione in IndexedDB tramite window.offlineStore.
  *
+ * Eventi emessi su window:
+ *   - 'pwa:enqueued'  { detail: { operationId, action, roomRef } }
+ *       Quando un'operazione viene accodata (offline o errore rete/server).
+ *   - 'pwa:saved-online' { detail: { operationId, action, roomRef } }
+ *       Quando un'operazione viene salvata direttamente online senza accodare.
+ *
  * Dipende da offline-store.js che deve essere caricato prima.
  */
 
@@ -23,13 +29,23 @@
     );
   }
 
+  function dispatchPwaEvent(name, detail) {
+    try {
+      global.dispatchEvent(new CustomEvent(name, { detail }));
+    } catch (err) {
+      console.warn('[api-client] dispatchEvent fallito:', err);
+    }
+  }
+
   async function enqueueAndReturn(action, body, operationId) {
     const store = global.offlineStore;
     await store.enqueueOutboxOperation({
       id: operationId,
       action,
       payload: body,
+      roomRef: body.roomRef || null,
     });
+    dispatchPwaEvent('pwa:enqueued', { operationId, action, roomRef: body.roomRef || null });
     return { status: 'queued', operationId };
   }
 
@@ -79,6 +95,7 @@
           return enqueueAndReturn(action, body, operationId);
         }
 
+        dispatchPwaEvent('pwa:saved-online', { operationId, action, roomRef });
         return { status: 'saved', operationId, payload: responsePayload };
       } catch (error) {
         if (isNetworkError(error)) {

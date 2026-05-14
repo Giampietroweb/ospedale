@@ -30,26 +30,51 @@ function sleep(ms) {
 
 function createMockOfflineStore(initialOps = []) {
   const ops = [...initialOps];
+  const metadata = new Map();
 
   return {
     listPendingOperations: async () => ops.filter((o) => o.status === 'pending'),
     countPendingOperations: async () => ops.filter((o) => o.status === 'pending').length,
+    getOperationById: async (id) => ops.find((o) => o.id === id) || null,
     markOperationSyncing: async (id) => {
       const op = ops.find((o) => o.id === id);
       if (op) op.status = 'syncing';
     },
-    markOperationSynced: async (id) => {
+    markOperationSynced: async (id, metadata) => {
       const op = ops.find((o) => o.id === id);
-      if (op) { op.status = 'synced'; op.error = null; }
+      if (op) {
+        op.status = 'synced';
+        op.error = null;
+        op.syncedAt = new Date().toISOString();
+        Object.assign(op, metadata || {});
+      }
     },
     markOperationError: async (id, error) => {
       const op = ops.find((o) => o.id === id);
       if (op) { op.status = 'error'; op.error = error; }
     },
-    markOperationPending: async (id) => {
+    markOperationPending: async (id, errorMessage = null) => {
       const op = ops.find((o) => o.id === id);
-      if (op) { op.status = 'pending'; op.error = null; }
+      if (op) { op.status = 'pending'; op.error = errorMessage; }
     },
+    recordAttempt: async (id) => {
+      const op = ops.find((o) => o.id === id);
+      if (op) {
+        op.attemptCount = (op.attemptCount || 0) + 1;
+        op.lastAttemptAt = new Date().toISOString();
+      }
+    },
+    setLastSyncAt: async (iso) => { metadata.set('lastSyncAt', iso); },
+    getLastSyncAt: async () => metadata.get('lastSyncAt') || null,
+    setMetadata: async (key, value) => { metadata.set(key, value); },
+    getMetadata: async (key) => metadata.get(key) ?? null,
+    getStats: async () => ({
+      total: ops.length,
+      pending: ops.filter((o) => o.status === 'pending').length,
+      syncing: ops.filter((o) => o.status === 'syncing').length,
+      synced: ops.filter((o) => o.status === 'synced').length,
+      error: ops.filter((o) => o.status === 'error').length,
+    }),
     getOps: () => ops,
   };
 }
@@ -227,6 +252,75 @@ async function runTests() {
     store.getOps().push(op2);
     await engine.flushOutbox({ reason: 'test' });
     assert(received.length === countBefore, 'offSyncEvent rimuove il listener');
+  }
+
+  // Test 7: recordAttempt e syncedAt vengono popolati
+  console.log('\nrecordAttempt / syncedAt');
+  {
+    const op = { id: 'op-7', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {}, attemptCount: 0 };
+    const store = createMockOfflineStore([op]);
+
+    const engine = loadSyncEngine({
+      offlineStore: store,
+      fetchImpl: async () => ({ ok: true, json: async () => ({ ok: true }), status: 200 }),
+      isOnline: true,
+    });
+
+    await engine.flushOutbox({ reason: 'test' });
+    const finalOp = store.getOps().find((o) => o.id === 'op-7');
+    assert(finalOp.attemptCount === 1, 'attemptCount incrementato a 1 dopo flush');
+    assert(typeof finalOp.lastAttemptAt === 'string', 'lastAttemptAt impostato dopo flush');
+    assert(typeof finalOp.syncedAt === 'string', 'syncedAt impostato al success');
+    const lastSync = await store.getLastSyncAt();
+    assert(typeof lastSync === 'string', 'lastSyncAt metadata aggiornato');
+  }
+
+  // Test 8: syncSingleById funziona su una singola operazione
+  console.log('\nsyncSingleById');
+  {
+    const op = { id: 'op-8', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {} };
+    const store = createMockOfflineStore([op]);
+
+    const engine = loadSyncEngine({
+      offlineStore: store,
+      fetchImpl: async () => ({ ok: true, json: async () => ({ ok: true }), status: 200 }),
+      isOnline: true,
+    });
+
+    const result = await engine.syncSingleById('op-8');
+    assert(result.success === true, 'syncSingleById ritorna success: true');
+    const finalOp = store.getOps().find((o) => o.id === 'op-8');
+    assert(finalOp.status === 'synced', 'op marcata come synced');
+
+    const offlineResult = await engine.syncSingleById('op-not-exist');
+    assert(offlineResult.success === false && offlineResult.reason === 'not-found', 'gestisce id non esistente');
+  }
+
+  // Test 9: lock rilasciato anche in caso di errore (try/finally)
+  console.log('\nlock rilasciato dopo errore');
+  {
+    const op = { id: 'op-9', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {} };
+    const store = createMockOfflineStore([op]);
+    let callCount = 0;
+
+    const engine = loadSyncEngine({
+      offlineStore: store,
+      fetchImpl: async () => {
+        callCount++;
+        // Primo tentativo fallisce con 500 (pending), secondo va a buon fine
+        if (callCount === 1) return { ok: false, json: async () => ({ ok: false }), status: 500 };
+        return { ok: true, json: async () => ({ ok: true }), status: 200 };
+      },
+      isOnline: true,
+    });
+
+    await engine.flushOutbox({ reason: 'test' });
+    assert(callCount === 1, 'fetch chiamato 1 volta nel primo flush');
+    // Se il lock fosse bloccato, il secondo flush non andrebbe avanti
+    await engine.flushOutbox({ reason: 'test-2' });
+    assert(callCount === 2, 'lock rilasciato: secondo flush procede');
+    const finalOp = store.getOps().find((o) => o.id === 'op-9');
+    assert(finalOp.status === 'synced', 'op finalmente sincronizzata');
   }
 
   // Riepilogo

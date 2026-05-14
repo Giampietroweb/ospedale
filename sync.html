@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monitor Sincronizzazione</title>
+  <link rel="stylesheet" href="/assets/vendor/tailwind.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1e40af">
+  <meta name="robots" content="noindex, nofollow">
+  <link rel="stylesheet" href="style.css">
+  <script src="/pwa-register.js" defer></script>
+</head>
+<body class="estrazioni-page sync-page">
+
+  <nav class="toolbar" aria-label="Navigazione principale">
+    <a href="index.html" class="home-cta-link-toolbar">Mappa</a>
+    <a href="estrazioni.html" class="home-cta-link-toolbar">Estrazioni</a>
+    <a href="cataloghi.html" class="home-cta-link-toolbar">Cataloghi</a>
+    <a href="sync.html" class="home-cta-link-toolbar" aria-current="page">Monitor sync</a>
+    <a href="test-ai/" class="home-cta-link-toolbar">Test AI</a>
+  </nav>
+
+  <main class="estrazioni-main sync-main">
+    <header class="estrazioni-header">
+      <h1 class="estrazioni-title">Monitor sincronizzazione</h1>
+      <p class="estrazioni-intro">
+        Storico completo delle operazioni di salvataggio. Le operazioni offline restano in attesa
+        finché il dispositivo non torna online e vengono poi inviate al server in ordine FIFO.
+      </p>
+    </header>
+
+    <!-- Summary -->
+    <section class="sync-summary" aria-label="Riepilogo sincronizzazione">
+      <div class="sync-summary-grid">
+        <div class="sync-summary-card sync-summary-card--pending">
+          <div class="sync-summary-card-label">In attesa</div>
+          <div class="sync-summary-card-value" id="syncStatPending">—</div>
+        </div>
+        <div class="sync-summary-card sync-summary-card--syncing">
+          <div class="sync-summary-card-label">In corso</div>
+          <div class="sync-summary-card-value" id="syncStatSyncing">—</div>
+        </div>
+        <div class="sync-summary-card sync-summary-card--synced">
+          <div class="sync-summary-card-label">Sincronizzate</div>
+          <div class="sync-summary-card-value" id="syncStatSynced">—</div>
+        </div>
+        <div class="sync-summary-card sync-summary-card--error">
+          <div class="sync-summary-card-label">Errori</div>
+          <div class="sync-summary-card-value" id="syncStatError">—</div>
+        </div>
+        <div class="sync-summary-card sync-summary-card--info sync-summary-card--wide">
+          <div class="sync-summary-card-label">Ultima sincronizzazione</div>
+          <div class="sync-summary-card-value sync-summary-card-value--small" id="syncLastSync">—</div>
+          <div class="sync-summary-card-extra" id="syncNetworkStatus">—</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Filtri + azioni -->
+    <section class="estrazioni-filters sync-filters" aria-label="Filtri operazioni">
+      <div class="sync-filter-row">
+        <label class="sync-filter">
+          <span class="sync-filter-label">Stato</span>
+          <select id="syncFilterStatus" class="sync-filter-input">
+            <option value="">Tutti</option>
+            <option value="pending">In attesa</option>
+            <option value="syncing">In corso</option>
+            <option value="synced">Sincronizzate</option>
+            <option value="error">Errori</option>
+          </select>
+        </label>
+
+        <label class="sync-filter">
+          <span class="sync-filter-label">Tipo operazione</span>
+          <select id="syncFilterAction" class="sync-filter-input">
+            <option value="">Tutte</option>
+            <option value="saveField">Modifica campo stanza</option>
+            <option value="saveApparecchiaturaRow">Apparecchiatura</option>
+            <option value="saveImpiantisticaRow">Impiantistica</option>
+            <option value="saveAltreDotazioniRow">Altre dotazioni</option>
+          </select>
+        </label>
+
+        <label class="sync-filter">
+          <span class="sync-filter-label">Stanza</span>
+          <input id="syncFilterRoom" type="text" class="sync-filter-input" placeholder="es. nord/3/N301">
+        </label>
+
+        <label class="sync-filter">
+          <span class="sync-filter-label">Dal</span>
+          <input id="syncFilterSince" type="date" class="sync-filter-input">
+        </label>
+      </div>
+
+      <div class="sync-actions-row">
+        <button id="syncBtnFlush" type="button" class="estrazioni-search-btn">Sincronizza ora</button>
+        <button id="syncBtnRefresh" type="button" class="estrazioni-reset-btn">Aggiorna</button>
+        <button id="syncBtnClearSynced" type="button" class="estrazioni-reset-btn">Elimina sincronizzate</button>
+        <label class="sync-auto-refresh">
+          <input id="syncAutoRefresh" type="checkbox" checked>
+          <span>Aggiornamento automatico (5s)</span>
+        </label>
+      </div>
+    </section>
+
+    <!-- Tabella operazioni -->
+    <section class="estrazioni-results sync-results" aria-label="Operazioni outbox">
+      <div class="estrazioni-results-scroll">
+        <table class="estrazioni-table sync-table" id="syncTable">
+          <thead>
+            <tr>
+              <th scope="col">Stato</th>
+              <th scope="col">Operazione</th>
+              <th scope="col">Stanza</th>
+              <th scope="col">Dettaglio</th>
+              <th scope="col">Creato</th>
+              <th scope="col">Ultimo tentativo</th>
+              <th scope="col">Sincronizzato</th>
+              <th scope="col">Tentativi</th>
+              <th scope="col">Azioni</th>
+            </tr>
+          </thead>
+          <tbody id="syncTableBody">
+            <tr><td colspan="9" class="estrazioni-empty">Caricamento…</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="sync-results-footer" id="syncTableFooter"></p>
+    </section>
+
+    <!-- Modal dettaglio payload -->
+    <div id="syncDetailModal" class="modal-overlay" aria-hidden="true">
+      <div class="modal sync-detail-modal" role="dialog" aria-modal="true" aria-labelledby="syncDetailTitle">
+        <button class="modal-close" id="syncDetailClose" type="button" aria-label="Chiudi">&times;</button>
+        <h2 class="modal-title" id="syncDetailTitle">Dettaglio operazione</h2>
+        <dl class="sync-detail-meta" id="syncDetailMeta"></dl>
+        <h3 class="sync-detail-section-title">Payload inviato</h3>
+        <pre class="sync-detail-payload" id="syncDetailPayload"></pre>
+        <h3 class="sync-detail-section-title" id="syncDetailResponseTitle" hidden>Risposta server</h3>
+        <pre class="sync-detail-payload" id="syncDetailResponse" hidden></pre>
+      </div>
+    </div>
+  </main>
+
+  <script src="/offline-store.js"></script>
+  <script src="/api-client.js"></script>
+  <script src="/sync-engine.js"></script>
+  <script src="/sync-ui.js"></script>
+  <script src="/sync-page.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      if (window.syncUI) window.syncUI.init();
+      if (window.syncEngine) window.syncEngine.init();
+      if (window.syncPage) window.syncPage.init();
+    });
+  </script>
+</body>
+</html>
