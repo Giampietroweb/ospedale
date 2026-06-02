@@ -4,8 +4,8 @@
 
 L'app "Ospedale" è una PWA (Progressive Web App) offline-first basata su vanilla JS + PHP.
 I dati in lettura sono disponibili offline via cache del service worker.
-I salvataggi offline vengono accodati in IndexedDB e sincronizzati automaticamente
-al ritorno della connessione, con monitoraggio completo via una pagina dedicata `/sync.html`.
+I salvataggi offline vengono accodati in IndexedDB e sincronizzati manualmente
+quando richiesto dall'utente, con monitoraggio completo via una pagina dedicata `/sync.html`.
 
 ---
 
@@ -99,7 +99,7 @@ apiClient.saveRoom(...)
 ## Flusso di sincronizzazione
 
 ```
-Trigger: 'online' | DOMContentLoaded | timer 30s | 'pwa:enqueued' | manuale
+Trigger: manuale
     ↓
 syncEngine.flushOutbox({ reason })
     ↓ FIFO per createdAt, lock isSyncInProgress (con finally)
@@ -116,11 +116,8 @@ Per ogni operazione pending (max 50/batch):
 sync:end → setLastSyncAt + setMetadata('lastFlushSummary')
     ↓
 Se restano pending e nessun errore di rete → flush continuativo (50ms dopo)
-Se errore di rete e pending > 0 → scheduleRetry (backoff esponenziale)
+Se errore di rete e pending > 0 → restano pending fino a nuovo avvio manuale
 ```
-
-### Backoff esponenziale
-1s, 2s, 4s, 8s, 16s, 30s (max). Resettato a 0 quando una operazione va a buon fine.
 
 ### Lock anti-concorrenza
 `isSyncInProgress` viene rilasciato in un blocco `finally` per garantire che
@@ -202,10 +199,10 @@ più vecchie di N ms. Utile per una pulizia automatica programmata
 ## Limitazioni note
 
 1. **Sincronizzazione garantita solo con tab aperta**: Background Sync API non è implementata.
-   La coda viene svuotata quando l'utente ha una pagina aperta e torna online.
+   La coda viene svuotata quando l'utente ha una pagina aperta e avvia la sync manualmente.
 
-2. **Timer periodico (30s) non attivo con tab chiusa**: se l'utente chiude il browser
-   offline, la sync partirà al prossimo avvio (`bootstrap`).
+2. **Nessun trigger automatico**: il ritorno online non avvia la sync da solo.
+   Le operazioni restano in `pending` finché l'utente non preme "Sincronizza ora".
 
 3. **Conflitti multi-device**: la politica last-write-wins può causare sovrascritture
    se due utenti modificano la stessa stanza quasi in contemporanea. Documentato e accettato.

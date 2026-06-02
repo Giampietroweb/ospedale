@@ -2,7 +2,7 @@
  * sync-engine.js
  *
  * Motore di sincronizzazione delle operazioni outbox offline.
- * Svuota la coda con ordine FIFO, backoff esponenziale e lock anti-concorrenza.
+ * Svuota la coda con ordine FIFO e lock anti-concorrenza.
  *
  * Dipende da offline-store.js e api-client.js (window.offlineStore, window.apiClient).
  * Esposto come window.syncEngine.
@@ -22,15 +22,9 @@
 
   const SAVE_ENDPOINT = '../api/save-modal.php';
 
-  // Backoff: 1s, 2s, 4s, 8s, 16s, 30s (max)
-  const BACKOFF_DELAYS_MS = [1000, 2000, 4000, 8000, 16000, 30000];
-  const PERIODIC_CHECK_INTERVAL_MS = 30000;
   const MAX_ITEMS_PER_FLUSH = 50;
 
   let isSyncInProgress = false;
-  let retryAttempt = 0;
-  let retryTimerId = null;
-  let periodicTimerId = null;
 
   const listeners = [];
 
@@ -123,7 +117,6 @@
     if (pendingOps.length === 0) return { skipped: true, reason: 'empty' };
 
     isSyncInProgress = true;
-    clearScheduledRetry();
 
     const batchStartTime = Date.now();
     emitEvent('sync:start', { count: pendingOps.length, reason });
@@ -144,7 +137,6 @@
 
         if (result.success) {
           syncedCount++;
-          retryAttempt = 0;
         } else if (result.permanent) {
           errorCount++;
         } else {
@@ -183,10 +175,6 @@
       return { syncedCount, errorCount, remainingCount, elapsedMs };
     }
 
-    if (networkFailure && remainingCount > 0) {
-      scheduleRetry();
-    }
-
     return { syncedCount, errorCount, remainingCount, elapsedMs };
   }
 
@@ -211,46 +199,6 @@
     return result;
   }
 
-  function scheduleRetry() {
-    if (retryTimerId) return;
-
-    const delayMs = BACKOFF_DELAYS_MS[Math.min(retryAttempt, BACKOFF_DELAYS_MS.length - 1)];
-    retryAttempt++;
-
-    retryTimerId = setTimeout(async () => {
-      retryTimerId = null;
-      await flushOutbox({ reason: 'retry' });
-    }, delayMs);
-  }
-
-  function clearScheduledRetry() {
-    if (retryTimerId) {
-      clearTimeout(retryTimerId);
-      retryTimerId = null;
-    }
-  }
-
-  function startPeriodicCheck() {
-    if (periodicTimerId) return;
-
-    periodicTimerId = setInterval(async () => {
-      const store = global.offlineStore;
-      if (!store) return;
-
-      const count = await store.countPendingOperations().catch(() => 0);
-      if (count > 0 && navigator.onLine) {
-        await flushOutbox({ reason: 'periodic' });
-      }
-    }, PERIODIC_CHECK_INTERVAL_MS);
-  }
-
-  function stopPeriodicCheck() {
-    if (periodicTimerId) {
-      clearInterval(periodicTimerId);
-      periodicTimerId = null;
-    }
-  }
-
   async function getStats() {
     const store = global.offlineStore;
     if (!store) return null;
@@ -261,26 +209,10 @@
   }
 
   function init() {
-    flushOutbox({ reason: 'bootstrap' }).catch(console.error);
-
-    window.addEventListener('online', () => {
-      clearScheduledRetry();
-      retryAttempt = 0;
-      flushOutbox({ reason: 'online' }).catch(console.error);
-    });
-
-    window.addEventListener('offline', () => {
-      clearScheduledRetry();
-    });
-
-    // Re-flush quando una nuova operazione è stata accodata (consente sync immediato online)
-    window.addEventListener('pwa:enqueued', () => {
-      if (navigator.onLine) {
-        flushOutbox({ reason: 'enqueued' }).catch(console.error);
-      }
-    });
-
-    startPeriodicCheck();
+    // Modalità manuale: nessun trigger automatico di flush.
+    // I listener sono lasciati per mantenere un lifecycle prevedibile.
+    window.addEventListener('online', () => {});
+    window.addEventListener('offline', () => {});
   }
 
   global.syncEngine = {

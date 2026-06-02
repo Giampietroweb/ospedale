@@ -534,7 +534,7 @@
     const time = formatShortTime(new Date().toISOString());
     const messages = {
       saved: `<strong>Salvato sul server</strong> alle ${time}`,
-      queued: `<strong>Salvato in locale</strong> alle ${time} — sarà sincronizzato al ritorno online`,
+      queued: `<strong>Salvato in locale</strong> alle ${time} — in attesa di sincronizzazione manuale`,
       error: `<strong>Errore sincronizzazione</strong>${errorMessage ? ': ' + escapeHtml(errorMessage) : ''}`,
     };
 

@@ -88,11 +88,15 @@ import { fileURLToPath } from 'node:url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 function loadSyncEngine({ offlineStore, fetchImpl, isOnline = true }) {
+  const eventHandlers = new Map();
   const mockWindow = {
     offlineStore,
     syncUI: null,
     navigator: { onLine: isOnline },
-    addEventListener: () => {},
+    addEventListener: (type, handler) => {
+      if (!eventHandlers.has(type)) eventHandlers.set(type, []);
+      eventHandlers.get(type).push(handler);
+    },
     fetch: fetchImpl,
   };
 
@@ -111,7 +115,14 @@ function loadSyncEngine({ offlineStore, fetchImpl, isOnline = true }) {
     return window.syncEngine;
   `);
 
-  return fn(mockWindow);
+  const engine = fn(mockWindow);
+  return {
+    engine,
+    dispatch(type) {
+      const handlers = eventHandlers.get(type) || [];
+      handlers.forEach((handler) => handler());
+    },
+  };
 }
 
 // ── Test suite ─────────────────────────────────────────────────────────────────
@@ -124,7 +135,7 @@ async function runTests() {
   {
     const store = createMockOfflineStore([]);
     let fetchCalled = false;
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => { fetchCalled = true; },
       isOnline: true,
@@ -141,7 +152,7 @@ async function runTests() {
     const store = createMockOfflineStore([op]);
     let events = [];
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => ({
         ok: true,
@@ -167,7 +178,7 @@ async function runTests() {
     const op = { id: 'op-2', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {} };
     const store = createMockOfflineStore([op]);
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => ({
         ok: false,
@@ -190,7 +201,7 @@ async function runTests() {
     const op = { id: 'op-3', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {} };
     const store = createMockOfflineStore([op]);
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => ({
         ok: false,
@@ -213,7 +224,7 @@ async function runTests() {
     const store = createMockOfflineStore([op]);
     let fetchCalled = false;
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => { fetchCalled = true; },
       isOnline: false,
@@ -231,7 +242,7 @@ async function runTests() {
     const received = [];
     const handler = (e) => received.push(e.type);
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => ({
         ok: true,
@@ -260,7 +271,7 @@ async function runTests() {
     const op = { id: 'op-7', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {}, attemptCount: 0 };
     const store = createMockOfflineStore([op]);
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => ({ ok: true, json: async () => ({ ok: true }), status: 200 }),
       isOnline: true,
@@ -281,7 +292,7 @@ async function runTests() {
     const op = { id: 'op-8', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {} };
     const store = createMockOfflineStore([op]);
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => ({ ok: true, json: async () => ({ ok: true }), status: 200 }),
       isOnline: true,
@@ -303,7 +314,7 @@ async function runTests() {
     const store = createMockOfflineStore([op]);
     let callCount = 0;
 
-    const engine = loadSyncEngine({
+    const { engine } = loadSyncEngine({
       offlineStore: store,
       fetchImpl: async () => {
         callCount++;
@@ -321,6 +332,63 @@ async function runTests() {
     assert(callCount === 2, 'lock rilasciato: secondo flush procede');
     const finalOp = store.getOps().find((o) => o.id === 'op-9');
     assert(finalOp.status === 'synced', 'op finalmente sincronizzata');
+  }
+
+  // Test 10: init non avvia sincronizzazione automatica
+  console.log('\ninit() — nessun trigger automatico');
+  {
+    const op = { id: 'op-10', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {} };
+    const store = createMockOfflineStore([op]);
+    let callCount = 0;
+
+    const { engine, dispatch } = loadSyncEngine({
+      offlineStore: store,
+      fetchImpl: async () => {
+        callCount++;
+        return { ok: true, json: async () => ({ ok: true }), status: 200 };
+      },
+      isOnline: true,
+    });
+
+    engine.init();
+    await sleep(20);
+    assert(callCount === 0, 'init non esegue flush automatico al bootstrap');
+
+    dispatch('online');
+    await sleep(20);
+    assert(callCount === 0, 'evento online non esegue flush automatico');
+
+    dispatch('pwa:enqueued');
+    await sleep(20);
+    assert(callCount === 0, 'evento pwa:enqueued non esegue flush automatico');
+
+    await engine.flushOutbox({ reason: 'manual-test' });
+    assert(callCount === 1, 'flush manuale continua a funzionare');
+  }
+
+  // Test 11: nessun auto-retry dopo errore rete/5xx
+  console.log('\nflushOutbox — nessun auto-retry');
+  {
+    const op = { id: 'op-11', status: 'pending', createdAt: new Date().toISOString(), action: 'saveField', payload: {} };
+    const store = createMockOfflineStore([op]);
+    let callCount = 0;
+
+    const { engine } = loadSyncEngine({
+      offlineStore: store,
+      fetchImpl: async () => {
+        callCount++;
+        return { ok: false, json: async () => ({ ok: false, error: 'Internal Server Error' }), status: 500 };
+      },
+      isOnline: true,
+    });
+
+    await engine.flushOutbox({ reason: 'manual-test' });
+    assert(callCount === 1, 'errore transitorio esegue un solo tentativo');
+    const interimOp = store.getOps().find((o) => o.id === 'op-11');
+    assert(interimOp.status === 'pending', 'operazione resta pending dopo errore transitorio');
+
+    await sleep(1200);
+    assert(callCount === 1, 'nessun retry automatico nel tempo');
   }
 
   // Riepilogo
