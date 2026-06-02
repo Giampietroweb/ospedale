@@ -700,25 +700,26 @@ async function saveRoomFragment(action, extraPayload) {
     throw new Error('Contesto stanza non valido');
   }
 
-  const response = await fetch('../api/save-modal.php', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      action,
-      roomRef,
-      autoAttributes: buildAutoAttributesPayload(),
-      ...extraPayload
-    })
-  });
+  const result = await window.apiClient.saveRoom(
+    action,
+    roomRef,
+    buildAutoAttributesPayload(),
+    extraPayload
+  );
 
-  const payload = await response.json();
-  if (!response.ok || !payload?.ok) {
-    throw new Error(payload?.error || `HTTP ${response.status}`);
+  if (result.status === 'queued') {
+    if (window.syncUI) {
+      window.syncUI.showSaveStatus('queued');
+      window.syncUI.updateQueueBadge();
+    }
+    return { ok: true, queued: true, operationId: result.operationId };
   }
 
-  return payload;
+  if (window.syncUI) {
+    window.syncUI.showSaveStatus('saved');
+  }
+
+  return result.payload;
 }
 
 function showSaveError(message) {

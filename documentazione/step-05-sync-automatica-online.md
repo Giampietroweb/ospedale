@@ -3,6 +3,12 @@
 ## Obiettivo dello step
 Svuotare in sicurezza la coda outbox quando la connessione ritorna, con retry controllato e ordine stabile.
 
+## Nota aggiornamento
+Nel comportamento corrente dell'app, la sincronizzazione è stata resa **solo manuale**:
+- nessun flush automatico su bootstrap, evento `online`, enqueue o timer periodico;
+- le operazioni `pending` vengono inviate solo con azione utente esplicita (es. pulsante "Sincronizza ora");
+- in caso di errore di rete/5xx, le operazioni restano `pending` fino al successivo avvio manuale.
+
 ## Prompt da lanciare
 ```text
 Implementa lo Step 05 nel progetto "ospedale": sync automatica della coda outbox quando torna la connessione.

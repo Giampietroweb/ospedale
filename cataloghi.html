@@ -5,12 +5,15 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Backoffice cataloghi</title>
   <link rel="stylesheet" href="./style.css">
+  <link rel="manifest" href="/manifest.webmanifest">
+  <meta name="theme-color" content="#1e40af">
 </head>
 <body class="estrazioni-page cataloghi-page">
   <nav class="toolbar" aria-label="Navigazione principale">
     <a href="index.html" class="home-cta-link-toolbar">Mappa</a>
     <a href="estrazioni.html" class="home-cta-link-toolbar">Estrazioni</a>
     <a href="cataloghi.html" class="home-cta-link-toolbar" aria-current="page">Cataloghi</a>
+    <a href="sync.html" class="home-cta-link-toolbar">Monitor sync</a>
     <a href="test-ai/" class="home-cta-link-toolbar">Test AI</a>
   </nav>
   <main class="estrazioni-main">
@@ -65,5 +68,6 @@
     </section>
   </main>
   <script src="./cataloghi.js"></script>
+  <script src="/pwa-register.js" defer></script>
 </body>
 </html>

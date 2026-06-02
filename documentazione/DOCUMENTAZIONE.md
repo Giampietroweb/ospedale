@@ -540,6 +540,27 @@ Utente clicca "Esporta Excel"
   → Il browser scarica il file XLSX
 ```
 
+### 8.6 Monitor sincronizzazione persistente
+
+```
+Utente apre sync.html
+  → GET api/sync-history.php (storico persistente da MySQL/sync_operations)
+  → Render tabella storico server (success/error/pending) con dettaglio payload e risposta
+  → In parallelo legge IndexedDB locale per mostrare solo pending/error di questo browser
+
+Utente salva offline
+  → operazione resta in IndexedDB locale (non ancora nello storico server)
+
+Utente clicca "Sincronizza ora"
+  → sync-engine invia le pending locali a save-modal.php
+  → save-modal.php aggiorna rooms/dotazioni e registra evento in sync_operations
+  → refresh monitor: la riga appare nello storico server persistente
+
+Utente cancella cookie/cache/service worker
+  → si azzera la coda locale (IndexedDB) del browser
+  → lo storico server in sync_operations resta disponibile e viene ricaricato da API
+```
+
 ---
 
 ## 9. Configurazione e deploy

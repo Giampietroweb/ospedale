@@ -12,6 +12,7 @@ const OUTPUT_DIR = resolve(PROJECT_ROOT, 'dist');
 
 const ROOT_FILES_TO_COPY = [
   '.env.example',
+  'api-client.js',
   'cataloghi.html',
   'cataloghi.js',
   'composer.json',
@@ -19,11 +20,19 @@ const ROOT_FILES_TO_COPY = [
   'estrazioni.html',
   'estrazioni.js',
   'index.html',
+  'manifest.webmanifest',
+  'offline-store.js',
+  'pwa-register.js',
   'script.js',
+  'service-worker.js',
+  'sync-engine.js',
+  'sync-page.js',
+  'sync-ui.js',
+  'sync.html',
   'style.css'
 ];
 
-const DIRECTORIES_TO_COPY = ['api', 'piani', 'planimetrie', 'vendor'];
+const DIRECTORIES_TO_COPY = ['api', 'assets', 'database', 'icons', 'piani', 'planimetrie', 'vendor'];
 
 const EXCLUDED_RELATIVE_PATHS = new Set(['api/test-db.php']);
 
@@ -47,8 +56,7 @@ const EXCLUDED_DIRECTORY_NAMES = new Set([
   'dist',
   'node_modules',
   'release',
-  'tmp',
-  'vendor'
+  'tmp'
 ]);
 
 function shouldExcludeFile(fileName) {
