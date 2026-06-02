@@ -51,7 +51,8 @@
   function formatRelative(isoString) {
     if (!isoString) return '—';
     const diffSec = Math.round((Date.now() - new Date(isoString).getTime()) / 1000);
-    if (diffSec < 0) return 'in arrivo';
+    if (diffSec < -120) return 'in arrivo';
+    if (diffSec < 0) return 'ora';
     if (diffSec < 5) return 'ora';
     if (diffSec < 60) return `${diffSec}s fa`;
     if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m fa`;

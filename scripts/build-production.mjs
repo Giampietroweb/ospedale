@@ -12,6 +12,7 @@ const OUTPUT_DIR = resolve(PROJECT_ROOT, 'dist');
 
 const ROOT_FILES_TO_COPY = [
   '.env.example',
+  '.htaccess',
   'api-client.js',
   'cataloghi.html',
   'cataloghi.js',
@@ -29,10 +30,11 @@ const ROOT_FILES_TO_COPY = [
   'sync-page.js',
   'sync-ui.js',
   'sync.html',
-  'style.css'
+  'style.css',
+  'toolbar-nav.js'
 ];
 
-const DIRECTORIES_TO_COPY = ['api', 'assets', 'database', 'icons', 'piani', 'planimetrie', 'vendor'];
+const DIRECTORIES_TO_COPY = ['api', 'assets', 'database', 'icons', 'piani', 'planimetrie', 'test-ai', 'vendor'];
 
 const EXCLUDED_RELATIVE_PATHS = new Set(['api/test-db.php']);
 

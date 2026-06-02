@@ -16,9 +16,12 @@
  * 5. Le vecchie cache vengono eliminate nell'handler activate
  */
 
-const CACHE_VERSION = 'app-shell-v3';
+const CACHE_VERSION = 'app-shell-v5';
 const RUNTIME_ASSETS_CACHE = 'runtime-assets-v1';
 const RUNTIME_API_CACHE = 'runtime-api-v1';
+
+/** Include credenziali HTTP (Basic Auth hosting) nelle richieste same-origin. */
+const FETCH_INIT = { credentials: 'include' };
 
 const APP_SHELL_ASSETS = [
   '/',
@@ -88,7 +91,7 @@ async function cacheFirst(request, cacheName) {
   if (cached) return cached;
 
   try {
-    const response = await fetch(request);
+    const response = await fetch(request, FETCH_INIT);
     if (response.ok) {
       cache.put(request, response.clone());
     }
@@ -104,7 +107,7 @@ async function cacheFirst(request, cacheName) {
 async function networkFirstWithTimeout(request, cacheName, timeoutMs) {
   const cache = await caches.open(cacheName);
 
-  const networkPromise = fetch(request.clone()).then((response) => {
+  const networkPromise = fetch(request.clone(), FETCH_INIT).then((response) => {
     if (response.ok) {
       cache.put(request, response.clone());
     }
@@ -129,7 +132,7 @@ async function networkFirstWithTimeout(request, cacheName, timeoutMs) {
 
 async function fallbackToCache(request, cacheName) {
   try {
-    return await fetch(request);
+    return await fetch(request, FETCH_INIT);
   } catch {
     const cache = await caches.open(cacheName);
     const cached = await cache.match(request);
@@ -141,13 +144,30 @@ async function fallbackToCache(request, cacheName) {
   }
 }
 
+async function precacheAppShell(cache) {
+  await Promise.all(
+    APP_SHELL_ASSETS.map(async (url) => {
+      try {
+        const response = await fetch(url, FETCH_INIT);
+        if (response.ok) {
+          await cache.put(url, response);
+        } else {
+          console.warn('[SW] precache skip:', url, response.status);
+        }
+      } catch (err) {
+        console.warn('[SW] precache skip:', url, err);
+      }
+    })
+  );
+}
+
 // ── Lifecycle: Install ────────────────────────────────────────────────────────
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches
       .open(CACHE_VERSION)
-      .then((cache) => cache.addAll(APP_SHELL_ASSETS))
+      .then((cache) => precacheAppShell(cache))
       .then(() => self.skipWaiting())
   );
 });

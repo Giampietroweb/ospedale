@@ -1,0 +1,13 @@
+# Apache / Aruba — document root (contenuto di dist/)
+# NOTA: la "Protezione password directory" del pannello Aruba va DISATTIVATA
+# per questo dominio: con Basic Auth attivo manifest e service worker rispondono 401.
+
+AddType application/manifest+json .webmanifest
+
+<Files ".env">
+    Require all denied
+</Files>
+
+<FilesMatch "^\.env\.">
+    Require all denied
+</FilesMatch>

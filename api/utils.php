@@ -14,6 +14,20 @@ function normalizeInventoryCode(mixed $value): string
     return strtoupper(trim((string)($value ?? '')));
 }
 
+/** Converte datetime MySQL (timezone applicazione) in ISO 8601 per il client. */
+function sqlDateTimeToIso(?string $raw, string $storageTimeZone = 'Europe/Rome'): ?string
+{
+    if ($raw === null || trim($raw) === '') {
+        return null;
+    }
+    try {
+        $date = new DateTimeImmutable($raw, new DateTimeZone($storageTimeZone));
+        return $date->format(DateTimeInterface::ATOM);
+    } catch (Throwable) {
+        return null;
+    }
+}
+
 function normalizeInventoryListForResponse(mixed $value): array
 {
     if (is_array($value)) {

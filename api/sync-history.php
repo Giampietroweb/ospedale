@@ -20,19 +20,6 @@ function parseJsonField(?string $raw): mixed
     return json_last_error() === JSON_ERROR_NONE ? $decoded : null;
 }
 
-function sqlDateTimeToIsoUtc(?string $raw): ?string
-{
-    if ($raw === null || trim($raw) === '') {
-        return null;
-    }
-    try {
-        $date = new DateTimeImmutable($raw, new DateTimeZone('UTC'));
-        return $date->format(DateTimeInterface::ATOM);
-    } catch (Throwable) {
-        return null;
-    }
-}
-
 function normalizeOutcome(?string $value): ?string
 {
     if ($value === null || $value === '') {
@@ -149,8 +136,8 @@ try {
             'action' => $row['action'],
             'outcome' => $row['outcome'],
             'roomRef' => $roomRef,
-            'createdAt' => sqlDateTimeToIsoUtc($row['created_at'] ?? null),
-            'processedAt' => sqlDateTimeToIsoUtc($row['processed_at'] ?? null),
+            'createdAt' => sqlDateTimeToIso($row['created_at'] ?? null),
+            'processedAt' => sqlDateTimeToIso($row['processed_at'] ?? null),
             'errorMessage' => $row['error_message'],
             'requestPayload' => parseJsonField($row['request_payload'] ?? null),
             'responsePayload' => parseJsonField($row['response_payload'] ?? null),
@@ -165,7 +152,7 @@ try {
             'success' => (int)($statsRow['success_count'] ?? 0),
             'error' => (int)($statsRow['error_count'] ?? 0),
             'pending' => (int)($statsRow['pending_count'] ?? 0),
-            'lastSuccessAt' => sqlDateTimeToIsoUtc($statsRow['last_success_at'] ?? null),
+            'lastSuccessAt' => sqlDateTimeToIso($statsRow['last_success_at'] ?? null),
         ],
         'pagination' => [
             'limit' => $limit,
