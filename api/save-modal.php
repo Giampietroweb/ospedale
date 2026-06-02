@@ -194,6 +194,60 @@ function syncAutoAttributesIfEmpty(PDO $pdo, int $roomId, array $autoAttributes,
     $updateStatement->execute();
 }
 
+function encodeJsonForStorage(mixed $value): ?string
+{
+    if ($value === null) {
+        return null;
+    }
+    $encoded = json_encode($value, JSON_UNESCAPED_UNICODE);
+    if ($encoded === false) {
+        return null;
+    }
+    return $encoded;
+}
+
+function recordSyncOperation(PDO $pdo, array $operationData): void
+{
+    $operationId = trim((string)($operationData['operationId'] ?? ''));
+    if ($operationId === '') {
+        return;
+    }
+
+    $insertOpStmt = $pdo->prepare(
+        'INSERT INTO sync_operations (
+            operation_id, action, room_ref, blocco, piano, room_code,
+            request_payload, response_payload, error_message, processed_at, outcome
+         ) VALUES (
+            :operation_id, :action, :room_ref, :blocco, :piano, :room_code,
+            :request_payload, :response_payload, :error_message, NOW(), :outcome
+         )
+         ON DUPLICATE KEY UPDATE
+            action = VALUES(action),
+            room_ref = VALUES(room_ref),
+            blocco = VALUES(blocco),
+            piano = VALUES(piano),
+            room_code = VALUES(room_code),
+            request_payload = VALUES(request_payload),
+            response_payload = VALUES(response_payload),
+            error_message = VALUES(error_message),
+            processed_at = NOW(),
+            outcome = VALUES(outcome)'
+    );
+
+    $insertOpStmt->execute([
+        ':operation_id' => $operationId,
+        ':action' => (string)($operationData['action'] ?? 'unknown'),
+        ':room_ref' => encodeJsonForStorage($operationData['roomRef'] ?? null),
+        ':blocco' => asNullableString($operationData['blocco'] ?? null),
+        ':piano' => asNullableString($operationData['piano'] ?? null),
+        ':room_code' => asNullableString($operationData['roomCode'] ?? null),
+        ':request_payload' => encodeJsonForStorage($operationData['requestPayload'] ?? null),
+        ':response_payload' => encodeJsonForStorage($operationData['responsePayload'] ?? null),
+        ':error_message' => asNullableString($operationData['errorMessage'] ?? null),
+        ':outcome' => (string)($operationData['outcome'] ?? 'pending'),
+    ]);
+}
+
 $allowedFieldMap = [
     'roomCodeName' => 'room_code_name',
     'occupazione' => 'occupazione',
@@ -267,12 +321,29 @@ if ($operationId !== null) {
 
         if (is_array($existingOp) && $existingOp['outcome'] === 'success') {
             // Operazione già processata con successo: risposta idempotente
-            echo json_encode([
+            $idempotentResponse = [
                 'ok' => true,
                 'action' => $action,
                 'idempotent' => true,
                 'operationId' => $operationId,
-            ], JSON_UNESCAPED_UNICODE);
+            ];
+            try {
+                recordSyncOperation($pdoCheck, [
+                    'operationId' => $operationId,
+                    'action' => $action,
+                    'roomRef' => $roomRef,
+                    'blocco' => $blocco,
+                    'piano' => $piano,
+                    'roomCode' => $roomCode,
+                    'requestPayload' => $payload,
+                    'responsePayload' => $idempotentResponse,
+                    'outcome' => 'success',
+                    'errorMessage' => null,
+                ]);
+            } catch (Throwable) {
+                // Best-effort storico operazioni.
+            }
+            echo json_encode($idempotentResponse, JSON_UNESCAPED_UNICODE);
             exit;
         }
     } catch (Throwable) {
@@ -525,26 +596,6 @@ try {
 
     $pdo->commit();
 
-    // Registra l'operazione come completata per deduplicazione futura
-    if ($operationId !== null) {
-        try {
-            $roomRefJson = json_encode($roomRef, JSON_UNESCAPED_UNICODE);
-            $insertOpStmt = $pdo->prepare(
-                'INSERT INTO sync_operations (operation_id, action, room_ref, processed_at, outcome)
-                 VALUES (:operation_id, :action, :room_ref, NOW(), :outcome)
-                 ON DUPLICATE KEY UPDATE processed_at = NOW(), outcome = :outcome'
-            );
-            $insertOpStmt->execute([
-                ':operation_id' => $operationId,
-                ':action' => $action,
-                ':room_ref' => $roomRefJson,
-                ':outcome' => 'success',
-            ]);
-        } catch (Throwable) {
-            // La registrazione è best-effort: non bloccare la risposta
-        }
-    }
-
     $responseData = [
         'ok' => true,
         'action' => $action,
@@ -555,10 +606,49 @@ try {
         $responseData['operationId'] = $operationId;
     }
 
+    // Registra l'operazione come completata e persistente per storico server
+    if ($operationId !== null) {
+        try {
+            recordSyncOperation($pdo, [
+                'operationId' => $operationId,
+                'action' => $action,
+                'roomRef' => $roomRef,
+                'blocco' => $blocco,
+                'piano' => $piano,
+                'roomCode' => $roomCode,
+                'requestPayload' => $payload,
+                'responsePayload' => $responseData,
+                'errorMessage' => null,
+                'outcome' => 'success',
+            ]);
+        } catch (Throwable) {
+            // La registrazione è best-effort: non bloccare la risposta
+        }
+    }
+
     echo json_encode($responseData, JSON_UNESCAPED_UNICODE);
 } catch (Throwable $throwable) {
     if (isset($pdo) && $pdo instanceof PDO && $pdo->inTransaction()) {
         $pdo->rollBack();
+    }
+    if ($operationId !== null) {
+        try {
+            $historyPdo = isset($pdo) && $pdo instanceof PDO ? $pdo : getDatabaseConnection();
+            recordSyncOperation($historyPdo, [
+                'operationId' => $operationId,
+                'action' => $action ?? 'unknown',
+                'roomRef' => $roomRef ?? null,
+                'blocco' => $blocco ?? null,
+                'piano' => $piano ?? null,
+                'roomCode' => $roomCode ?? null,
+                'requestPayload' => $payload ?? null,
+                'responsePayload' => ['ok' => false],
+                'errorMessage' => $throwable->getMessage(),
+                'outcome' => 'error',
+            ]);
+        } catch (Throwable) {
+            // Best-effort storico errori.
+        }
     }
     apiErrorResponse('Errore salvataggio: ' . $throwable->getMessage(), 500);
 }

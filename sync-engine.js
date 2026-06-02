@@ -196,6 +196,25 @@
 
     await store.markOperationPending(operationId, null);
     const result = await performSingleSync(op);
+    if (result.success) {
+      const lastSyncAt = new Date().toISOString();
+      await store.setLastSyncAt(lastSyncAt);
+      await store.setMetadata('lastFlushSummary', {
+        syncedCount: 1,
+        errorCount: 0,
+        remainingCount: await store.countPendingOperations(),
+        elapsedMs: 0,
+        reason: 'single',
+        at: lastSyncAt,
+      });
+      emitEvent('sync:end', {
+        syncedCount: 1,
+        errorCount: 0,
+        remainingCount: await store.countPendingOperations(),
+        elapsedMs: 0,
+        lastSyncAt,
+      });
+    }
     return result;
   }
 

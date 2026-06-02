@@ -10,8 +10,8 @@
 (function (global) {
   'use strict';
 
-  const AUTO_REFRESH_INTERVAL_MS = 5000;
   const MAX_ROWS = 500;
+  const HISTORY_ENDPOINT = 'api/sync-history.php';
 
   const filters = {
     status: '',
@@ -20,9 +20,10 @@
     since: '',
   };
 
-  let autoRefreshTimerId = null;
   let isRefreshing = false;
   let currentRows = [];
+  let localOperationsById = new Map();
+  let lastManualSyncAtOverride = null;
 
   // ── DOM utilities ──────────────────────────────────────────────────────────
 
@@ -36,6 +37,13 @@
     return iso ? window.syncUI.formatRelative(iso) : '—';
   }
 
+  function pickMostRecentIso(firstIso, secondIso) {
+    const firstMs = firstIso ? new Date(firstIso).getTime() : 0;
+    const secondMs = secondIso ? new Date(secondIso).getTime() : 0;
+    if (!firstMs && !secondMs) return null;
+    return firstMs >= secondMs ? firstIso : secondIso;
+  }
+
   function escapeHtml(text) {
     if (text === null || text === undefined) return '';
     const div = document.createElement('div');
@@ -46,7 +54,7 @@
   // ── Descrizione operazione ─────────────────────────────────────────────────
 
   function describePayloadShort(op) {
-    const payload = op.payload || {};
+    const payload = op.payload || op.requestPayload || {};
     const row = payload.row || {};
     switch (op.action) {
       case 'saveField':
@@ -67,7 +75,8 @@
   // ── Filtri ─────────────────────────────────────────────────────────────────
 
   function matchesFilters(op) {
-    if (filters.status && op.status !== filters.status) return false;
+    const uiStatus = op.status === 'success' ? 'synced' : op.status;
+    if (filters.status && uiStatus !== filters.status) return false;
     if (filters.action && op.action !== filters.action) return false;
     if (filters.since) {
       const sinceMs = new Date(filters.since).getTime();
@@ -117,28 +126,35 @@
   function renderRow(op) {
     const room = window.syncUI.describeRoom(op.roomRef);
     const actionName = window.syncUI.actionLabel(op.action);
-    const statusName = window.syncUI.statusLabel(op.status);
+    const uiStatus = op.status === 'success' ? 'synced' : op.status;
+    const statusName = window.syncUI.statusLabel(uiStatus);
     const detail = describePayloadShort(op);
-    const errorMarkup = op.error
-      ? `<div class="sync-row-error" title="${escapeHtml(op.error)}">${escapeHtml(op.error)}</div>`
+    const errorMessage = op.error || op.errorMessage || null;
+    const errorMarkup = errorMessage
+      ? `<div class="sync-row-error" title="${escapeHtml(errorMessage)}">${escapeHtml(errorMessage)}</div>`
       : '';
 
-    const canRetry = op.status === 'pending' || op.status === 'error';
+    const canRetry = op.source === 'local' && (op.status === 'pending' || op.status === 'error');
+    const canDelete = op.source === 'local';
+    const operationTag = op.source === 'local'
+      ? '<div class="sync-row-origin">Locale (questo browser)</div>'
+      : '<div class="sync-row-origin">Storico server</div>';
+    const processedAt = op.processedAt || op.syncedAt || null;
 
     return `
-      <tr class="sync-row sync-row--${op.status}" data-id="${escapeHtml(op.id)}">
-        <td data-label="Stato"><span class="sync-status-pill sync-status-pill--${op.status}">${statusName}</span></td>
+      <tr class="sync-row sync-row--${uiStatus}" data-id="${escapeHtml(op.id)}">
+        <td data-label="Stato"><span class="sync-status-pill sync-status-pill--${uiStatus}">${statusName}</span></td>
         <td data-label="Operazione">${escapeHtml(actionName)}</td>
         <td data-label="Stanza"><code class="sync-room-code">${escapeHtml(room)}</code></td>
-        <td data-label="Dettaglio">${detail}${errorMarkup}</td>
+        <td data-label="Dettaglio">${detail}${operationTag}${errorMarkup}</td>
         <td data-label="Creato" title="${escapeHtml(fmt(op.createdAt))}">${escapeHtml(fmtRelative(op.createdAt))}<br><span class="sync-time-abs">${escapeHtml(fmt(op.createdAt))}</span></td>
         <td data-label="Ultimo tentativo" title="${op.lastAttemptAt ? escapeHtml(fmt(op.lastAttemptAt)) : ''}">${op.lastAttemptAt ? escapeHtml(fmtRelative(op.lastAttemptAt)) : '—'}</td>
-        <td data-label="Sincronizzato" title="${op.syncedAt ? escapeHtml(fmt(op.syncedAt)) : ''}">${op.syncedAt ? escapeHtml(fmtRelative(op.syncedAt)) : '—'}</td>
+        <td data-label="Sincronizzato" title="${processedAt ? escapeHtml(fmt(processedAt)) : ''}">${processedAt ? escapeHtml(fmtRelative(processedAt)) : '—'}</td>
         <td data-label="Tentativi" class="sync-cell-numeric">${op.attemptCount || 0}</td>
         <td data-label="Azioni" class="sync-actions-cell">
           <button type="button" class="sync-row-btn" data-action="detail" data-id="${escapeHtml(op.id)}">Dettaglio</button>
           ${canRetry ? `<button type="button" class="sync-row-btn sync-row-btn--primary" data-action="retry" data-id="${escapeHtml(op.id)}">Riprova</button>` : ''}
-          <button type="button" class="sync-row-btn sync-row-btn--danger" data-action="delete" data-id="${escapeHtml(op.id)}">Elimina</button>
+          ${canDelete ? `<button type="button" class="sync-row-btn sync-row-btn--danger" data-action="delete" data-id="${escapeHtml(op.id)}">Elimina</button>` : ''}
         </td>
       </tr>
     `;
@@ -146,17 +162,89 @@
 
   // ── Aggiornamento dati ─────────────────────────────────────────────────────
 
+  function buildHistoryUrl() {
+    const params = new URLSearchParams();
+    params.set('limit', String(MAX_ROWS));
+    params.set('offset', '0');
+    if (filters.status) {
+      const statusToOutcome = { synced: 'success', error: 'error', pending: 'pending' };
+      const outcome = statusToOutcome[filters.status] || filters.status;
+      params.set('outcome', outcome);
+    }
+    if (filters.action) params.set('action', filters.action);
+    if (filters.roomQuery) params.set('roomQuery', filters.roomQuery);
+    if (filters.since) params.set('since', filters.since);
+    return `${HISTORY_ENDPOINT}?${params.toString()}`;
+  }
+
+  async function fetchServerHistory() {
+    const response = await fetch(buildHistoryUrl(), {
+      headers: { Accept: 'application/json' },
+    });
+    const payload = await response.json().catch(() => null);
+    if (!response.ok || !payload?.ok) {
+      throw new Error(payload?.error || `HTTP ${response.status}`);
+    }
+    return payload;
+  }
+
+  function toUiRowFromServer(row) {
+    const roomRef = row.roomRef || {};
+    const requestPayload = row.requestPayload || {};
+    const responsePayload = row.responsePayload || {};
+    return {
+      id: row.operationId || `${row.action}-${row.createdAt || Date.now()}`,
+      source: 'server',
+      status: row.outcome || 'success',
+      action: row.action || 'unknown',
+      roomRef: {
+        blocco: roomRef.blocco || '',
+        piano: roomRef.piano || '',
+        roomCode: roomRef.roomCode || '',
+      },
+      payload: requestPayload,
+      requestPayload,
+      responsePayload,
+      serverResponse: responsePayload,
+      errorMessage: row.errorMessage || null,
+      error: row.errorMessage || null,
+      createdAt: row.createdAt || null,
+      lastAttemptAt: row.processedAt || null,
+      processedAt: row.processedAt || null,
+      syncedAt: row.processedAt || null,
+      attemptCount: 0,
+    };
+  }
+
+  function toUiRowFromLocal(operation) {
+    return {
+      ...operation,
+      source: 'local',
+      id: operation.id,
+      processedAt: operation.syncedAt || null,
+      requestPayload: operation.payload || null,
+      responsePayload: operation.serverResponse || null,
+      errorMessage: operation.error || null,
+    };
+  }
+
   async function refresh() {
     if (isRefreshing) return;
     isRefreshing = true;
     try {
-      const [ops, stats, lastSyncAt] = await Promise.all([
+      const [historyPayload, localOps, localStats, localLastSyncAt] = await Promise.all([
+        fetchServerHistory(),
         window.offlineStore.listAllOperations({ limit: MAX_ROWS }),
         window.offlineStore.getStats(),
         window.offlineStore.getLastSyncAt(),
       ]);
-      currentRows = ops;
-      renderSummary(stats, lastSyncAt);
+      const localOutstanding = (localOps || []).filter((op) => op.status === 'pending' || op.status === 'error');
+      localOperationsById = new Map(localOutstanding.map((op) => [op.id, op]));
+      const serverRows = (historyPayload.rows || []).map(toUiRowFromServer);
+      const localRows = localOutstanding.map(toUiRowFromLocal);
+      currentRows = [...localRows, ...serverRows];
+      const serverLastSyncAt = historyPayload?.stats?.lastSuccessAt || null;
+      renderSummary(historyPayload.stats || {}, localStats, serverLastSyncAt, localLastSyncAt);
       renderTable();
     } catch (err) {
       console.error('[syncPage] Errore refresh:', err);
@@ -165,16 +253,20 @@
     }
   }
 
-  function renderSummary(stats, lastSyncAt) {
-    $('syncStatPending').textContent = stats.pending || 0;
-    $('syncStatSyncing').textContent = stats.syncing || 0;
-    $('syncStatSynced').textContent = stats.synced || 0;
-    $('syncStatError').textContent = stats.error || 0;
+  function renderSummary(serverStats, localStats, serverLastSyncAt, localLastSyncAt) {
+    $('syncStatPending').textContent = (localStats?.pending || 0);
+    $('syncStatSyncing').textContent = (localStats?.syncing || 0);
+    $('syncStatSynced').textContent = (serverStats.success || 0);
+    $('syncStatError').textContent = (serverStats.error || 0);
 
-    if (lastSyncAt) {
-      $('syncLastSync').innerHTML = `${fmt(lastSyncAt)}<br><span class="sync-time-rel">${fmtRelative(lastSyncAt)}</span>`;
+    const effectiveLastSyncAt = pickMostRecentIso(
+      pickMostRecentIso(serverLastSyncAt, localLastSyncAt),
+      lastManualSyncAtOverride
+    );
+    if (effectiveLastSyncAt) {
+      $('syncLastSync').innerHTML = `${fmt(effectiveLastSyncAt)}<br><span class="sync-time-rel">${fmtRelative(effectiveLastSyncAt)}</span>`;
     } else {
-      $('syncLastSync').textContent = 'Mai';
+      $('syncLastSync').textContent = 'Nessuna sincronizzazione manuale eseguita';
     }
 
     const online = navigator.onLine;
@@ -187,6 +279,8 @@
   // ── Azioni ─────────────────────────────────────────────────────────────────
 
   async function retryOperation(id, btn) {
+    const localOp = localOperationsById.get(id);
+    if (!localOp) return;
     if (btn) {
       btn.disabled = true;
       btn.textContent = '…';
@@ -196,9 +290,12 @@
         alert('Dispositivo offline. Connettiti e riprova.');
         return;
       }
-      const result = await window.syncEngine.syncSingleById(id);
+      const result = await window.syncEngine.syncSingleById(localOp.id);
       if (!result.success && result.reason !== 'already-synced') {
         console.warn('[syncPage] Retry non riuscito:', result);
+      } else if (result.success) {
+        // Aggiornamento UI immediato anche prima del rientro completo dello storico server.
+        lastManualSyncAtOverride = new Date().toISOString();
       }
     } catch (err) {
       console.error('[syncPage] retryOperation:', err);
@@ -212,9 +309,11 @@
   }
 
   async function deleteOperation(id) {
+    const localOp = localOperationsById.get(id);
+    if (!localOp) return;
     if (!confirm('Eliminare definitivamente questa operazione dalla coda locale? L\'azione non può essere annullata.')) return;
     try {
-      await window.offlineStore.deleteOperation(id);
+      await window.offlineStore.deleteOperation(localOp.id);
       await refresh();
     } catch (err) {
       console.error('[syncPage] deleteOperation:', err);
@@ -245,6 +344,7 @@
         return;
       }
       await window.syncEngine.flushOutbox({ reason: 'sync-page' });
+      lastManualSyncAtOverride = new Date().toISOString();
     } catch (err) {
       console.error('[syncPage] flushNow:', err);
     } finally {
@@ -272,30 +372,31 @@
       ['Stato', window.syncUI.statusLabel(op.status)],
       ['Stanza', room],
       ['Creato', fmt(op.createdAt)],
-      ['Ultimo aggiornamento', fmt(op.updatedAt)],
+      ['Origine', op.source === 'local' ? 'Coda locale (questo browser)' : 'Storico server'],
+      ['Ultimo aggiornamento', fmt(op.updatedAt || op.processedAt || op.createdAt)],
       ['Ultimo tentativo', op.lastAttemptAt ? fmt(op.lastAttemptAt) : '—'],
-      ['Sincronizzato', op.syncedAt ? fmt(op.syncedAt) : '—'],
+      ['Sincronizzato', (op.processedAt || op.syncedAt) ? fmt(op.processedAt || op.syncedAt) : '—'],
       ['Tentativi', op.attemptCount || 0],
     ];
-    if (op.error) rows.push(['Ultimo errore', op.error]);
+    if (op.error || op.errorMessage) rows.push(['Ultimo errore', op.error || op.errorMessage]);
 
     meta.innerHTML = rows.map(([k, v]) =>
       `<dt>${escapeHtml(k)}</dt><dd>${escapeHtml(v)}</dd>`
     ).join('');
 
     try {
-      payloadPre.textContent = JSON.stringify(op.payload, null, 2);
+      payloadPre.textContent = JSON.stringify(op.requestPayload || op.payload, null, 2);
     } catch {
       payloadPre.textContent = String(op.payload);
     }
 
-    if (op.serverResponse) {
+    if (op.responsePayload || op.serverResponse) {
       responseTitle.hidden = false;
       responsePre.hidden = false;
       try {
-        responsePre.textContent = JSON.stringify(op.serverResponse, null, 2);
+        responsePre.textContent = JSON.stringify(op.responsePayload || op.serverResponse, null, 2);
       } catch {
-        responsePre.textContent = String(op.serverResponse);
+        responsePre.textContent = String(op.responsePayload || op.serverResponse);
       }
     } else {
       responseTitle.hidden = true;
@@ -312,20 +413,6 @@
     overlay.setAttribute('aria-hidden', 'true');
   }
 
-  // ── Auto-refresh ───────────────────────────────────────────────────────────
-
-  function startAutoRefresh() {
-    if (autoRefreshTimerId) return;
-    autoRefreshTimerId = setInterval(refresh, AUTO_REFRESH_INTERVAL_MS);
-  }
-
-  function stopAutoRefresh() {
-    if (autoRefreshTimerId) {
-      clearInterval(autoRefreshTimerId);
-      autoRefreshTimerId = null;
-    }
-  }
-
   // ── Inizializzazione ───────────────────────────────────────────────────────
 
   function bindFilters() {
@@ -337,11 +424,6 @@
     $('syncBtnRefresh').addEventListener('click', () => refresh());
     $('syncBtnFlush').addEventListener('click', (e) => flushNow(e.currentTarget));
     $('syncBtnClearSynced').addEventListener('click', clearAllSynced);
-
-    $('syncAutoRefresh').addEventListener('change', (e) => {
-      if (e.target.checked) startAutoRefresh();
-      else stopAutoRefresh();
-    });
 
     $('syncDetailClose').addEventListener('click', closeDetailModal);
     $('syncDetailModal').addEventListener('click', (e) => {
@@ -369,7 +451,6 @@
   function init() {
     bindFilters();
     refresh();
-    if ($('syncAutoRefresh').checked) startAutoRefresh();
   }
 
   global.syncPage = { init, refresh };

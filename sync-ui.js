@@ -116,30 +116,11 @@
         <p class="pwa-sync-toolbar__meta" id="pwa-sync-toolbar-last-sync">Ultima sync: —</p>
         <div class="pwa-sync-toolbar__stats" id="pwa-sync-toolbar-stats" aria-live="polite"></div>
         <div class="pwa-sync-toolbar__actions">
-          <button type="button" class="pwa-sync-toolbar__action" id="pwa-sync-toolbar-retry">Riprova ora</button>
           <button type="button" class="pwa-sync-toolbar__action" id="pwa-sync-toolbar-details">Dettagli rapidi</button>
           <a class="pwa-sync-toolbar__action pwa-sync-toolbar__action--link" id="pwa-sync-toolbar-report" href="${syncReportHref()}">Report completo</a>
         </div>
       </div>
     `;
-
-    wrapper.querySelector('#pwa-sync-toolbar-retry').addEventListener('click', async (event) => {
-      event.stopPropagation();
-      const btn = event.currentTarget;
-      btn.disabled = true;
-      btn.textContent = 'Sincronizzando...';
-      try {
-        if (global.syncEngine) await global.syncEngine.flushOutbox({ reason: 'manual' });
-        await refreshDebugPanel();
-        await updateQueueBadge();
-      } catch (err) {
-        console.error('[syncUI] Errore durante "Riprova ora":', err);
-      } finally {
-        btn.disabled = false;
-        btn.textContent = 'Riprova ora';
-        global.toolbarNav?.closeAll();
-      }
-    });
 
     wrapper.querySelector('#pwa-sync-toolbar-details').addEventListener('click', (event) => {
       event.stopPropagation();
@@ -187,11 +168,11 @@
     panel.innerHTML = `
       <header class="pwa-debug-header">
         <div class="pwa-debug-header-text">
-          <h3 class="pwa-debug-title">Monitor sincronizzazione</h3>
+          <h3 class="pwa-debug-title">Monitor sincronizzazione locale</h3>
           <p class="pwa-debug-subtitle" id="pwa-debug-last-sync">Ultima sync: —</p>
         </div>
         <div class="pwa-debug-actions">
-          <button id="pwa-sync-now-btn" type="button" class="pwa-debug-btn pwa-debug-btn--primary">Riprova ora</button>
+          <button id="pwa-sync-now-btn" type="button" class="pwa-debug-btn pwa-debug-btn--primary">Sincronizza ora</button>
           <button id="pwa-debug-close-btn" type="button" class="pwa-debug-close" aria-label="Chiudi pannello">&#x2715;</button>
         </div>
       </header>
@@ -217,8 +198,8 @@
 
       <p id="pwa-sync-status-line" class="pwa-sync-status-line" aria-live="polite"></p>
 
-      <ul id="pwa-debug-list" class="pwa-debug-list" aria-label="Ultime operazioni outbox"></ul>
-      <p id="pwa-debug-empty" class="pwa-debug-empty" hidden>Nessuna operazione registrata.</p>
+      <ul id="pwa-debug-list" class="pwa-debug-list" aria-label="Ultime operazioni outbox locali"></ul>
+      <p id="pwa-debug-empty" class="pwa-debug-empty" hidden>Nessuna operazione locale registrata.</p>
 
       <footer class="pwa-debug-footer">
         <a id="pwa-debug-full-report" class="pwa-debug-footer-link" href="${syncReportHref()}">
@@ -240,10 +221,10 @@
         }
         await refreshDebugPanel();
       } catch (err) {
-        console.error('[syncUI] Errore durante "Riprova ora":', err);
+        console.error('[syncUI] Errore durante "Sincronizza ora":', err);
       } finally {
         btn.disabled = false;
-        btn.textContent = 'Riprova ora';
+        btn.textContent = 'Sincronizza ora';
       }
     });
 
@@ -314,7 +295,7 @@
     if (lastSyncEl) {
       lastSyncEl.textContent = lastSyncAt
         ? `Ultima sync: ${formatShortTime(lastSyncAt)} (${formatRelative(lastSyncAt)})`
-        : 'Nessuna sincronizzazione ancora effettuata';
+        : 'Nessuna sincronizzazione manuale eseguita';
     }
 
     if (!stats) {
@@ -410,7 +391,7 @@
     if (lastSyncAt) {
       el.innerHTML = `Ultima sync: <strong>${formatShortTime(lastSyncAt)}</strong> <span class="pwa-debug-subtitle-rel">(${formatRelative(lastSyncAt)})</span>`;
     } else {
-      el.textContent = 'Nessuna sincronizzazione ancora effettuata';
+      el.textContent = 'Nessuna sincronizzazione manuale eseguita';
     }
   }
 

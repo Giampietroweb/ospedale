@@ -20,7 +20,7 @@ quando richiesto dall'utente, con monitoraggio completo via una pagina dedicata 
 | `api-client.js` | Wrapper POST: online→server, offline→outbox. Emette eventi su `window` |
 | `sync-engine.js` | Motore sync: FIFO, backoff, lock, auto-reflush, retry singolo |
 | `sync-ui.js` | Badge rete/coda, pannello monitor floating, feedback modale |
-| `sync.html` + `sync-page.js` | Report completo navigabile delle operazioni outbox |
+| `sync.html` + `sync-page.js` | Monitor server-first: storico persistente + coda locale corrente |
 
 ---
 
@@ -128,13 +128,13 @@ viene saltato per lock, emette l'evento `sync:skipped` con `reason: 'lock'`.
 
 ## Pagina Monitor (`/sync.html`)
 
-Pagina dedicata al monitoraggio operazioni offline:
-- **Summary cards**: pending, syncing, synced, error + ultima sincronizzazione + stato rete
+Pagina dedicata al monitoraggio sincronizzazioni in modalità server-first:
+- **Summary cards**: pending/syncing locali (browser corrente), success/error server, ultima sincronizzazione + stato rete
 - **Filtri**: stato, tipo operazione, stanza (substring `blocco/piano/codice`), data minima
-- **Tabella**: stato, operazione, stanza, dettaglio (campo o riga modificata),
-  creato (relativo + assoluto), ultimo tentativo, sincronizzato, tentativi, azioni
+- **Tabella**: unione di storico server persistente e operazioni locali non ancora sincronizzate,
+  con indicazione esplicita dell'origine
 - **Azioni per riga**: "Dettaglio" (apre modale con payload JSON + risposta server),
-  "Riprova" (solo se pending/error), "Elimina"
+  "Riprova"/"Elimina" solo per righe locali pending/error
 - **Azioni globali**: "Sincronizza ora", "Aggiorna", "Elimina sincronizzate"
 - **Auto-refresh** ogni 5s (toggleable)
 
@@ -143,7 +143,7 @@ Pagina dedicata al monitoraggio operazioni offline:
 ## Idempotenza backend
 
 Ogni operazione ha un `operationId` UUID generato lato client.
-Il backend registra ogni `operation_id` nella tabella `sync_operations`.
+Il backend registra ogni `operation_id` nella tabella `sync_operations` come storico persistente.
 Se riceve la stessa operazione due volte, risponde `{ ok: true, idempotent: true }` senza rieseguire.
 
 Politica conflitti: **last-write-wins** basata su `updated_at` del server.
@@ -186,9 +186,8 @@ tra versioni per non perdere le risposte API in cache.
 
 ## Retention IndexedDB
 
-`offlineStore.deleteAllSyncedOperations()` rimuove tutte le operazioni con status `synced`
-mantenendo solo quelle in attesa o in errore. La pagina `/sync.html` espone un pulsante
-"Elimina sincronizzate" che invoca questa funzione.
+`offlineStore.deleteAllSyncedOperations()` rimuove tutte le operazioni locali con status `synced`
+mantenendo solo quelle in attesa o in errore nel browser corrente.
 
 `offlineStore.purgeSyncedOlderThan(milliseconds)` rimuove solo le operazioni `synced`
 più vecchie di N ms. Utile per una pulizia automatica programmata
@@ -214,8 +213,8 @@ più vecchie di N ms. Utile per una pulizia automatica programmata
    Per aggiornarle, scaricare nuovamente in `assets/vendor/` e incrementare
    `RUNTIME_ASSETS_CACHE` nel SW.
 
-6. **Crescita IndexedDB**: senza retention manuale, le operazioni `synced` si accumulano.
-   Usare il pulsante "Elimina sincronizzate" da `/sync.html` o `purgeSyncedOlderThan` programmaticamente.
+6. **Crescita IndexedDB locale**: senza retention manuale, le operazioni `synced` locali si accumulano.
+   Lo storico server in `sync_operations` resta persistente anche dopo pulizia dati sito.
 
 ---
 
