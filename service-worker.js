@@ -16,7 +16,7 @@
  * 5. Le vecchie cache vengono eliminate nell'handler activate
  */
 
-const CACHE_VERSION = 'app-shell-v5';
+const CACHE_VERSION = 'app-shell-v7';
 const RUNTIME_ASSETS_CACHE = 'runtime-assets-v1';
 const RUNTIME_API_CACHE = 'runtime-api-v1';
 
@@ -77,12 +77,78 @@ function isStaticAsset(request) {
   const { pathname } = new URL(request.url);
   return (
     pathname.startsWith('/assets/') ||
+    pathname.startsWith('/planimetrie/') ||
     pathname.endsWith('.css') ||
     pathname.endsWith('.js') ||
     pathname.endsWith('.svg') ||
+    pathname.endsWith('.json') ||
     pathname.endsWith('.png') ||
     pathname.endsWith('.webmanifest')
   );
+}
+
+function offlineNavigationResponse() {
+  return new Response('Pagina non disponibile offline.', {
+    status: 503,
+    headers: { 'Content-Type': 'text/plain; charset=utf-8' },
+  });
+}
+
+/** Risolve varianti URL (/ vs index.html, query string planimetria, ecc.). */
+async function matchNavigationRequest(cache, request) {
+  const { pathname } = new URL(request.url);
+  const candidates = [
+    request,
+    pathname,
+    pathname === '/' ? '/index.html' : null,
+    pathname.endsWith('/') ? `${pathname}index.html` : null,
+  ].filter(Boolean);
+
+  for (const key of candidates) {
+    const hit = await cache.match(key);
+    if (hit) return hit;
+  }
+  return null;
+}
+
+async function putNavigationCache(cache, request, response) {
+  const { pathname } = new URL(request.url);
+  const keys = new Set([pathname || '/index.html']);
+  if (pathname === '/' || pathname === '/index.html') {
+    keys.add('/');
+    keys.add('/index.html');
+  }
+  await Promise.all([...keys].map((key) => cache.put(key, response.clone())));
+}
+
+async function handleNavigation(request, cacheName, event) {
+  const cache = await caches.open(cacheName);
+  const cached = await matchNavigationRequest(cache, request);
+
+  const refreshCache = () =>
+    fetch(request, FETCH_INIT)
+      .then(async (response) => {
+        if (response.ok) {
+          await putNavigationCache(cache, request, response);
+        }
+      })
+      .catch(() => {});
+
+  if (cached) {
+    event.waitUntil(refreshCache());
+    return cached;
+  }
+
+  try {
+    const response = await fetch(request, FETCH_INIT);
+    if (response.ok) {
+      await putNavigationCache(cache, request, response);
+    }
+    return response;
+  } catch {
+    const shell = (await cache.match('/index.html')) || (await cache.match('/'));
+    return shell || offlineNavigationResponse();
+  }
 }
 
 async function cacheFirst(request, cacheName) {
@@ -104,8 +170,20 @@ async function cacheFirst(request, cacheName) {
   }
 }
 
+function offlineApiResponse() {
+  return new Response(JSON.stringify({ ok: false, error: 'Dati non disponibili offline.' }), {
+    status: 503,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  });
+}
+
 async function networkFirstWithTimeout(request, cacheName, timeoutMs) {
   const cache = await caches.open(cacheName);
+  const cached = await cache.match(request);
+
+  if (!self.navigator.onLine) {
+    return cached || offlineApiResponse();
+  }
 
   const networkPromise = fetch(request.clone(), FETCH_INIT).then((response) => {
     if (response.ok) {
@@ -121,26 +199,7 @@ async function networkFirstWithTimeout(request, cacheName, timeoutMs) {
   try {
     return await Promise.race([networkPromise, timeoutPromise]);
   } catch {
-    const cached = await cache.match(request);
-    if (cached) return cached;
-    return new Response(JSON.stringify({ ok: false, error: 'Dati non disponibili offline.' }), {
-      status: 503,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
-    });
-  }
-}
-
-async function fallbackToCache(request, cacheName) {
-  try {
-    return await fetch(request, FETCH_INIT);
-  } catch {
-    const cache = await caches.open(cacheName);
-    const cached = await cache.match(request);
-    if (cached) return cached;
-    return new Response('Pagina non disponibile offline.', {
-      status: 503,
-      headers: { 'Content-Type': 'text/plain; charset=utf-8' },
-    });
+    return cached || offlineApiResponse();
   }
 }
 
@@ -199,7 +258,7 @@ self.addEventListener('fetch', (event) => {
   if (request.method !== 'GET') return;
 
   if (isNavigationRequest(request)) {
-    event.respondWith(fallbackToCache(request, CACHE_VERSION));
+    event.respondWith(handleNavigation(request, CACHE_VERSION, event));
     return;
   }
 

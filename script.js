@@ -3002,15 +3002,38 @@ async function loadRoomDataFromDatabase(roomContext, roomCode, requestToken) {
     piano: roomContext.piano,
     roomCode
   });
+  const roomRef = {
+    blocco: roomContext.blocco,
+    piano: roomContext.piano,
+    roomCode
+  };
 
-  const response = await fetch(`../api/get-room.php?${params.toString()}`);
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
-  }
+  let payload = null;
 
-  const payload = await parseJsonResponseOrThrow(response);
-  if (!payload?.ok) {
-    throw new Error(payload?.error || 'Errore caricamento stanza');
+  try {
+    const response = await fetch(`../api/get-room.php?${params.toString()}`);
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    payload = await parseJsonResponseOrThrow(response);
+    if (!payload?.ok) {
+      throw new Error(payload?.error || 'Errore caricamento stanza');
+    }
+
+    if (window.offlineStore?.saveRoomCache) {
+      window.offlineStore.saveRoomCache(roomRef, payload).catch(() => {});
+    }
+  } catch (error) {
+    if (window.offlineStore?.getRoomCache) {
+      payload = await window.offlineStore.getRoomCache(roomRef).catch(() => null);
+    }
+    if (!payload) {
+      const offlineHint = navigator.onLine
+        ? error.message || 'errore sconosciuto'
+        : 'Dati non in cache. Connettiti e apri la stanza almeno una volta.';
+      throw new Error(offlineHint);
+    }
   }
 
   if (requestToken !== lastModalRequestToken) {
@@ -3020,7 +3043,6 @@ async function loadRoomDataFromDatabase(roomContext, roomCode, requestToken) {
   if (payload.exists) {
     applyRoomAttributesFromPayload(payload.attributiStanza);
     applyTableRowsFromPayload(payload);
-    return;
   }
 }
 

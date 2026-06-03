@@ -4,8 +4,10 @@
  * Gestione IndexedDB per la coda outbox delle operazioni offline.
  * Esposto come window.offlineStore per compatibilità con il vanilla JS esistente.
  *
- * Schema DB v2:
- *   outbox (keyPath: id)
+ * Schema DB v3:
+ *   outbox ...
+ *   metadata ...
+ *   roomCache (keyPath: key) — snapshot GET get-room.php per lettura offline
  *     - id          string (uuid)
  *     - status      'pending' | 'syncing' | 'synced' | 'error'
  *     - action      string  (es. 'saveApparecchiaturaRow')
@@ -28,9 +30,10 @@
   'use strict';
 
   const DB_NAME = 'ospedale_offline_db';
-  const DB_VERSION = 2;
+  const DB_VERSION = 3;
   const OUTBOX_STORE = 'outbox';
   const META_STORE = 'metadata';
+  const ROOM_CACHE_STORE = 'roomCache';
 
   let dbInstance = null;
 
@@ -43,6 +46,13 @@
       return crypto.randomUUID();
     }
     return `${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
+  }
+
+  function makeRoomCacheKey(roomRef) {
+    const blocco = String(roomRef?.blocco ?? '').trim().toLowerCase();
+    const piano = String(roomRef?.piano ?? '').trim();
+    const roomCode = String(roomRef?.roomCode ?? '').trim().toUpperCase();
+    return `${blocco}/${piano}/${roomCode}`;
   }
 
   function openOfflineDb() {
@@ -70,6 +80,10 @@
 
         if (!db.objectStoreNames.contains(META_STORE)) {
           db.createObjectStore(META_STORE, { keyPath: 'key' });
+        }
+
+        if (!db.objectStoreNames.contains(ROOM_CACHE_STORE)) {
+          db.createObjectStore(ROOM_CACHE_STORE, { keyPath: 'key' });
         }
 
         if (outboxStore && tx) {
@@ -132,6 +146,17 @@
       tx.onerror = () => reject(new Error(`Errore transazione metadata: ${tx.error?.message}`));
       tx.onabort = () => reject(new Error(`Transazione metadata annullata: ${tx.error?.message}`));
       fn(tx.objectStore(META_STORE), (value) => { result = value; });
+    }));
+  }
+
+  function runRoomCacheTx(mode, fn) {
+    return openOfflineDb().then((db) => new Promise((resolve, reject) => {
+      const tx = db.transaction(ROOM_CACHE_STORE, mode);
+      let result;
+      tx.oncomplete = () => resolve(result);
+      tx.onerror = () => reject(new Error(`Errore transazione roomCache: ${tx.error?.message}`));
+      tx.onabort = () => reject(new Error(`Transazione roomCache annullata: ${tx.error?.message}`));
+      fn(tx.objectStore(ROOM_CACHE_STORE), (value) => { result = value; });
     }));
   }
 
@@ -359,6 +384,32 @@
     return setMetadata('lastSyncAt', timestampIso || nowIso());
   }
 
+  async function saveRoomCache(roomRef, payload) {
+    const key = makeRoomCacheKey(roomRef);
+    const record = {
+      key,
+      roomRef: {
+        blocco: roomRef.blocco,
+        piano: roomRef.piano,
+        roomCode: roomRef.roomCode,
+      },
+      payload,
+      cachedAt: nowIso(),
+    };
+    return runRoomCacheTx('readwrite', (store, setResult) => {
+      const req = store.put(record);
+      req.onsuccess = () => setResult(record);
+    });
+  }
+
+  async function getRoomCache(roomRef) {
+    const key = makeRoomCacheKey(roomRef);
+    return runRoomCacheTx('readonly', (store, setResult) => {
+      const req = store.get(key);
+      req.onsuccess = () => setResult(req.result?.payload ?? null);
+    });
+  }
+
   global.offlineStore = {
     generateOperationId,
     openOfflineDb,
@@ -381,5 +432,8 @@
     getMetadata,
     getLastSyncAt,
     setLastSyncAt,
+    makeRoomCacheKey,
+    saveRoomCache,
+    getRoomCache,
   };
 })(window);
