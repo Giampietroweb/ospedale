@@ -131,10 +131,49 @@ CREATE TABLE IF NOT EXISTS catalog_accreditamento_locale (
   KEY idx_catalog_accreditamento_locale_active_sort (is_active, sort_order, label)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE IF NOT EXISTS equipment_bundles (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  name VARCHAR(255) NOT NULL,
+  description TEXT NULL,
+  is_active TINYINT(1) NOT NULL DEFAULT 1,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uniq_equipment_bundles_name (name),
+  KEY idx_equipment_bundles_active (is_active, name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS equipment_bundle_items (
+  id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  bundle_id BIGINT UNSIGNED NOT NULL,
+  catalog_apparecchiatura_id BIGINT UNSIGNED NULL,
+  apparecchiatura VARCHAR(255) NULL,
+  tipologia VARCHAR(100) NULL,
+  produttore VARCHAR(255) NULL,
+  modello VARCHAR(255) NULL,
+  qta VARCHAR(50) NULL,
+  nuovo VARCHAR(20) NULL,
+  trasferimento VARCHAR(20) NULL,
+  note TEXT NULL,
+  sort_order INT UNSIGNED NOT NULL DEFAULT 0,
+  created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_equipment_bundle_items_bundle_id (bundle_id),
+  KEY idx_equipment_bundle_items_catalog_apparecchiatura_id (catalog_apparecchiatura_id),
+  CONSTRAINT fk_equipment_bundle_items_bundle
+    FOREIGN KEY (bundle_id) REFERENCES equipment_bundles (id)
+    ON DELETE CASCADE,
+  CONSTRAINT fk_equipment_bundle_items_catalog_apparecchiatura
+    FOREIGN KEY (catalog_apparecchiatura_id) REFERENCES catalog_apparecchiature (id)
+    ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 CREATE TABLE IF NOT EXISTS room_apparecchiature (
   id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   room_id BIGINT UNSIGNED NOT NULL,
   catalog_apparecchiatura_id BIGINT UNSIGNED NULL,
+  bundle_id BIGINT UNSIGNED NULL,
   apparecchiatura VARCHAR(255) NULL,
   tipologia VARCHAR(100) NULL,
   produttore VARCHAR(255) NULL,
@@ -150,11 +189,15 @@ CREATE TABLE IF NOT EXISTS room_apparecchiature (
   PRIMARY KEY (id),
   KEY idx_room_apparecchiature_room_id (room_id),
   KEY idx_room_apparecchiature_catalog_apparecchiatura_id (catalog_apparecchiatura_id),
+  KEY idx_room_apparecchiature_bundle_id (bundle_id),
   CONSTRAINT fk_room_apparecchiature_room
     FOREIGN KEY (room_id) REFERENCES rooms (id)
     ON DELETE CASCADE,
   CONSTRAINT fk_room_apparecchiature_catalog_apparecchiatura
     FOREIGN KEY (catalog_apparecchiatura_id) REFERENCES catalog_apparecchiature (id)
+    ON DELETE SET NULL,
+  CONSTRAINT fk_room_apparecchiature_bundle
+    FOREIGN KEY (bundle_id) REFERENCES equipment_bundles (id)
     ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

@@ -71,6 +71,13 @@ const appNoteInput = document.getElementById('appNoteInput');
 const appAddButton = document.getElementById('appAddButton');
 const appSaveButton = document.getElementById('appSaveButton');
 const appCancelButton = document.getElementById('appCancelButton');
+const bundleApplyTriggerBtn = document.getElementById('bundleApplyTriggerBtn');
+const bundlePicker = document.getElementById('bundlePicker');
+const bundlePickerSelect = document.getElementById('bundlePickerSelect');
+const bundlePickerApplyBtn = document.getElementById('bundlePickerApplyBtn');
+const bundlePickerCancelBtn = document.getElementById('bundlePickerCancelBtn');
+const bundlePickerError = document.getElementById('bundlePickerError');
+const appliedBundlesBanner = document.getElementById('appliedBundlesBanner');
 const apparecchiaturaEditor = document.getElementById('apparecchiaturaEditor');
 let appTipologiaTomSelect = null;
 let appProduttoreTomSelect = null;
@@ -97,6 +104,7 @@ let baseImageWidth = 0;
 let baseImageHeight = 0;
 let activeFieldBeingEdited = null;
 let editingApparecchiaturaIndex = null;
+let availableBundles = [];
 const editingImpiantisticaIndexes = new Set();
 const editingAltreDotazioniIndexes = new Set();
 let requestedFloorName = '';
@@ -727,6 +735,7 @@ function showSaveError(message) {
 }
 
 function resetRoomTables() {
+  hideBundlePicker();
   apparecchiaturaRows.length = 0;
   impiantisticaRows.forEach((row) => {
     row.qtaPresenti = '';
@@ -2250,6 +2259,11 @@ function normalizeApparecchiaturaRow(row) {
   const apparecchiaturaValue = String(safeRow.apparecchiatura || safeRow.tipologia || '-').trim() || '-';
   const serializedInventory = serializeInventarioList(safeRow.inv);
 
+  const bundleIdRaw = safeRow.bundleId ?? safeRow.bundle_id ?? null;
+  const bundleId = bundleIdRaw === null || bundleIdRaw === '' ? null : Number(bundleIdRaw);
+  const bundleNameRaw = safeRow.bundleName ?? safeRow.bundle_name ?? null;
+  const bundleName = bundleNameRaw === null || bundleNameRaw === '' ? null : String(bundleNameRaw).trim();
+
   return {
     apparecchiatura: apparecchiaturaValue,
     tipologia: normalizeApparecchiaturaTipologiaValue(safeRow.tipologia),
@@ -2259,7 +2273,9 @@ function normalizeApparecchiaturaRow(row) {
     nuovo: String(safeRow.nuovo || '-').trim() || '-',
     trasferimento: String(safeRow.trasferimento || '-').trim() || '-',
     inv: serializedInventory || '-',
-    note: String(safeRow.note || '-').trim() || '-'
+    note: String(safeRow.note || '-').trim() || '-',
+    bundleId: Number.isFinite(bundleId) && bundleId > 0 ? bundleId : null,
+    bundleName: bundleName || null
   };
 }
 
@@ -2313,13 +2329,311 @@ function resetApparecchiaturaForm() {
   setApparecchiaturaEditMode(false);
 }
 
+function setBundlePickerError(message) {
+  if (!bundlePickerError) {
+    return;
+  }
+  bundlePickerError.textContent = message || '';
+  bundlePickerError.hidden = !message;
+}
+
+function hideBundlePicker() {
+  if (bundlePicker) {
+    bundlePicker.hidden = true;
+  }
+  if (bundlePickerSelect) {
+    bundlePickerSelect.value = '';
+  }
+  setBundlePickerError('');
+}
+
+function showBundlePicker() {
+  if (!bundlePicker) {
+    return;
+  }
+  bundlePicker.hidden = false;
+  setBundlePickerError('');
+}
+
+function renderBundlePickerOptions() {
+  if (!bundlePickerSelect) {
+    return;
+  }
+  const selectedValue = bundlePickerSelect.value;
+  const optionsMarkup = ['<option value="">— Seleziona un bundle —</option>'];
+  availableBundles.forEach((bundle) => {
+    const bundleId = Number(bundle.id);
+    const itemCount = Number(bundle.itemCount || (bundle.items || []).length || 0);
+    optionsMarkup.push(
+      `<option value="${bundleId}">${escapeHtml(bundle.name)} (${itemCount})</option>`
+    );
+  });
+  bundlePickerSelect.innerHTML = optionsMarkup.join('');
+  if (selectedValue) {
+    bundlePickerSelect.value = selectedValue;
+  }
+}
+
+async function loadAvailableBundles() {
+  try {
+    const response = await fetch('../api/bundles.php?action=list&activeOnly=1&withItems=1');
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    const payload = await parseJsonResponseOrThrow(response);
+    if (!payload?.ok) {
+      throw new Error(payload?.error || 'Errore caricamento bundle');
+    }
+    availableBundles = Array.isArray(payload.bundles) ? payload.bundles : [];
+    renderBundlePickerOptions();
+  } catch (error) {
+    console.error('[BundleLoader] Errore caricamento bundle', error);
+    availableBundles = [];
+    renderBundlePickerOptions();
+  }
+}
+
+function getAppliedBundlesInRoom() {
+  const bundles = [];
+  const seenBundleIds = new Set();
+  apparecchiaturaRows.forEach((row) => {
+    const bundleId = Number(row.bundleId);
+    const bundleName = String(row.bundleName || '').trim();
+    if (!Number.isFinite(bundleId) || bundleId <= 0 || bundleName === '' || seenBundleIds.has(bundleId)) {
+      return;
+    }
+    seenBundleIds.add(bundleId);
+    const rowCount = apparecchiaturaRows.filter((candidate) => Number(candidate.bundleId) === bundleId).length;
+    bundles.push({ id: bundleId, name: bundleName, rowCount });
+  });
+  return bundles;
+}
+
+function renderAppliedBundlesBanner() {
+  if (!appliedBundlesBanner) {
+    return;
+  }
+  const appliedBundles = getAppliedBundlesInRoom();
+
+  if (appliedBundles.length === 0) {
+    appliedBundlesBanner.hidden = true;
+    appliedBundlesBanner.innerHTML = '';
+    return;
+  }
+
+  appliedBundlesBanner.hidden = false;
+  appliedBundlesBanner.innerHTML = appliedBundles.map((bundle) => `
+    <div class="applied-bundle-chip">
+      <span class="applied-bundle-chip-label">Bundle: ${escapeHtml(bundle.name)} (${bundle.rowCount})</span>
+      <button
+        type="button"
+        class="applied-bundle-remove"
+        data-bundle-remove="${bundle.id}"
+        aria-label="Rimuovi associazione bundle ${escapeHtml(bundle.name)}"
+      >
+        Rimuovi
+      </button>
+    </div>
+  `).join('');
+
+  appliedBundlesBanner.querySelectorAll('[data-bundle-remove]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      await removeBundleAssociation(Number(button.dataset.bundleRemove));
+    });
+  });
+}
+
+async function removeBundleAssociation(bundleId) {
+  const numericBundleId = Number(bundleId);
+  const bundleMeta = getAppliedBundlesInRoom().find((bundle) => bundle.id === numericBundleId);
+  if (!bundleMeta) {
+    return;
+  }
+
+  const shouldRemove = window.confirm(
+    `Rimuovere il bundle "${bundleMeta.name}"?\nVerranno eliminate ${bundleMeta.rowCount} apparecchiature associate al bundle.`
+  );
+  if (!shouldRemove) {
+    return;
+  }
+
+  const previousRowsSnapshot = cloneApparecchiaturaRows(apparecchiaturaRows);
+  const previousRowsCount = previousRowsSnapshot.length;
+  const previousEditingIndex = editingApparecchiaturaIndex;
+
+  replaceApparecchiaturaRows(
+    apparecchiaturaRows.filter((row) => Number(row.bundleId) !== numericBundleId)
+  );
+
+  if (previousEditingIndex !== null) {
+    const editedRow = previousRowsSnapshot[previousEditingIndex];
+    if (Number(editedRow?.bundleId) === numericBundleId) {
+      resetApparecchiaturaForm();
+    } else {
+      let removedBeforeEditedRow = 0;
+      previousRowsSnapshot.forEach((row, rowIndex) => {
+        if (rowIndex < previousEditingIndex && Number(row.bundleId) === numericBundleId) {
+          removedBeforeEditedRow += 1;
+        }
+      });
+      editingApparecchiaturaIndex = previousEditingIndex - removedBeforeEditedRow;
+      if (!apparecchiaturaRows[editingApparecchiaturaIndex]) {
+        resetApparecchiaturaForm();
+      }
+    }
+  }
+
+  renderApparecchiaturaTable();
+  setApparecchiaturaRowButtonsDisabled(true);
+  setAppliedBundleRemoveButtonsDisabled(true);
+  if (appAddButton) {
+    appAddButton.disabled = true;
+  }
+  if (appSaveButton) {
+    appSaveButton.disabled = true;
+  }
+  if (appCancelButton) {
+    appCancelButton.disabled = true;
+  }
+
+  try {
+    await persistApparecchiaturaRowsAfterDelete(previousRowsCount);
+  } catch (error) {
+    console.error('[BundleRemove] Errore rimozione associazione bundle', { bundleId: numericBundleId, error });
+    showSaveError(`Errore rimozione bundle: ${error.message || 'errore sconosciuto'}`);
+    apparecchiaturaRows.length = 0;
+    previousRowsSnapshot.forEach((row) => {
+      apparecchiaturaRows.push(row);
+    });
+    editingApparecchiaturaIndex = previousEditingIndex;
+    renderApparecchiaturaTable();
+    return;
+  } finally {
+    setApparecchiaturaRowButtonsDisabled(false);
+    setAppliedBundleRemoveButtonsDisabled(false);
+    if (appAddButton) {
+      appAddButton.disabled = false;
+    }
+    if (appSaveButton) {
+      appSaveButton.disabled = false;
+    }
+    if (appCancelButton) {
+      appCancelButton.disabled = false;
+    }
+  }
+
+  renderApparecchiaturaTable();
+}
+
+async function fetchBundleWithItems(bundleId) {
+  const cachedBundle = availableBundles.find((bundle) => Number(bundle.id) === bundleId);
+  if (cachedBundle && Array.isArray(cachedBundle.items) && cachedBundle.items.length > 0) {
+    return cachedBundle;
+  }
+
+  const response = await fetch(`../api/bundles.php?action=get&id=${encodeURIComponent(bundleId)}`);
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  const payload = await parseJsonResponseOrThrow(response);
+  if (!payload?.ok || !payload.bundle) {
+    throw new Error(payload?.error || 'Bundle non trovato');
+  }
+  return payload.bundle;
+}
+
+async function applyBundle(bundleId) {
+  const numericBundleId = Number(bundleId);
+  if (!Number.isFinite(numericBundleId) || numericBundleId <= 0) {
+    setBundlePickerError('Seleziona un bundle valido.');
+    return;
+  }
+
+  let bundle;
+  try {
+    bundle = await fetchBundleWithItems(numericBundleId);
+  } catch (error) {
+    setBundlePickerError(error.message || 'Errore caricamento bundle');
+    return;
+  }
+
+  const bundleItems = Array.isArray(bundle.items) ? bundle.items : [];
+  if (bundleItems.length === 0) {
+    setBundlePickerError('Il bundle selezionato non contiene apparecchiature.');
+    return;
+  }
+
+  setBundlePickerError('');
+  const startRowIndex = apparecchiaturaRows.length;
+  bundleItems.forEach((item) => {
+    apparecchiaturaRows.push(normalizeApparecchiaturaRow({
+      apparecchiatura: item.apparecchiatura,
+      tipologia: item.tipologia,
+      produttore: item.produttore,
+      modello: item.modello,
+      qta: item.qta,
+      nuovo: item.nuovo,
+      trasferimento: item.trasferimento,
+      inv: '-',
+      note: item.note,
+      bundleId: bundle.id,
+      bundleName: bundle.name
+    }));
+  });
+
+  setApparecchiaturaRowButtonsDisabled(true);
+  setAppliedBundleRemoveButtonsDisabled(true);
+  if (bundleApplyTriggerBtn) {
+    bundleApplyTriggerBtn.disabled = true;
+  }
+  if (bundlePickerApplyBtn) {
+    bundlePickerApplyBtn.disabled = true;
+  }
+  if (appAddButton) {
+    appAddButton.disabled = true;
+  }
+
+  try {
+    for (let rowIndex = startRowIndex; rowIndex < apparecchiaturaRows.length; rowIndex += 1) {
+      await saveApparecchiaturaRow(rowIndex);
+    }
+  } catch (error) {
+    console.error('[BundleApply] Errore applicazione bundle', { bundleId: numericBundleId, error });
+    apparecchiaturaRows.splice(startRowIndex);
+    setBundlePickerError(error.message || 'Errore applicazione bundle');
+    renderApparecchiaturaTable();
+    return;
+  } finally {
+    setApparecchiaturaRowButtonsDisabled(false);
+    setAppliedBundleRemoveButtonsDisabled(false);
+    if (bundleApplyTriggerBtn) {
+      bundleApplyTriggerBtn.disabled = false;
+    }
+    if (bundlePickerApplyBtn) {
+      bundlePickerApplyBtn.disabled = false;
+    }
+    if (appAddButton) {
+      appAddButton.disabled = false;
+    }
+  }
+
+  hideBundlePicker();
+  renderApparecchiaturaTable();
+}
+
 function renderApparecchiaturaTable() {
   const rowsHtml = apparecchiaturaRows.map((row, index) => {
     const normalizedRow = normalizeApparecchiaturaRow(row);
     apparecchiaturaRows[index] = normalizedRow;
+    const bundleBadgeMarkup = normalizedRow.bundleName
+      ? `<span class="bundle-badge" title="Riga da bundle">Bundle: ${escapeHtml(normalizedRow.bundleName)}</span>`
+      : '';
     return `
     <tr>
-      <td>${escapeHtml(normalizedRow.apparecchiatura)}</td>
+      <td>
+        <div class="apparecchiatura-cell-label">${escapeHtml(normalizedRow.apparecchiatura)}</div>
+        ${bundleBadgeMarkup}
+      </td>
       <td>${escapeHtml(normalizedRow.tipologia || '-')}</td>
       <td>${escapeHtml(normalizedRow.produttore)}</td>
       <td>${escapeHtml(normalizedRow.modello)}</td>
@@ -2399,6 +2713,8 @@ function renderApparecchiaturaTable() {
       await handleDeleteApparecchiatura(rowIndex);
     });
   });
+
+  renderAppliedBundlesBanner();
 }
 
 async function saveImpiantisticaRow(rowIndex) {
@@ -2441,19 +2757,24 @@ async function saveApparecchiaturaRow(rowIndex) {
     return;
   }
 
+  const savePayload = {
+    apparecchiatura: normalizeInputValue(row.apparecchiatura),
+    tipologia: normalizeInputValue(row.tipologia),
+    produttore: normalizeInputValue(row.produttore),
+    modello: normalizeInputValue(row.modello),
+    qta: normalizeInputValue(row.qta),
+    nuovo: normalizeInputValue(row.nuovo),
+    trasferimento: normalizeInputValue(row.trasferimento),
+    inv: normalizeInventarioList(row.inv),
+    note: normalizeInputValue(row.note)
+  };
+  if (row.bundleId) {
+    savePayload.bundleId = row.bundleId;
+  }
+
   await saveRoomFragment('saveApparecchiaturaRow', {
     rowIndex,
-    row: {
-      apparecchiatura: normalizeInputValue(row.apparecchiatura),
-      tipologia: normalizeInputValue(row.tipologia),
-      produttore: normalizeInputValue(row.produttore),
-      modello: normalizeInputValue(row.modello),
-      qta: normalizeInputValue(row.qta),
-      nuovo: normalizeInputValue(row.nuovo),
-      trasferimento: normalizeInputValue(row.trasferimento),
-      inv: normalizeInventarioList(row.inv),
-      note: normalizeInputValue(row.note)
-    }
+    row: savePayload
   });
 }
 
@@ -2466,8 +2787,24 @@ function setApparecchiaturaRowButtonsDisabled(disabled) {
   });
 }
 
+function setAppliedBundleRemoveButtonsDisabled(disabled) {
+  if (!appliedBundlesBanner) {
+    return;
+  }
+  appliedBundlesBanner.querySelectorAll('[data-bundle-remove]').forEach((buttonElement) => {
+    buttonElement.disabled = disabled;
+  });
+}
+
 function cloneApparecchiaturaRows(rows) {
   return rows.map((row) => ({ ...row }));
+}
+
+function replaceApparecchiaturaRows(nextRows) {
+  apparecchiaturaRows.length = 0;
+  nextRows.forEach((row) => {
+    apparecchiaturaRows.push(row);
+  });
 }
 
 async function persistApparecchiaturaRowsAfterDelete(previousRowsCount) {
@@ -2475,21 +2812,22 @@ async function persistApparecchiaturaRowsAfterDelete(previousRowsCount) {
     await saveApparecchiaturaRow(rowIndex);
   }
 
-  const orphanRowIndex = previousRowsCount - 1;
-  if (orphanRowIndex >= apparecchiaturaRows.length) {
+  const emptyRowPayload = {
+    apparecchiatura: null,
+    tipologia: null,
+    produttore: null,
+    modello: null,
+    qta: null,
+    nuovo: null,
+    trasferimento: null,
+    inv: [],
+    note: null
+  };
+
+  for (let orphanRowIndex = apparecchiaturaRows.length; orphanRowIndex < previousRowsCount; orphanRowIndex += 1) {
     await saveRoomFragment('saveApparecchiaturaRow', {
       rowIndex: orphanRowIndex,
-      row: {
-        apparecchiatura: null,
-        tipologia: null,
-        produttore: null,
-        modello: null,
-        qta: null,
-        nuovo: null,
-        trasferimento: null,
-        inv: [],
-        note: null
-      }
+      row: emptyRowPayload
     });
   }
 }
@@ -2523,6 +2861,7 @@ async function handleDeleteApparecchiatura(rowIndex) {
 
   renderApparecchiaturaTable();
   setApparecchiaturaRowButtonsDisabled(true);
+  setAppliedBundleRemoveButtonsDisabled(true);
   appAddButton.disabled = true;
   appSaveButton.disabled = true;
   appCancelButton.disabled = true;
@@ -2554,6 +2893,7 @@ async function handleDeleteApparecchiatura(rowIndex) {
     }
     renderApparecchiaturaTable();
     setApparecchiaturaRowButtonsDisabled(false);
+    setAppliedBundleRemoveButtonsDisabled(false);
     appAddButton.disabled = false;
     appSaveButton.disabled = false;
     appCancelButton.disabled = false;
@@ -2562,6 +2902,7 @@ async function handleDeleteApparecchiatura(rowIndex) {
 
   renderApparecchiaturaTable();
   setApparecchiaturaRowButtonsDisabled(false);
+  setAppliedBundleRemoveButtonsDisabled(false);
   appAddButton.disabled = false;
   appSaveButton.disabled = false;
   appCancelButton.disabled = false;
@@ -3044,6 +3385,8 @@ async function loadRoomDataFromDatabase(roomContext, roomCode, requestToken) {
     applyRoomAttributesFromPayload(payload.attributiStanza);
     applyTableRowsFromPayload(payload);
   }
+
+  await loadAvailableBundles();
 }
 
 async function parseJsonResponseOrThrow(response) {
@@ -3286,6 +3629,10 @@ function openModal(textValue) {
     showSaveError('Impossibile derivare blocco e piano dalla URL');
     return;
   }
+
+  loadAvailableBundles().catch((error) => {
+    console.error('[BundleLoader] Errore caricamento bundle in modale', error);
+  });
 
   loadRoomDataFromDatabase(floorContext, roomCode, requestToken).catch((error) => {
     console.error('[RoomLoad] Errore caricamento stanza', error);
@@ -3557,12 +3904,12 @@ async function handleSaveApparecchiatura() {
     window.alert('Qta deve essere maggiore di 0.');
     return;
   }
+  const rowIndex = editingApparecchiaturaIndex;
   const updatedRow = normalizeApparecchiaturaRow({
+    ...apparecchiaturaRows[rowIndex],
     ...rawUpdatedRow,
     qta: qtaValue
   });
-
-  const rowIndex = editingApparecchiaturaIndex;
   apparecchiaturaRows[rowIndex] = updatedRow;
   const dirtyFieldKeys = getDirtyApparecchiaturaFieldKeys();
   appSaveButton.disabled = true;
@@ -3615,6 +3962,15 @@ appSaveButton.addEventListener('click', async () => {
   await handleSaveApparecchiatura();
 });
 appCancelButton.addEventListener('click', resetApparecchiaturaForm);
+bundleApplyTriggerBtn?.addEventListener('click', () => {
+  showBundlePicker();
+});
+bundlePickerCancelBtn?.addEventListener('click', () => {
+  hideBundlePicker();
+});
+bundlePickerApplyBtn?.addEventListener('click', async () => {
+  await applyBundle(bundlePickerSelect?.value);
+});
 sectionApparecchiaturaButton.addEventListener('click', () => setActiveModalSection('apparecchiatura'));
 sectionImpiantisticaButton.addEventListener('click', () => setActiveModalSection('impiantistica'));
 sectionAltreDotazioniButton.addEventListener('click', () => setActiveModalSection('altre-dotazioni'));

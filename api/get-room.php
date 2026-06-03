@@ -64,16 +64,19 @@ try {
     $apparecchiatureStatement = $pdo->prepare(
         'SELECT
             COALESCE(ca.label, ra.apparecchiatura) AS apparecchiatura,
-            tipologia,
-            produttore,
-            modello,
-            qta,
-            nuovo,
-            trasferimento,
-            inv,
-            note
+            ra.tipologia,
+            ra.produttore,
+            ra.modello,
+            ra.qta,
+            ra.nuovo,
+            ra.trasferimento,
+            ra.inv,
+            ra.note,
+            ra.bundle_id AS bundleId,
+            eb.name AS bundleName
          FROM room_apparecchiature ra
          LEFT JOIN catalog_apparecchiature ca ON ca.id = ra.catalog_apparecchiatura_id
+         LEFT JOIN equipment_bundles eb ON eb.id = ra.bundle_id
          WHERE ra.room_id = :room_id
          ORDER BY ra.sort_order ASC, ra.id ASC'
     );

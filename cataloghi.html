@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Backoffice cataloghi</title>
   <link rel="stylesheet" href="./style.css">
+  <link rel="stylesheet" href="/assets/vendor/tom-select.css">
   <link rel="manifest" href="/manifest.webmanifest">
   <meta name="theme-color" content="#1e40af">
 </head>
@@ -56,6 +57,58 @@
         <button id="catalogAddBtn" type="button" class="estrazioni-search-btn">Salva</button>
       </div>
       <p id="catalogError" class="estrazioni-error" hidden></p>
+
+      <details id="bundleSection" class="bundle-section-disclosure" hidden>
+        <summary class="bundle-section-toggle">Bundle apparecchiature</summary>
+        <div class="bundle-section-panel bundle-section" aria-label="Bundle apparecchiature">
+        <p class="estrazioni-intro bundle-section-intro">
+          Crea preset riutilizzabili di apparecchiature da associare rapidamente alle stanze.
+        </p>
+        <div class="bundle-section-actions">
+          <button id="bundleCreateBtn" type="button" class="estrazioni-search-btn">Crea bundle</button>
+        </div>
+
+        <div id="bundleForm" class="bundle-form" hidden>
+          <input id="bundleEditId" type="hidden" value="">
+          <fieldset class="bundle-form-meta">
+            <legend class="bundle-form-meta-legend">Dati bundle</legend>
+            <div class="bundle-form-meta-grid">
+              <label class="bundle-form-field" for="bundleNameInput">
+                <span class="bundle-form-label">Nome bundle</span>
+                <input id="bundleNameInput" type="text" placeholder="Es. Stanza standard degenza" required>
+              </label>
+              <label class="bundle-form-field bundle-form-field-wide" for="bundleDescInput">
+                <span class="bundle-form-label">Descrizione <span class="bundle-form-label-optional">(opzionale)</span></span>
+                <textarea id="bundleDescInput" rows="3" placeholder="Note sul bundle"></textarea>
+              </label>
+            </div>
+          </fieldset>
+          <div class="bundle-items-editor">
+            <div class="bundle-items-editor-header">
+              <h3 class="bundle-items-title">Apparecchiature nel bundle</h3>
+              <button id="bundleAddItemBtn" type="button" class="estrazioni-page-btn">Aggiungi riga</button>
+            </div>
+            <div id="bundleItemsContainer" class="bundle-items-container"></div>
+          </div>
+          <div class="estrazioni-actions">
+            <button id="bundleSaveBtn" type="button" class="estrazioni-search-btn">Salva bundle</button>
+            <button id="bundleCancelBtn" type="button" class="estrazioni-page-btn">Annulla</button>
+          </div>
+          <p id="bundleError" class="estrazioni-error" hidden></p>
+        </div>
+
+        <div class="estrazioni-results bundle-section-results">
+          <div class="estrazioni-results-scroll">
+            <table class="estrazioni-table">
+              <thead>
+                <tr><th>ID</th><th>Nome</th><th>N. righe</th><th>Attivo</th><th>Azioni</th></tr>
+              </thead>
+              <tbody id="bundleTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+        </div>
+      </details>
     </section>
 
     <section class="estrazioni-results" aria-label="Voci catalogo">
@@ -67,6 +120,7 @@
       </div>
     </section>
   </main>
+  <script src="/assets/vendor/tom-select.complete.min.js"></script>
   <script src="./cataloghi.js"></script>
   <script src="/pwa-register.js" defer></script>
 </body>

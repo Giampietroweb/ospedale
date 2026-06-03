@@ -548,6 +548,19 @@ try {
             'catalog_apparecchiature',
             $normalizedRow['apparecchiatura']
         );
+        $bundleId = asNullableInt($row['bundleId'] ?? null);
+        if ($bundleId !== null && $bundleId <= 0) {
+            $bundleId = null;
+        }
+        if ($bundleId !== null) {
+            $bundleCheckStatement = $pdo->prepare(
+                'SELECT id FROM equipment_bundles WHERE id = :bundle_id AND is_active = 1 LIMIT 1'
+            );
+            $bundleCheckStatement->execute([':bundle_id' => $bundleId]);
+            if (!$bundleCheckStatement->fetch(PDO::FETCH_ASSOC)) {
+                $bundleId = null;
+            }
+        }
 
         $hasUsefulValue = array_filter($normalizedRow, static fn($value) => $value !== null) !== [];
         $existingRoom = fetchExistingRoom($pdo, $blocco, $piano, $roomCode);
@@ -564,14 +577,15 @@ try {
             if ($hasUsefulValue) {
                 $insertStatement = $pdo->prepare(
                     'INSERT INTO room_apparecchiature (
-                        room_id, catalog_apparecchiatura_id, apparecchiatura, tipologia, produttore, modello, qta, nuovo, trasferimento, inv, note, sort_order
+                        room_id, catalog_apparecchiatura_id, bundle_id, apparecchiatura, tipologia, produttore, modello, qta, nuovo, trasferimento, inv, note, sort_order
                     ) VALUES (
-                        :room_id, :catalog_apparecchiatura_id, :apparecchiatura, :tipologia, :produttore, :modello, :qta, :nuovo, :trasferimento, :inv, :note, :sort_order
+                        :room_id, :catalog_apparecchiatura_id, :bundle_id, :apparecchiatura, :tipologia, :produttore, :modello, :qta, :nuovo, :trasferimento, :inv, :note, :sort_order
                     )'
                 );
                 $insertStatement->execute([
                     ':room_id' => $roomId,
                     ':catalog_apparecchiatura_id' => $catalogApparecchiaturaId,
+                    ':bundle_id' => $bundleId,
                     ':apparecchiatura' => $normalizedRow['apparecchiatura'],
                     ':tipologia' => $normalizedRow['tipologia'],
                     ':produttore' => $normalizedRow['produttore'],

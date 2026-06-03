@@ -312,10 +312,23 @@
           </div>
           <div class="table-editor-actions">
             <button id="appAddButton" class="table-editor-button table-editor-button-primary" type="button">Aggiungi</button>
+            <button id="bundleApplyTriggerBtn" class="table-editor-button table-editor-button-muted" type="button">Associa bundle</button>
             <button id="appSaveButton" class="table-editor-button table-editor-button-success" type="button" hidden>Salva modifica</button>
             <button id="appCancelButton" class="table-editor-button table-editor-button-muted" type="button" hidden>Annulla</button>
           </div>
         </div>
+        <div id="bundlePicker" class="bundle-picker" hidden>
+          <label class="bundle-picker-label" for="bundlePickerSelect">Seleziona bundle</label>
+          <div class="bundle-picker-controls">
+            <select id="bundlePickerSelect">
+              <option value="">— Seleziona un bundle —</option>
+            </select>
+            <button id="bundlePickerApplyBtn" class="table-editor-button table-editor-button-primary" type="button">Applica</button>
+            <button id="bundlePickerCancelBtn" class="table-editor-button table-editor-button-muted" type="button">Annulla</button>
+          </div>
+          <p id="bundlePickerError" class="bundle-picker-error" hidden></p>
+        </div>
+        <div id="appliedBundlesBanner" class="applied-bundles-banner" hidden></div>
         <table class="modal-table">
           <thead>
             <tr>
