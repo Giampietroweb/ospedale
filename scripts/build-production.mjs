@@ -34,7 +34,58 @@ const ROOT_FILES_TO_COPY = [
   'toolbar-nav.js'
 ];
 
-const DIRECTORIES_TO_COPY = ['api', 'assets', 'database', 'icons', 'piani', 'planimetrie', 'test-ai', 'vendor'];
+const DIRECTORIES_TO_COPY = ['api', 'assets', 'database', 'piani', 'planimetrie', 'test-ai', 'vendor'];
+
+/** File che devono esistere in dist/ dopo la build (fail-fast se mancanti). */
+const REQUIRED_BUILD_FILES = [
+  '.env.example',
+  '.htaccess',
+  'api-client.js',
+  'api/bundles.php',
+  'api/catalog-utils.php',
+  'api/catalogs.php',
+  'api/config.php',
+  'api/database.php',
+  'api/estrazioni-export.php',
+  'api/estrazioni-query.php',
+  'api/estrazioni.php',
+  'api/get-room.php',
+  'api/get-rooms-for-floor.php',
+  'api/save-modal.php',
+  'api/sync-history.php',
+  'api/utils.php',
+  'assets/icons/icon-192.svg',
+  'assets/icons/icon-512.svg',
+  'assets/vendor/tailwind.css',
+  'assets/vendor/tom-select.css',
+  'assets/vendor/tom-select.complete.min.js',
+  'cataloghi.html',
+  'cataloghi.js',
+  'composer.json',
+  'composer.lock',
+  'database/migration-bundles.sql',
+  'database/migration-sync-operations.sql',
+  'database/schema.sql',
+  'estrazioni.html',
+  'estrazioni.js',
+  'index.html',
+  'manifest.webmanifest',
+  'offline-store.js',
+  'piani/planimetria.html',
+  'pwa-register.js',
+  'script.js',
+  'service-worker.js',
+  'style.css',
+  'sync-engine.js',
+  'sync-page.js',
+  'sync-ui.js',
+  'sync.html',
+  'test-ai/api/list-rooms.php',
+  'test-ai/index.html',
+  'test-ai/test-ai.js',
+  'toolbar-nav.js',
+  'vendor/autoload.php',
+];
 
 const EXCLUDED_RELATIVE_PATHS = new Set(['api/test-db.php']);
 
@@ -44,9 +95,12 @@ const EXCLUDED_FILE_PATTERNS = [
   /\.tmp$/i,
   /\.bak$/i,
   /\.backup$/i,
+  /-old\.svg$/i,
   /_old\.svg$/i,
   /\.optimized\.svg$/i,
-  /^REPORT-/i
+  /^REPORT-/i,
+  /^\.DS_Store$/i,
+  /^Thumbs\.db$/i
 ];
 
 const EXCLUDED_DIRECTORY_NAMES = new Set([
@@ -167,6 +221,83 @@ function formatBytes(bytes) {
   return `${value.toFixed(2)} ${units[unitIndex]}`;
 }
 
+async function collectPlanimetrieRequirements() {
+  const planimetrieRoot = resolve(PROJECT_ROOT, 'planimetrie');
+  if (!existsSync(planimetrieRoot)) {
+    return [];
+  }
+
+  const required = [];
+  const entries = await readdir(planimetrieRoot, { withFileTypes: true });
+
+  for (const entry of entries) {
+    if (!entry.isDirectory()) {
+      continue;
+    }
+
+    const floorName = entry.name;
+    const floorFiles = await readdir(resolve(planimetrieRoot, floorName));
+    const mainSvg = `${floorName}.svg`;
+
+    if (floorFiles.includes(mainSvg)) {
+      required.push(`planimetrie/${floorName}/${mainSvg}`);
+    }
+
+    for (const jsonName of [`occorrenze-${floorName}.json`, `occorenze-${floorName}.json`]) {
+      if (floorFiles.includes(jsonName)) {
+        required.push(`planimetrie/${floorName}/${jsonName}`);
+      }
+    }
+  }
+
+  return required;
+}
+
+function assertRequiredBuildFiles(extraRequiredFiles = []) {
+  const requiredFiles = [...REQUIRED_BUILD_FILES, ...extraRequiredFiles];
+  const missingFiles = requiredFiles.filter(
+    (relativePath) => !existsSync(resolve(OUTPUT_DIR, relativePath))
+  );
+
+  if (missingFiles.length > 0) {
+    throw new Error(
+      `Build incompleta: file obbligatori mancanti in dist/:\n${missingFiles.map((file) => `  - ${file}`).join('\n')}`
+    );
+  }
+}
+
+async function assertDistHasNoExcludedArtifacts() {
+  const forbiddenFiles = [];
+
+  async function walkDirectory(directoryPath) {
+    const entries = await readdir(directoryPath, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const entryPath = join(directoryPath, entry.name);
+      if (entry.isDirectory()) {
+        await walkDirectory(entryPath);
+        continue;
+      }
+
+      if (!entry.isFile()) {
+        continue;
+      }
+
+      if (shouldExcludeFile(entry.name)) {
+        forbiddenFiles.push(relative(OUTPUT_DIR, entryPath));
+      }
+    }
+  }
+
+  await walkDirectory(OUTPUT_DIR);
+
+  if (forbiddenFiles.length > 0) {
+    throw new Error(
+      `Build incompleta: file non ammessi presenti in dist/:\n${forbiddenFiles.map((file) => `  - ${file}`).join('\n')}`
+    );
+  }
+}
+
 async function writeManifest(copiedFiles) {
   const outputSizeBytes = await calculateDirectorySize(OUTPUT_DIR);
   const manifest = {
@@ -205,6 +336,10 @@ async function main() {
   for (const directory of DIRECTORIES_TO_COPY) {
     await copyDirectoryFiltered(directory, copiedFiles);
   }
+
+  const planimetrieRequirements = await collectPlanimetrieRequirements();
+  assertRequiredBuildFiles(planimetrieRequirements);
+  await assertDistHasNoExcludedArtifacts();
 
   const manifest = await writeManifest(copiedFiles);
 

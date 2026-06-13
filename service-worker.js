@@ -16,7 +16,7 @@
  * 5. Le vecchie cache vengono eliminate nell'handler activate
  */
 
-const CACHE_VERSION = 'app-shell-v7';
+const CACHE_VERSION = 'app-shell-v8';
 const RUNTIME_ASSETS_CACHE = 'runtime-assets-v1';
 const RUNTIME_API_CACHE = 'runtime-api-v1';
 
@@ -53,6 +53,7 @@ const API_GET_PATHS = [
   '/api/get-room.php',
   '/api/get-rooms-for-floor.php',
   '/api/catalogs.php',
+  '/api/bundles.php',
 ];
 
 const NETWORK_FIRST_TIMEOUT_MS = 4000;
