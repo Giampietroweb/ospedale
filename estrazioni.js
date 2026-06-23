@@ -87,9 +87,17 @@ function labelPiano(piano) {
   return `Piano ${piano}`;
 }
 
-function getSelectedTipo() {
+let selectedTipo = 'attributi_stanza';
+let tipoChangeInProgress = false;
+
+function syncSelectedTipoFromDom() {
   const checked = document.querySelector('input[name="estrazioniTipo"]:checked');
-  return checked && checked.value ? checked.value : 'attributi_stanza';
+  selectedTipo = checked && checked.value ? checked.value : 'attributi_stanza';
+  return selectedTipo;
+}
+
+function getSelectedTipo() {
+  return syncSelectedTipoFromDom();
 }
 
 function getDettaglioLabel(tipo) {
@@ -167,6 +175,40 @@ function setLoading(isLoading) {
     btn.disabled = isLoading;
     btn.setAttribute('aria-busy', isLoading ? 'true' : 'false');
   }
+}
+
+function setExportBusy(isBusy) {
+  const btn = document.getElementById('estrazioniExportBtn');
+  if (btn) {
+    btn.disabled = isBusy;
+    btn.setAttribute('aria-busy', isBusy ? 'true' : 'false');
+  }
+}
+
+function parseFilenameFromContentDisposition(headerValue) {
+  if (!headerValue) {
+    return null;
+  }
+  const utf8Match = headerValue.match(/filename\*=UTF-8''([^;]+)/i);
+  if (utf8Match) {
+    return decodeURIComponent(utf8Match[1]);
+  }
+  const asciiMatch = headerValue.match(/filename="([^"]+)"/i);
+  if (asciiMatch) {
+    return asciiMatch[1];
+  }
+  return null;
+}
+
+function defaultExportFilenameForTipo(tipo) {
+  const tipoSlug = {
+    attributi_stanza: 'attributi-stanza',
+    impiantistica: 'impiantistica',
+    altre_dotazioni: 'altre-dotazioni',
+    apparecchiature: 'apparecchiature',
+  }[tipo] || 'apparecchiature';
+  const stamp = new Date().toISOString().replace(/[-:]/g, '').replace(/\..+/, '').replace('T', '-');
+  return `estrazioni-${tipoSlug}-${stamp}.xlsx`;
 }
 
 function formatInvForCell(inv) {
@@ -543,24 +585,36 @@ async function onPianoChanged() {
 }
 
 async function onTipoChanged() {
+  tipoChangeInProgress = true;
+  setExportBusy(true);
   try {
+    syncSelectedTipoFromDom();
     setErrorMessage('');
     updateDettaglioFilterUi();
+    if (tsDettaglio) {
+      tsDettaglio.clear(true);
+    }
     await loadRootOptions();
     clearResultsTable();
     await runSearch();
   } catch (error) {
     console.error('[Estrazioni] tipo changed', error);
     setErrorMessage(error.message || 'Errore aggiornamento opzioni');
+  } finally {
+    tipoChangeInProgress = false;
+    setExportBusy(false);
   }
 }
 
 function wireTipoListeners() {
-  const tipoInputs = document.querySelectorAll('input[name=\"estrazioniTipo\"]');
+  const tipoInputs = document.querySelectorAll('input[name="estrazioniTipo"]');
   if (!tipoInputs.length) {
     return;
   }
   tipoInputs.forEach((input) => {
+    input.addEventListener('input', () => {
+      syncSelectedTipoFromDom();
+    });
     input.addEventListener('change', () => {
       onTipoChanged();
     });
@@ -615,7 +669,49 @@ function buildSearchUrl() {
 
 function buildExportUrl() {
   const params = buildEstrazioniFilterParams();
+  params.set('_', String(Date.now()));
   return `${EXPORT_URL}?${params.toString()}`;
+}
+
+async function runExport() {
+  if (tipoChangeInProgress) {
+    setErrorMessage('Attendi il completamento del cambio tipo di estrazione.');
+    return;
+  }
+
+  const tipo = syncSelectedTipoFromDom();
+  setErrorMessage('');
+  setExportBusy(true);
+
+  try {
+    const response = await fetch(buildExportUrl(), {
+      credentials: 'include',
+      cache: 'no-store',
+    });
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(errorText || `HTTP ${response.status}`);
+    }
+
+    const blob = await response.blob();
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = downloadUrl;
+    link.download =
+      parseFilenameFromContentDisposition(response.headers.get('Content-Disposition')) ||
+      defaultExportFilenameForTipo(tipo);
+    link.rel = 'noopener';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(downloadUrl);
+  } catch (error) {
+    console.error('[Estrazioni] export', error);
+    setErrorMessage(error.message || 'Errore durante l\'export Excel');
+  } finally {
+    setExportBusy(false);
+  }
 }
 
 function clearAllTomSelectFilters() {
@@ -674,6 +770,7 @@ async function resetFilters() {
   if (radioToSelect) {
     radioToSelect.checked = true;
   }
+  syncSelectedTipoFromDom();
 
   setErrorMessage('');
   setLoading(true);
@@ -734,8 +831,7 @@ document.getElementById('estrazioniSearchBtn')?.addEventListener('click', () => 
 });
 
 document.getElementById('estrazioniExportBtn')?.addEventListener('click', () => {
-  setErrorMessage('');
-  window.location.assign(buildExportUrl());
+  runExport();
 });
 
 document.getElementById('estrazioniResetBtn')?.addEventListener('click', () => {
@@ -773,6 +869,7 @@ document.getElementById('estrazioniPageSize')?.addEventListener('change', (event
 if (!initTomSelects()) {
   // stop
 } else {
+  syncSelectedTipoFromDom();
   updateDettaglioFilterUi();
   renderTableHead(getSelectedTipo());
   updatePaginationUi(0);

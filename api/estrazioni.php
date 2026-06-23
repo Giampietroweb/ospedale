@@ -26,7 +26,7 @@ function readPianoParam(): string
 
 function readTipoParam(): string
 {
-    $tipo = trim((string)($_GET['tipo'] ?? 'apparecchiature'));
+    $tipo = trim((string)($_GET['tipo'] ?? 'attributi_stanza'));
     if (!in_array($tipo, ESTRAZIONI_VALID_TIPI, true)) {
         apiErrorResponse('tipo non valido');
     }

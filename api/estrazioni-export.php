@@ -82,7 +82,9 @@ $filename = 'estrazioni-' . $tipoSlug . '-' . date('Ymd-His') . '.xlsx';
 
 header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
 header('Content-Disposition: attachment; filename="' . $filename . '"');
-header('Cache-Control: private, max-age=0');
+header('Cache-Control: no-store, no-cache, must-revalidate');
+header('Pragma: no-cache');
+header('Expires: 0');
 
 $writer = new Xlsx($spreadsheet);
 $writer->save('php://output');

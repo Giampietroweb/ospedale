@@ -96,7 +96,7 @@ function estrazioniBuildRoomWhereAndParams(array $filters): array
  */
 function parseEstrazioniFiltersFromGet(array $get): array
 {
-    $tipo = trim((string)($get['tipo'] ?? 'apparecchiature'));
+    $tipo = trim((string)($get['tipo'] ?? 'attributi_stanza'));
     if (!in_array($tipo, ESTRAZIONI_VALID_TIPI, true)) {
         throw new InvalidArgumentException('tipo non valido');
     }
